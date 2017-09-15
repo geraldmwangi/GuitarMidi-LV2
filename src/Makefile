@@ -1,10 +1,10 @@
 CC = g++
-CXXFLAGS = 
+CXXFLAGS = -fPIC -DPIC
 LDFLAGS =
 NAME= guitarmidi
 CPPFILES= $(NAME).c
 $(NAME):
-	$(CC) -shared -o $(NAME).so -fPIC $(CPPFILES)
+	$(CC) -shared -o $(NAME).so $(CXXFLAGS) $(CPPFILES)
 
 clear:
 	rm -f *.o
