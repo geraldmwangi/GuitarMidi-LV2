@@ -1,0 +1,6 @@
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://github.com/geraldmwangi/GuitarMidi-LV2> a lv2:Plugin .
+<http://github.com/geraldmwangi/GuitarMidi-LV2>	lv2:Binary <guitarmidi.so> .
+<http://github.com/geraldmwangi/GuitarMidi-LV2>	rdfs:seeAlso <guitarmidi.ttl> .
