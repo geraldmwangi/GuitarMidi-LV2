@@ -1,5 +1,7 @@
 #pragma once
 #include <DspFilters/Dsp.h>
+#include <aubio/aubio.h>
+#include <aubio/pitch/pitch.h>
 
 typedef enum
 {
@@ -7,7 +9,7 @@ typedef enum
     NOTECL_OUTPUT = 1
 } PortIndex;
 #define FILTERORDER 4 // the real order is 2*MAXORDER
-#define MAXORDER 20 // the real order is 2*MAXORDER
+#define MAXORDER 4 // the real order is 2*MAXORDER
 /**
  * @brief Implementing an elliptic band pass filter from the DSPFilters repo
  *
@@ -19,6 +21,16 @@ private:
     float m_bandwidth;
     float m_passbandatten;
     float m_samplerate;
+
+    aubio_pitch_t* mPitchDetector;
+    fvec_t* m_pitchfreq;
+    float* m_pitchbuffer;
+    int m_pitchBufferCounter;
+    int mInBufSize;
+    int mBufferSize;
+
+    bool m_noteOnOffState;
+    bool m_oldNoteOnOffState;
 
     Dsp::SimpleFilter <Dsp::Elliptic::BandPass<MAXORDER>, 1> m_filter[FILTERORDER];
 

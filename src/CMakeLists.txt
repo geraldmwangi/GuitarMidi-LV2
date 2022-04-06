@@ -5,7 +5,7 @@ include_directories(include)
 set(SRC guitarmidi.cpp  noteclassifier.cpp)
 
 add_library(guitarmidi SHARED ${SRC})
-target_link_libraries(guitarmidi dsp)
+target_link_libraries(guitarmidi dsp aubio)
 
 install(TARGETS guitarmidi
         DESTINATION guitarmidi.lv2)
