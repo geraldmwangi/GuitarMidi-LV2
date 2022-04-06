@@ -6,4 +6,5 @@
 *.cpp.o
 *.cpp.d
 Makefile~
+build
 bin

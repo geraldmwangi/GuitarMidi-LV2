@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "bandpassfilter.h": "c",
+        "cassert": "cpp",
+        "math.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Enabled"
+}

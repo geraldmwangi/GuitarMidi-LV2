@@ -74,10 +74,11 @@ typedef struct
    stored, since there is no additional instance data.
 */
 
-typedef struct {
-        float   beat_time;
-        uint8_t size;
-        uint8_t event[3];
+typedef struct
+{
+    float beat_time;
+    uint8_t size;
+    uint8_t event[3];
 } MIDISequence;
 
 typedef struct
@@ -109,11 +110,11 @@ instantiate(const LV2_Descriptor *descriptor,
             const LV2_Feature *const *features)
 {
     TestMidi *testmidi = (TestMidi *)calloc(1, sizeof(TestMidi));
-    testmidi->srate=rate;
-    testmidi->current_sample=0;
-    testmidi->noteon_time_s=1;
-    testmidi->note_freq=110;
-    testmidi->note_is_on=false;
+    testmidi->srate = rate;
+    testmidi->current_sample = 0;
+    testmidi->noteon_time_s = 1;
+    testmidi->note_freq = 110;
+    testmidi->note_is_on = false;
 
     return (LV2_Handle)testmidi;
 }
@@ -165,61 +166,67 @@ static void
 run(LV2_Handle instance, uint32_t n_samples)
 {
     TestMidi *testmidi = (TestMidi *)instance;
-      // Get the capacity
-  const uint32_t out_capacity = testmidi->output->atom.size;
+    // Get the capacity
+    const uint32_t out_capacity = testmidi->output->atom.size;
     // Write an empty Sequence header to the output
-  lv2_atom_sequence_clear(testmidi->output);
-  testmidi->output->atom.type;
+    lv2_atom_sequence_clear(testmidi->output);
+    testmidi->output->atom.type;
 
     // Struct for a 3 byte MIDI event, used for writing notes
-  typedef struct {
-    LV2_Atom_Event event;
-    uint8_t        msg[3];
-  } MIDINoteEvent;
+    typedef struct
+    {
+        LV2_Atom_Event event;
+        uint8_t msg[3];
+    } MIDINoteEvent;
 
-    int notesamples=testmidi->noteon_time_s*testmidi->srate;
-    for(unsigned int i=0;i<n_samples;i++)
+    int notesamples = testmidi->noteon_time_s * testmidi->srate;
+    for (unsigned int i = 0; i < n_samples; i++)
     {
         (testmidi->current_sample)++;
-        if(testmidi->current_sample>notesamples)
+        if (testmidi->current_sample > notesamples)
         {
-            testmidi->current_sample=0;
-            if(testmidi->note_is_on)
+            testmidi->current_sample = 0;
+            if (testmidi->note_is_on)
             {
-                //Send note off
-                testmidi->note_is_on=false;
+                // Send note off
+                testmidi->note_is_on = false;
                 printf("Note off\n");
-                //MIDISequence noteoff={ 0.50, 3, {0x80,  60, 0x00} };
-                
+                // MIDISequence noteoff={ 0.50, 3, {0x80,  60, 0x00} };
+                // IRC:
+                /**
+                 *  JimsonDrift: did you see the atom util header? it makes it so you dont need to understand the full logic, just use the utlities it provides
+[16:47] <JimsonDrift> falktx: No I didnt. I'll look at that
+[16:47] <falktx> https://github.com/lv2/lv2/blob/master/lv2/atom/util.h
+                 *
+                 */
                 MIDINoteEvent noteoff;
                 noteoff.event.time;
-                noteoff.event.body.size=3;
-                noteoff.event.body.type=testmidi->uris.midi_Event;
-                //noteoff.msg={0x80,  60, 0x00};
-                noteoff.msg[0]=0x80;
-                noteoff.msg[1]=60;
-                noteoff.msg[0]=0x00;
-                if(!lv2_atom_sequence_append_event(testmidi->output,out_capacity,&noteoff.event))
+                noteoff.event.body.size = 3;
+                noteoff.event.body.type = testmidi->uris.midi_Event;
+                // noteoff.msg={0x80,  60, 0x00};
+                noteoff.msg[0] = 0x80;
+                noteoff.msg[1] = 60;
+                noteoff.msg[0] = 0x00;
+                if (!lv2_atom_sequence_append_event(testmidi->output, out_capacity, &noteoff.event))
                     printf("Failed to write noteoff");
             }
             else
             {
-                //Send note on
-                testmidi->note_is_on=true;
+                // Send note on
+                testmidi->note_is_on = true;
                 printf("Note on\n");
-                //MIDISequence noteon={ 0.00, 3, {0x90,  60, 0x7f} };
-                                MIDINoteEvent noteon;
-                noteon.event.body.size=3;
-                noteon.event.body.type=testmidi->uris.midi_Event;
-                //noteoff.msg={0x80,  60, 0x00};
-                noteon.msg[0]=0x80;
-                noteon.msg[1]=60;
-                noteon.msg[0]=0x7f;
-                if(!lv2_atom_sequence_append_event(testmidi->output,out_capacity,&noteon.event))
+                // MIDISequence noteon={ 0.00, 3, {0x90,  60, 0x7f} };
+                MIDINoteEvent noteon;
+                noteon.event.body.size = 3;
+                noteon.event.body.type = testmidi->uris.midi_Event;
+                // noteoff.msg={0x80,  60, 0x00};
+                noteon.msg[0] = 0x80;
+                noteon.msg[1] = 60;
+                noteon.msg[0] = 0x7f;
+                if (!lv2_atom_sequence_append_event(testmidi->output, out_capacity, &noteon.event))
                     printf("Failed to write noteon");
             }
         }
-
     }
 }
 

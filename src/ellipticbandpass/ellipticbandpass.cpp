@@ -39,7 +39,7 @@ void EllipticBandPass::initParameter(uint32_t index, Parameter &parameter)
         parameter.unit="Hz";
         parameter.ranges.def=m_bandwidth;
     }
-    else if(index==2)
+    else if(index==2)#define MAXORDER 20
     {
         parameter.name="Passband Attenuation";
         parameter.ranges.max=20.0;
