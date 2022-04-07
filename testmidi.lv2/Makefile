@@ -1,5 +1,5 @@
 CC = g++
-CXXFLAGS = 
+CXXFLAGS = -g -O0
 LDFLAGS =
 NAME= testmidi
 SRC= src

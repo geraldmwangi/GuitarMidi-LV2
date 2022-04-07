@@ -40,7 +40,7 @@ instantiate(const LV2_Descriptor*     descriptor,
             const LV2_Feature* const* features)
 {
 
-   NoteClassifier* notecl=new NoteClassifier(rate,146.6);
+   NoteClassifier* notecl=new NoteClassifier(rate,440);
 	return (LV2_Handle)notecl;
 }
 

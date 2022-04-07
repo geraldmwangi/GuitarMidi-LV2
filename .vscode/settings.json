@@ -2,7 +2,9 @@
     "files.associations": {
         "bandpassfilter.h": "c",
         "cassert": "cpp",
-        "math.h": "c"
+        "math.h": "c",
+        "midi.h": "c",
+        "vector": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }
