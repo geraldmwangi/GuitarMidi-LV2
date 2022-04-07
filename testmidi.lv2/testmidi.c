@@ -205,24 +205,25 @@ activate(LV2_Handle instance)
    `lv2:hardRTCapable`, `run()` must be real-time safe, so blocking (e.g. with
    a mutex) or memory allocation are not allowed.
 */
-/** static void
+static const MIDISequence s0[] = { // C-4 major
+	{ 0.00, 3, {0x90,  60, 0x7f} },
+	{ 0.49, 3, {0x80,  60, 0x00} },
+	{ 0.50, 3, {0x90,  60, 0x7f} },
+	{ 0.60, 3, {0x80,  60, 0x00} },
+	{ 1.00, 3, {0x90,  60, 0x7f} },
+	{ 1.50, 3, {0x80,  60, 0x00} },
+	{ 2.00, 3, {0xff, 255, 0xff} }, // sentinel
+};
+ static void
 run(LV2_Handle instance, uint32_t n_samples)
 {
     TestMidi *testmidi = (TestMidi *)instance;
     // Get the capacity
     const uint32_t out_capacity = testmidi->output->atom.size;
-    	lv2_atom_forge_set_buffer (&testmidi->forge, (uint8_t*)self->output, capacity);
+	lv2_atom_forge_set_buffer (&testmidi->forge, (uint8_t*)testmidi->output, out_capacity);
 	lv2_atom_forge_sequence_head (&testmidi->forge, &testmidi->frame, 0);
-    // Write an empty Sequence header to the output
-    lv2_atom_sequence_clear(testmidi->output);
-    testmidi->output->atom.type;
-
     // Struct for a 3 byte MIDI event, used for writing notes
-    typedef struct
-    {
-        LV2_Atom_Event event;
-        uint8_t msg[3];
-    } MIDINoteEvent;
+    typedef uint8_t MIDINoteEvent;
 
     int notesamples = testmidi->noteon_time_s * testmidi->srate;
     for (unsigned int i = 0; i < n_samples; i++)
@@ -245,16 +246,8 @@ run(LV2_Handle instance, uint32_t n_samples)
                  *
                  */
                 
- /**               MIDINoteEvent noteoff;
-                noteoff.event.time;
-                noteoff.event.body.size = 3;
-                noteoff.event.body.type = testmidi->uris.midi_Event;
-                // noteoff.msg={0x80,  60, 0x00};
-                noteoff.msg[0] = 0x80;
-                noteoff.msg[1] = 60;
-                noteoff.msg[0] = 0x00;
-                if (!lv2_atom_sequence_append_event(testmidi->output, out_capacity, &noteoff.event))
-                    printf("Failed to write noteoff");
+             uint8_t noteoff[3]={0x80,  60, 0x00};
+                forge_midimessage (testmidi, 0, noteoff, 3);
             }
             else
             {
@@ -262,33 +255,16 @@ run(LV2_Handle instance, uint32_t n_samples)
                 testmidi->note_is_on = true;
                 printf("Note on\n");
                 // MIDISequence noteon={ 0.00, 3, {0x90,  60, 0x7f} };
-                MIDINoteEvent noteon;
-                noteon.event.body.size = 3;
-                noteon.event.body.type = testmidi->uris.midi_Event;
-                // noteoff.msg={0x80,  60, 0x00};
-                noteon.msg[0] = 0x80;
-                noteon.msg[1] = 60;
-                noteon.msg[0] = 0x7f;
-                if (!lv2_atom_sequence_append_event(testmidi->output, out_capacity, &noteon.event))
-                    printf("Failed to write noteon");
+                uint8_t noteon[3] ={0x90,  60, 0x7f};
+                forge_midimessage (testmidi, 0, noteon, 3);
             }
         }
     }
-}**/
-static const MIDISequence s0[] = { // C-4 major
-	{ 0.00, 3, {0x90,  60, 0x7f} },
-	{ 0.50, 3, {0x80,  60, 0x00} },
-	{ 1.00, 3, {0x90,  64, 0x7f} },
-	{ 1.50, 3, {0x80,  64, 0x00} },
-	{ 2.00, 3, {0x90,  67, 0x7f} },
-	{ 2.50, 3, {0x80,  67, 0x00} },
-	{ 3.00, 3, {0x90,  72, 0x7f} },
-	{ 3.50, 3, {0x80,  72, 0x00} },
-	{ 4.00, 3, {0xff, 255, 0xff} }, // sentinel
-};
+}
+
 
 static void
-run (LV2_Handle instance, uint32_t n_samples)
+runOld (LV2_Handle instance, uint32_t n_samples)
 {
 	TestMidi* self = (TestMidi*)instance;
 	if (!self->output) {
@@ -317,7 +293,7 @@ run (LV2_Handle instance, uint32_t n_samples)
 			break;
 		}
 
-		forge_midimessage (self, ev_beat_time, seq[pos].event, seq[pos].size);
+		forge_midimessage (self, 0, seq[pos].event, seq[pos].size);
 		++pos;
 
 		if (seq[pos].event[0] == 0xff && seq[pos].event[1] == 0xff) {

@@ -15,4 +15,4 @@ clear:
 	$(MAKE) -C $(SRC)/ clear
 	rm -r $(LV2DIR)/$(NAME).lv2
 test:
-	jalv.qt5 $(LV2URI)
+	jalv $(LV2URI)
