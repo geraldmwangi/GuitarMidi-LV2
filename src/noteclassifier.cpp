@@ -58,9 +58,9 @@ void NoteClassifier::process(int nsamples)
 {
     memcpy(output, input, nsamples * sizeof(float));
 
-    // //rectify signal
-    // for(int s=0;s<nsamples;s++)
-    //     output[s]=fabs(output[s]);
+
+    for(int s=0;s<nsamples;s++)
+        output[s]=10*output[s];
 
     for (int i = 0; i < FILTERORDER; i++)
         m_filter[i].process(nsamples, &output);
@@ -70,9 +70,9 @@ void NoteClassifier::process(int nsamples)
 
     for (int s = 1; s < (nsamples - 1); s++)
     {
-        if (output[s] > output[s - 1] && output[s] > output[s + 1] && output[s] > 0)
+        if (fabs(output[s] )> fabs(output[s - 1]) && fabs(output[s]) > fabs(output[s + 1] )&& fabs(output[s]) > 0)
         {
-            meanenv += output[s];
+            meanenv += fabs(output[s]);
             count++;
         }
     }
@@ -86,41 +86,44 @@ void NoteClassifier::process(int nsamples)
         if (m_pitchBufferCounter >= mInBufSize)
         {
             m_pitchBufferCounter = 0;
+
             fvec_t Buf;
             Buf.data = m_pitchbuffer;
             Buf.length = mInBufSize;
 
             aubio_pitch_do(mPitchDetector, &Buf, m_pitchfreq);
-
-            if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 4.0)
-            {
-                m_noteOnOffState = true;
-                // printf("got signal: %f, freq: %f\n", meanenv, m_pitchfreq->data[0]);
-            }
-            else
-                m_noteOnOffState = false;
         }
+        m_noteOnOffState = true;
+        // if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 4.0)
+        // {
+        //     m_noteOnOffState = true;
+        //     // printf("got signal: %f, freq: %f\n", meanenv, m_pitchfreq->data[0]);
+        // }
+        // else
+        //     m_noteOnOffState = false;
     }
     else
         m_noteOnOffState = false;
-    // if (m_noteOnOffState)
-    //     printf("Note: %f on\n", m_centerfreq);
-    // else
-    //     printf("Note: %f off\n", m_centerfreq);
     if (m_noteOnOffState != m_oldNoteOnOffState)
         if (m_noteOnOffState)
         {
-            printf("Note: %f on", m_centerfreq);
+            //printf("Note: %f on", m_centerfreq);
             uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
             uint8_t noteon[3] = {0x90, midinote, 0x7f};
             m_midiOutput.sendMidiMessage(noteon);
         }
         else
         {
-            printf("Note: %f off", m_centerfreq);
+            //printf("Note: %f off", m_centerfreq);
             uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
             uint8_t noteoff[3] = {0x90, midinote, 0x00};
             m_midiOutput.sendMidiMessage(noteoff);
         }
+    // if(!m_noteOnOffState)
+    // {
+    //         uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
+    //         uint8_t noteoff[3] = {0x90, midinote, 0x00};
+    //         m_midiOutput.sendMidiMessage(noteoff);       
+    // }
     m_oldNoteOnOffState = m_noteOnOffState;
 }

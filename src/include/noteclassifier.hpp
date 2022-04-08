@@ -28,12 +28,12 @@ private:
     bool m_noteOnOffState;
     bool m_oldNoteOnOffState;
 
-    Dsp::SimpleFilter <Dsp::Elliptic::BandPass<MAXORDER>, 1> m_filter[FILTERORDER];
+    Dsp::SimpleFilter <Dsp::Elliptic::BandPass<MAXORDER>, 1,Dsp::DirectFormI> m_filter[FILTERORDER];
 
     MidiOutput m_midiOutput;
 
 public:
-    NoteClassifier(LV2_URID_Map *map,float samplerate, float center = 110.0, float bandwidth = 20, float passbandatten = 5);
+    NoteClassifier(LV2_URID_Map *map,float samplerate, float center = 110.0, float bandwidth = 20, float passbandatten = 10);
 
     void initialize();
 
