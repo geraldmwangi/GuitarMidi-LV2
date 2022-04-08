@@ -94,32 +94,35 @@ typedef struct
     double note_freq;
     bool note_is_on;
 
-    	/* atom-forge and URI mapping */
-	LV2_Atom_Forge forge;
-	LV2_Atom_Forge_Frame frame;
-	LV2_URID midi_MidiEvent;
+    /* atom-forge and URI mapping */
+    LV2_Atom_Forge forge;
+    LV2_Atom_Forge_Frame frame;
+    LV2_URID midi_MidiEvent;
 
-    	uint32_t pos; // event number
-	int32_t  tme;  // sample time
+    uint32_t pos; // event number
+    int32_t tme;  // sample time
 } TestMidi;
 
 /**
  * add a midi message to the output port
  */
 static void
-forge_midimessage (TestMidi* self,
-                   uint32_t tme,
-                   const uint8_t* const buffer,
-                   uint32_t size)
+forge_midimessage(TestMidi *self,
+                  uint32_t tme,
+                  const uint8_t *const buffer,
+                  uint32_t size)
 {
-	LV2_Atom midiatom;
-	midiatom.type = self->midi_MidiEvent;
-	midiatom.size = size;
+    LV2_Atom midiatom;
+    midiatom.type = self->midi_MidiEvent;
+    midiatom.size = size;
 
-	if (0 == lv2_atom_forge_frame_time (&self->forge, tme)) return;
-	if (0 == lv2_atom_forge_raw (&self->forge, &midiatom, sizeof (LV2_Atom))) return;
-	if (0 == lv2_atom_forge_raw (&self->forge, buffer, size)) return;
-	lv2_atom_forge_pad (&self->forge, sizeof (LV2_Atom) + size);
+    if (0 == lv2_atom_forge_frame_time(&self->forge, tme))
+        return;
+    if (0 == lv2_atom_forge_raw(&self->forge, &midiatom, sizeof(LV2_Atom)))
+        return;
+    if (0 == lv2_atom_forge_raw(&self->forge, buffer, size))
+        return;
+    lv2_atom_forge_pad(&self->forge, sizeof(LV2_Atom) + size);
 }
 
 /**
@@ -144,20 +147,22 @@ instantiate(const LV2_Descriptor *descriptor,
     testmidi->noteon_time_s = 1;
     testmidi->note_freq = 110;
     testmidi->note_is_on = false;
-    testmidi->tme=0;
-    testmidi->pos=0;
+    testmidi->tme = 0;
+    testmidi->pos = 0;
 
-	LV2_URID_Map* map = NULL;
+    LV2_URID_Map *map = NULL;
 
-	int i;
-	for (i=0; features[i]; ++i) {
-		if (!strcmp (features[i]->URI, LV2_URID__map)) {
-			map = (LV2_URID_Map*)features[i]->data;
-		} 
-	}
+    int i;
+    for (i = 0; features[i]; ++i)
+    {
+        if (!strcmp(features[i]->URI, LV2_URID__map))
+        {
+            map = (LV2_URID_Map *)features[i]->data;
+        }
+    }
 
-    	lv2_atom_forge_init (&testmidi->forge, map);
-	testmidi->midi_MidiEvent = map->map (map->handle, LV2_MIDI__MidiEvent);
+    lv2_atom_forge_init(&testmidi->forge, map);
+    testmidi->midi_MidiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
 
     return (LV2_Handle)testmidi;
 }
@@ -205,23 +210,24 @@ activate(LV2_Handle instance)
    `lv2:hardRTCapable`, `run()` must be real-time safe, so blocking (e.g. with
    a mutex) or memory allocation are not allowed.
 */
-static const MIDISequence s0[] = { // C-4 major
-	{ 0.00, 3, {0x90,  60, 0x7f} },
-	{ 0.49, 3, {0x80,  60, 0x00} },
-	{ 0.50, 3, {0x90,  60, 0x7f} },
-	{ 0.60, 3, {0x80,  60, 0x00} },
-	{ 1.00, 3, {0x90,  60, 0x7f} },
-	{ 1.50, 3, {0x80,  60, 0x00} },
-	{ 2.00, 3, {0xff, 255, 0xff} }, // sentinel
+static const MIDISequence s0[] = {
+    // C-4 major
+    {0.00, 3, {0x90, 60, 0x7f}},
+    {0.49, 3, {0x80, 60, 0x00}},
+    {0.50, 3, {0x90, 60, 0x7f}},
+    {0.60, 3, {0x80, 60, 0x00}},
+    {1.00, 3, {0x90, 60, 0x7f}},
+    {1.50, 3, {0x80, 60, 0x00}},
+    {2.00, 3, {0xff, 255, 0xff}}, // sentinel
 };
- static void
+static void
 run(LV2_Handle instance, uint32_t n_samples)
 {
     TestMidi *testmidi = (TestMidi *)instance;
     // Get the capacity
     const uint32_t out_capacity = testmidi->output->atom.size;
-	lv2_atom_forge_set_buffer (&testmidi->forge, (uint8_t*)testmidi->output, out_capacity);
-	lv2_atom_forge_sequence_head (&testmidi->forge, &testmidi->frame, 0);
+    lv2_atom_forge_set_buffer(&testmidi->forge, (uint8_t *)testmidi->output, out_capacity);
+    lv2_atom_forge_sequence_head(&testmidi->forge, &testmidi->frame, 0);
     // Struct for a 3 byte MIDI event, used for writing notes
     typedef uint8_t MIDINoteEvent;
 
@@ -245,9 +251,9 @@ run(LV2_Handle instance, uint32_t n_samples)
 [16:47] <falktx> https://github.com/lv2/lv2/blob/master/lv2/atom/util.h
                  *
                  */
-                
-             uint8_t noteoff[3]={0x80,  60, 0x00};
-                forge_midimessage (testmidi, 0, noteoff, 3);
+
+                uint8_t noteoff[3] = {0x80, 60, 0x00};
+                forge_midimessage(testmidi, 0, noteoff, 3);
             }
             else
             {
@@ -255,56 +261,55 @@ run(LV2_Handle instance, uint32_t n_samples)
                 testmidi->note_is_on = true;
                 printf("Note on\n");
                 // MIDISequence noteon={ 0.00, 3, {0x90,  60, 0x7f} };
-                uint8_t noteon[3] ={0x90,  60, 0x7f};
-                forge_midimessage (testmidi, 0, noteon, 3);
+                uint8_t noteon[3] = {0x90, 60, 0x7f};
+                forge_midimessage(testmidi, 0, noteon, 3);
             }
         }
     }
 }
 
-
 static void
-runOld (LV2_Handle instance, uint32_t n_samples)
+runOld(LV2_Handle instance, uint32_t n_samples)
 {
-	TestMidi* self = (TestMidi*)instance;
-	if (!self->output) {
-		return;
-	}
+    TestMidi *self = (TestMidi *)instance;
+    if (!self->output)
+    {
+        return;
+    }
 
-	const uint32_t capacity = self->output->atom.size;
-	lv2_atom_forge_set_buffer (&self->forge, (uint8_t*)self->output, capacity);
-	lv2_atom_forge_sequence_head (&self->forge, &self->frame, 0);
+    const uint32_t capacity = self->output->atom.size;
+    lv2_atom_forge_set_buffer(&self->forge, (uint8_t *)self->output, capacity);
+    lv2_atom_forge_sequence_head(&self->forge, &self->frame, 0);
 
+    MIDISequence const *seq = s0; // sequences[self->sid];
+    uint32_t pos = self->pos;
 
-	
-	MIDISequence const* seq = s0;//sequences[self->sid];
-	uint32_t pos = self->pos;
+    int32_t tme = self->tme;
+    const float spb = self->noteon_time_s * self->srate; // self->spb;
 
+    while (1)
+    {
+        const int32_t ev_beat_time = seq[pos].beat_time * spb - tme;
+        if (ev_beat_time < 0)
+        {
+            break;
+        }
+        if (ev_beat_time >= n_samples)
+        {
+            break;
+        }
 
-	int32_t tme = self->tme;
-	const float spb = self->noteon_time_s * self->srate;//self->spb;
+        forge_midimessage(self, 0, seq[pos].event, seq[pos].size);
+        ++pos;
 
-	while (1) {
-		const int32_t ev_beat_time = seq[pos].beat_time * spb - tme;
-		if (ev_beat_time < 0) {
-			break;
-		}
-		if (ev_beat_time >= n_samples) {
-			break;
-		}
-
-		forge_midimessage (self, 0, seq[pos].event, seq[pos].size);
-		++pos;
-
-		if (seq[pos].event[0] == 0xff && seq[pos].event[1] == 0xff) {
-			tme -= seq[pos].beat_time * spb;
-			pos = 0;
-		}
-	}
-	self->tme = tme + n_samples;
-	self->pos = pos;
-
-
+        if (seq[pos].event[0] == 0xff && seq[pos].event[1] == 0xff)
+        {
+            tme -= seq[pos].beat_time * spb;
+            pos = 0;
+        }
+    }
+    self->tme = tme + n_samples;
+    self->pos = pos;
 }
 /**
    The `deactivate()` method is the counterpart to `activate()`, and is called by

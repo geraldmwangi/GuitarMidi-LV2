@@ -7,6 +7,10 @@
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix urid:  <http://lv2plug.in/ns/ext/urid#> .
+@prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
 
 # First the type of the plugin is described.  All plugins must explicitly list
 # `lv2:Plugin` as a type.  A more specific type should also be given, where
@@ -32,4 +36,12 @@
 		lv2:index 1 ;
 		lv2:symbol "out" ;
 		lv2:name "Out"
-	] .
+	], [
+        a lv2:OutputPort ,
+            atom:AtomPort ;
+        atom:bufferType atom:Sequence ;
+        atom:supports midi:MidiEvent ;
+        lv2:index 2 ;
+        lv2:symbol "midiout" ;
+        lv2:name "MidiOut"
+    ] .

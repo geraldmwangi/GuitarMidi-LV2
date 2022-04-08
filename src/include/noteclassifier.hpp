@@ -2,12 +2,8 @@
 #include <DspFilters/Dsp.h>
 #include <aubio/aubio.h>
 #include <aubio/pitch/pitch.h>
+#include <midioutput.hpp>
 
-typedef enum
-{
-    NOTECL_INPUT = 0,
-    NOTECL_OUTPUT = 1
-} PortIndex;
 #define FILTERORDER 4 // the real order is 2*MAXORDER
 #define MAXORDER 4 // the real order is 2*MAXORDER
 /**
@@ -34,8 +30,10 @@ private:
 
     Dsp::SimpleFilter <Dsp::Elliptic::BandPass<MAXORDER>, 1> m_filter[FILTERORDER];
 
+    MidiOutput m_midiOutput;
+
 public:
-    NoteClassifier(float samplerate, float center = 110.0, float bandwidth = 40, float passbandatten = 5);
+    NoteClassifier(LV2_URID_Map *map,float samplerate, float center = 110.0, float bandwidth = 20, float passbandatten = 5);
 
     void initialize();
 
@@ -45,4 +43,6 @@ public:
 
     const float *input;
     float *output;
+
+    void setMidiOutput(LV2_Atom_Sequence* output);
 };

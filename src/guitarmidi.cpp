@@ -20,92 +20,89 @@
 #include <math.h>
 #include <stdlib.h>
 
-
 #include "lv2/lv2plug.in/ns/lv2core/lv2.h"
-#include <noteclassifier.hpp>
-
+#include <fretboard.hpp>
 
 #define AMP_URI "http://github.com/geraldmwangi/GuitarMidi-LV2"
 
-
-
-
-
-
-
 static LV2_Handle
-instantiate(const LV2_Descriptor*     descriptor,
-            double                    rate,
-            const char*               bundle_path,
-            const LV2_Feature* const* features)
+instantiate(const LV2_Descriptor *descriptor,
+			double rate,
+			const char *bundle_path,
+			const LV2_Feature *const *features)
 {
+	LV2_URID_Map *map = NULL;
 
-   NoteClassifier* notecl=new NoteClassifier(rate,440);
-	return (LV2_Handle)notecl;
+	int i;
+	for (i = 0; features[i]; ++i)
+	{
+		if (!strcmp(features[i]->URI, LV2_URID__map))
+		{
+			map = (LV2_URID_Map *)features[i]->data;
+		}
+	}
+	FretBoard *fretboard = new FretBoard(map, rate);
+	return (LV2_Handle)fretboard;
 }
-
 
 static void
 connect_port(LV2_Handle instance,
-             uint32_t   port,
-             void*      data)
+			 uint32_t port,
+			 void *data)
 {
-	NoteClassifier* notecl = (NoteClassifier*)instance;
+	FretBoard *fretboard = (FretBoard *)instance;
 
-	switch ((PortIndex)port) {
-	case NOTECL_INPUT:
-		notecl->input = (const float*)data;
+	switch ((PortIndex)port)
+	{
+	case FRETBOARD_INPUT:
+		//notecl->input = (const float *)data;
+		fretboard->setAudioInput((const float *)data);
 		break;
-	case NOTECL_OUTPUT:
-		notecl->output = (float*)data;
+	case FRETBOARD_OUTPUT:
+		fretboard->setAudioOutput((float*) data);
+		break;
+	case FRETBOARD_MIDIOUTPUT:
+		fretboard->setMidiOutput((LV2_Atom_Sequence*)data);
 		break;
 	}
 }
 
-
 static void
 activate(LV2_Handle instance)
 {
-   NoteClassifier* notecl = (NoteClassifier*)instance;
-   notecl->initialize();
+	FretBoard *notecl = (FretBoard *)instance;
+	notecl->initialize();
 }
 
 /** Define a macro for converting a gain in dB to a coefficient. */
-#define DB_CO(g) ((g) > -90.0f ? powf(10.0f, (g) * 0.05f) : 0.0f)
-
+#define DB_CO(g) ((g) > -90.0f ? powf(10.0f, (g)*0.05f) : 0.0f)
 
 static void
 run(LV2_Handle instance, uint32_t n_samples)
 {
-	 NoteClassifier* notecl = ( NoteClassifier*)instance;
-   notecl->process(n_samples);
-
-	
+	FretBoard *notecl = (FretBoard *)instance;
+	notecl->process(n_samples);
 }
-
 
 static void
 deactivate(LV2_Handle instance)
 {
-   NoteClassifier* notecl = (NoteClassifier*)instance;
-   notecl->finalize();
+	FretBoard *notecl = (FretBoard *)instance;
+	notecl->finalize();
 }
-
 
 static void
 cleanup(LV2_Handle instance)
 {
-	NoteClassifier* notecl = ( NoteClassifier*)instance;
-   delete notecl;
+	FretBoard *notecl = (FretBoard *)instance;
+	delete notecl;
 }
 
-
-static const void*
-extension_data(const char* uri)
+static const void *
+extension_data(const char *uri)
 {
 	return NULL;
 }
-
 
 static const LV2_Descriptor descriptor = {
 	AMP_URI,
@@ -115,16 +112,17 @@ static const LV2_Descriptor descriptor = {
 	run,
 	deactivate,
 	cleanup,
-	extension_data
-};
-
+	extension_data};
 
 LV2_SYMBOL_EXPORT
-const LV2_Descriptor*
+const LV2_Descriptor *
 lv2_descriptor(uint32_t index)
 {
-	switch (index) {
-	case 0:  return &descriptor;
-	default: return NULL;
+	switch (index)
+	{
+	case 0:
+		return &descriptor;
+	default:
+		return NULL;
 	}
 }

@@ -1,6 +1,7 @@
 #include <noteclassifier.hpp>
+#include <cmath>
 
-NoteClassifier::NoteClassifier(float samplerate, float center, float bandwidth, float passbandatten)
+NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center, float bandwidth, float passbandatten) : m_midiOutput(map)
 {
     m_centerfreq = center;
     m_passbandatten = passbandatten;
@@ -13,6 +14,10 @@ NoteClassifier::NoteClassifier(float samplerate, float center, float bandwidth, 
     m_noteOnOffState = false;
 }
 
+void NoteClassifier::setMidiOutput(LV2_Atom_Sequence *output)
+{
+    m_midiOutput.setMidiOutput(output);
+}
 void NoteClassifier::initialize()
 {
     for (int i = 0; i < FILTERORDER; i++)
@@ -98,14 +103,24 @@ void NoteClassifier::process(int nsamples)
     }
     else
         m_noteOnOffState = false;
-    if (m_noteOnOffState)
-        printf("Note: %f on\n", m_centerfreq);
-    else
-        printf("Note: %f off\n", m_centerfreq);
+    // if (m_noteOnOffState)
+    //     printf("Note: %f on\n", m_centerfreq);
+    // else
+    //     printf("Note: %f off\n", m_centerfreq);
     if (m_noteOnOffState != m_oldNoteOnOffState)
         if (m_noteOnOffState)
+        {
             printf("Note: %f on", m_centerfreq);
+            uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
+            uint8_t noteon[3] = {0x90, midinote, 0x7f};
+            m_midiOutput.sendMidiMessage(noteon);
+        }
         else
+        {
             printf("Note: %f off", m_centerfreq);
+            uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
+            uint8_t noteoff[3] = {0x90, midinote, 0x00};
+            m_midiOutput.sendMidiMessage(noteoff);
+        }
     m_oldNoteOnOffState = m_noteOnOffState;
 }
