@@ -1,3 +1,21 @@
+/* GuitarMidi-LV2 Library
+ * Copyright (C) 2022 Gerald Mwangi
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General
+ * Public License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301  USA
+ */
 #include <noteclassifier.hpp>
 #include <cmath>
 
@@ -25,6 +43,7 @@ void NoteClassifier::setMidiOutput(LV2_Atom_Sequence *output)
 void NoteClassifier::initialize()
 {
     //Setup FILTERORDER 1st order filters. Currently Elliptic::BandPass crashes when running setup() with orders higher than 1
+    //When we solve this we can run sharper filters with narrower bandwidth and maybe drop the pitch validation below in process()
     for (int i = 0; i < FILTERORDER; i++)
     {
         m_filter[i].reset();
@@ -67,6 +86,8 @@ void NoteClassifier::process(int nsamples)
     memcpy(output, input, nsamples * sizeof(float));
 
     m_noteOnOffState = m_oldNoteOnOffState;
+
+    //Increase gain to increase the response in the passband
     for (int s = 0; s < nsamples; s++)
         output[s] = 10 * output[s];
 
@@ -76,6 +97,7 @@ void NoteClassifier::process(int nsamples)
     float meanenv = 0;
     int count = 0;
 
+    //Get average envelope
     for (int s = 1; s < (nsamples - 1); s++)
     {
         if (fabs(output[s]) > fabs(output[s - 1]) && fabs(output[s]) > fabs(output[s + 1]) && fabs(output[s]) > 0)
@@ -87,10 +109,13 @@ void NoteClassifier::process(int nsamples)
     if (count)
         meanenv /= count;
 
+    //If envelope greater then threshold consider these nsamples a candidate 
     if (meanenv > 0.05)
     {
         memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
         m_pitchBufferCounter += nsamples;
+
+        //Check that the pitch is correct. This step is probably unneccessary if we can increase the order of the filters see comment above in initialize()
         if (m_pitchBufferCounter >= mInBufSize)
         {
             m_pitchBufferCounter = 0;
@@ -102,36 +127,31 @@ void NoteClassifier::process(int nsamples)
             aubio_pitch_do(mPitchDetector, &Buf, m_pitchfreq);
             if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 4.0)
             {
+                //Candidtate is valid
                 m_noteOnOffState = true;
-                // printf("got signal: %f, freq: %f\n", meanenv, m_pitchfreq->data[0]);
             }
             else
-                m_noteOnOffState = false;
+                m_noteOnOffState = false; //Candidtate is incorrect
         }
         // m_noteOnOffState = true;
     }
     else
-        m_noteOnOffState = false;
+        m_noteOnOffState = false; //No candidate or previous note has stopped
     if (m_noteOnOffState != m_oldNoteOnOffState)
         if (m_noteOnOffState)
         {
-            // printf("Note: %f on", m_centerfreq);
+            //Send note on
             uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
             uint8_t noteon[3] = {0x90, midinote, 0x7f};
             m_midiOutput.sendMidiMessage(noteon);
         }
         else
         {
-            // printf("Note: %f off", m_centerfreq);
+            //Send note off
             uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
             uint8_t noteoff[3] = {0x90, midinote, 0x00};
             m_midiOutput.sendMidiMessage(noteoff);
         }
-    // if(!m_noteOnOffState)
-    // {
-    //         uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
-    //         uint8_t noteoff[3] = {0x90, midinote, 0x00};
-    //         m_midiOutput.sendMidiMessage(noteoff);
-    // }
+
     m_oldNoteOnOffState = m_noteOnOffState;
 }
