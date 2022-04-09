@@ -11,22 +11,27 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_pitchbuffer = 0;
     m_pitchBufferCounter = 0;
     m_pitchfreq = 0;
+
+    //TODO query host for buffersize. This is only used for the pitch detector
     mBufferSize = 512;
     m_noteOnOffState = false;
 }
 
 void NoteClassifier::setMidiOutput(LV2_Atom_Sequence *output)
 {
+    //Set midi output
     m_midiOutput.setMidiOutput(output);
 }
 void NoteClassifier::initialize()
 {
+    //Setup FILTERORDER 1st order filters. Currently Elliptic::BandPass crashes when running setup() with orders higher than 1
     for (int i = 0; i < FILTERORDER; i++)
     {
         m_filter[i].reset();
         m_filter[i].setup(1, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 60.0);
     }
 
+    //Setup a schmitt trigger as pitchdetector
     if (mPitchDetector)
         del_aubio_pitch(mPitchDetector);
 
@@ -45,6 +50,7 @@ void NoteClassifier::initialize()
 
 void NoteClassifier::finalize()
 {
+    //Release ressources
     for (int i = 0; i < FILTERORDER; i++)
         m_filter[i].reset();
     if (mPitchDetector)
@@ -57,6 +63,7 @@ void NoteClassifier::finalize()
 
 void NoteClassifier::process(int nsamples)
 {
+    //The filters work inplace so we have to initialize the output with the input data
     memcpy(output, input, nsamples * sizeof(float));
 
     m_noteOnOffState = m_oldNoteOnOffState;
