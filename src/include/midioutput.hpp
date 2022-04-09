@@ -22,7 +22,7 @@ private:
     LV2_URID m_midiEvent;
     LV2_Atom_Sequence *m_midioutput;
 
-    void forge_midimessage(
+    bool forge_midimessage(
         const uint8_t *const buffer,
         uint32_t size);
 
