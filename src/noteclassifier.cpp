@@ -31,7 +31,7 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_pitchfreq = 0;
 
     //TODO query host for buffersize. This is only used for the pitch detector
-    mBufferSize = 512;
+    mBufferSize = 256;
     m_noteOnOffState = false;
 }
 
@@ -143,14 +143,14 @@ void NoteClassifier::process(int nsamples)
             //Send note on
             uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
             uint8_t noteon[3] = {0x90, midinote, 0x7f};
-            m_midiOutput.sendMidiMessage(noteon);
+            m_midiOutput.sendMidiMessage(noteon,nsamples);
         }
         else
         {
             //Send note off
             uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
             uint8_t noteoff[3] = {0x90, midinote, 0x00};
-            m_midiOutput.sendMidiMessage(noteoff);
+            m_midiOutput.sendMidiMessage(noteoff,nsamples);
         }
 
     m_oldNoteOnOffState = m_noteOnOffState;

@@ -43,14 +43,15 @@ private:
     LV2_Atom_Forge_Frame m_frame;
     LV2_URID m_midiEvent;
     LV2_Atom_Sequence *m_midioutput;
+    int64_t m_frames;
 
     bool forge_midimessage(
         const uint8_t *const buffer,
-        uint32_t size);
+        uint32_t size,int64_t frames);
 
 public:
     MidiOutput(LV2_URID_Map *map);
     void setMidiOutput(LV2_Atom_Sequence* output);
-    void sendMidiMessage(uint8_t midinote[3]);
+    void sendMidiMessage(uint8_t midinote[3],int64_t frames);
     
 };
