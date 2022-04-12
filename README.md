@@ -34,8 +34,7 @@ For Guitar Midi to work somewhat well you must set your input gain on the sound 
 Have fun hopefully.
 
 ### Current Bugs and missing things
-* Sometimes GuitarMidi-LV2 fails to send note off messages, so that some notes just hang. 
-    This is a bug in my understanding/implementation of LV2's Midi API
+* Velocity is not extracted from the audio. All midi notes have max velocity (=127)
 * there is no midi panic control
 * latency is higher then theoretically possible. Due to an issue in the DSPFilter library I can only setup 1st order filters, although 2nd order filters
     should be possible 
