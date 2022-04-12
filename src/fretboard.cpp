@@ -20,6 +20,7 @@
 
 FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
 {
+    m_midioutput=make_shared<MidiOutput>(map);
     // E string
     m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 82.41,10));
     m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 87.31,10));
@@ -81,14 +82,19 @@ void FretBoard::setAudioOutput(float *output)
 
 void FretBoard::setMidiOutput(LV2_Atom_Sequence *output)
 {
-    for (auto notecl : m_noteClassifiers)
+    if(m_midioutput)
     {
-        notecl->setMidiOutput(output);
+        m_midioutput->setMidiOutput(output);
+        for (auto notecl : m_noteClassifiers)
+        {
+            notecl->setMidiOutput(m_midioutput);
+        }
     }
 }
 
 void FretBoard::initialize()
 {
+    m_midioutput->initializeSequence();
     for (auto notecl : m_noteClassifiers)
         notecl->initialize();
 }
@@ -101,6 +107,7 @@ void FretBoard::finalize()
 
 void FretBoard::process(int nsamples)
 {
+    m_midioutput->initializeSequence();
     for (auto notecl : m_noteClassifiers)
         notecl->process(nsamples);
 }

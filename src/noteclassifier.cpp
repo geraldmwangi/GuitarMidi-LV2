@@ -19,7 +19,7 @@
 #include <noteclassifier.hpp>
 #include <cmath>
 
-NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center, float bandwidth, float passbandatten) : m_midiOutput(map)
+NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center, float bandwidth, float passbandatten) 
 {
     m_centerfreq = center;
     m_passbandatten = passbandatten;
@@ -35,10 +35,10 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_noteOnOffState = false;
 }
 
-void NoteClassifier::setMidiOutput(LV2_Atom_Sequence *output)
+void NoteClassifier::setMidiOutput(shared_ptr<MidiOutput> output)
 {
     //Set midi output
-    m_midiOutput.setMidiOutput(output);
+    m_midiOutput=output;
 }
 void NoteClassifier::initialize()
 {
@@ -143,14 +143,14 @@ void NoteClassifier::process(int nsamples)
             //Send note on
             uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
             uint8_t noteon[3] = {0x90, midinote, 0x7f};
-            m_midiOutput.sendMidiMessage(noteon,nsamples);
+            m_midiOutput->sendMidiMessage(noteon,nsamples);
         }
         else
         {
             //Send note off
             uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
             uint8_t noteoff[3] = {0x90, midinote, 0x00};
-            m_midiOutput.sendMidiMessage(noteoff,nsamples);
+            m_midiOutput->sendMidiMessage(noteoff,nsamples);
         }
 
     m_oldNoteOnOffState = m_noteOnOffState;

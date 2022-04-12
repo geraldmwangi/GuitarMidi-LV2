@@ -4,7 +4,8 @@
         "cassert": "cpp",
         "math.h": "c",
         "midi.h": "c",
-        "vector": "c"
+        "vector": "c",
+        "memory": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

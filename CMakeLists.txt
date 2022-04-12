@@ -5,7 +5,6 @@ project("GuitarMidi-LV2")
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 set(DSPFiltersDir DSPFilters/shared/DSPFilters)
 include_directories( ${DSPFiltersDir}/include/ /usr/include)

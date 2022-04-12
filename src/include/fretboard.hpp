@@ -43,6 +43,8 @@ private:
      */
     vector<shared_ptr<NoteClassifier>> m_noteClassifiers;
 
+    shared_ptr<MidiOutput> m_midioutput;
+
 public:
     /**
      * @brief Construct a new Fret Board object. Setup the bank of NoteClassifiers at the standard E A D g b e tuning of the guitar up to the 5th fret

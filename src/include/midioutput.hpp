@@ -52,6 +52,7 @@ private:
 public:
     MidiOutput(LV2_URID_Map *map);
     void setMidiOutput(LV2_Atom_Sequence* output);
+    void initializeSequence();
     void sendMidiMessage(uint8_t midinote[3],int64_t frames);
     
 };

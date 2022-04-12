@@ -21,9 +21,11 @@
 #include <aubio/aubio.h>
 #include <aubio/pitch/pitch.h>
 #include <midioutput.hpp>
+#include <memory>
 
 #define FILTERORDER 4 // the real order is 2*MAXORDER
 #define MAXORDER 4 // the real order is 2*MAXORDER
+using namespace std;
 /**
  * @brief NoteClassifier analyses polyphonic audio and triggers a midi note when it finds 
  * a signal of a particular frequency
@@ -124,7 +126,7 @@ private:
      * @brief m_midiOutput: The midioutput object
      * 
      */
-    MidiOutput m_midiOutput;
+    std::shared_ptr<MidiOutput> m_midiOutput;
 
 public:
 
@@ -175,5 +177,5 @@ public:
      * 
      * @param output pointer to midi output buffer provided by the host
      */
-    void setMidiOutput(LV2_Atom_Sequence* output);
+    void setMidiOutput(shared_ptr<MidiOutput> output);
 };
