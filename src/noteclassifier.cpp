@@ -102,38 +102,40 @@ void NoteClassifier::process(int nsamples)
     {
         if (fabs(output[s]) > fabs(output[s - 1]) && fabs(output[s]) > fabs(output[s + 1]) && fabs(output[s]) > 0)
         {
-            meanenv += fabs(output[s]);
+            float absval=fabs(output[s]);
+            //meanenv += fabs(output[s]);
+            meanenv=(absval>meanenv)?absval:meanenv;
             count++;
         }
     }
-    if (count)
-        meanenv /= count;
+    // if (count)
+    //     meanenv /= count;
 
     //If envelope greater then threshold consider these nsamples a candidate 
     if (meanenv > 0.05)
     {
-        memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
-        m_pitchBufferCounter += nsamples;
+        // memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
+        // m_pitchBufferCounter += nsamples;
 
-        //Check that the pitch is correct. This step is probably unneccessary if we can increase the order of the filters see comment above in initialize()
-        if (m_pitchBufferCounter >= mInBufSize)
-        {
-            m_pitchBufferCounter = 0;
+        // // Check that the pitch is correct. This step is probably unneccessary if we can increase the order of the filters see comment above in initialize()
+        // if (m_pitchBufferCounter >= mInBufSize)
+        // {
+        //     m_pitchBufferCounter = 0;
 
-            fvec_t Buf;
-            Buf.data = m_pitchbuffer;
-            Buf.length = mInBufSize;
+        //     fvec_t Buf;
+        //     Buf.data = m_pitchbuffer;
+        //     Buf.length = mInBufSize;
 
-            aubio_pitch_do(mPitchDetector, &Buf, m_pitchfreq);
-            if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 4.0)
-            {
-                //Candidtate is valid
-                m_noteOnOffState = true;
-            }
-            else
-                m_noteOnOffState = false; //Candidtate is incorrect
-        }
-        // m_noteOnOffState = true;
+        //     aubio_pitch_do(mPitchDetector, &Buf, m_pitchfreq);
+        //     if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 4.0)
+        //     {
+        //         //Candidtate is valid
+        //         m_noteOnOffState = true;
+        //     }
+        //     else
+        //         m_noteOnOffState = false; //Candidtate is incorrect
+        // }
+         m_noteOnOffState = true;
     }
     else
         m_noteOnOffState = false; //No candidate or previous note has stopped
