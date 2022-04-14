@@ -23,8 +23,8 @@
 #include <midioutput.hpp>
 #include <memory>
 
-#define FILTERORDER 4 // the real order is 2*MAXORDER
-#define MAXORDER 4 // the real order is 2*MAXORDER
+#define FILTERORDER 2 // the real order is 2*MAXORDER
+#define MAXORDER 2 // the real order is 2*MAXORDER
 using namespace std;
 /**
  * @brief NoteClassifier analyses polyphonic audio and triggers a midi note when it finds 
@@ -139,7 +139,7 @@ public:
      * @param bandwidth bandwidth of the bandpass filters
      * @param passbandatten The attenuation in db of amplitude of the ripple in the pass and stopband of the elliptic filters
      */
-    NoteClassifier(LV2_URID_Map *map,float samplerate, float center = 110.0, float bandwidth = 20, float passbandatten = 10);
+    NoteClassifier(LV2_URID_Map *map,float samplerate, float center = 110.0, float bandwidth = 20, float passbandatten = 1);
 
     /**
      * @brief initialize the filters and the pitchdetector
