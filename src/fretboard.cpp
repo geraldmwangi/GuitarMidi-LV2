@@ -22,46 +22,52 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
 {
     m_midioutput=make_shared<MidiOutput>(map);
     // E string
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 82.41,10));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 87.31,10));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 92.50,10));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 98.00,10));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 103.83,10));
+    float Ebw=10;
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 82.41,Ebw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 87.31,Ebw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 92.50,Ebw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 98.00,Ebw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 103.83,Ebw));
 
     // // A string
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 110,20));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 116.54,20));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 123.47,20));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 130.81,20));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 138.59,20));
+    float Abw=10;
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 110,Abw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 116.54,Abw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 123.47,Abw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 130.81,Abw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 138.59,Abw));
 
     // // D string
-     m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 146.83,30));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 155.56,30));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 164.81,30));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 174.61,30));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 185.00,30));
+    float Dbw=10;
+     m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 146.83,Dbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 155.56,Dbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 164.81,Dbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 174.61,Dbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 185.00,Dbw));
 
     // // g string
-     m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 196.00,40));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 207.65,40));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 220,40));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 233.08,40));
+    float gbw=10;
+     m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 196.00,gbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 207.65,gbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 220,gbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 233.08,gbw));
 
     // // b string
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 246.94,50));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 261.63,50));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 277.18,50));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 293.66,50));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 311.13,50));
+    float bbw=10;
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 246.94,bbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 261.63,bbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 277.18,bbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 293.66,bbw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 311.13,bbw));
 
     // // e string
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 329.63));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 349.23));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 369.99));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 392));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 415.30));
-    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 440));
+    float ebw=10;
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 329.63,ebw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 349.23,ebw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 369.99,ebw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 392,ebw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 415.30,ebw));
+    m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 440,ebw));
 }
 
 void FretBoard::setAudioInput(const float *input)
