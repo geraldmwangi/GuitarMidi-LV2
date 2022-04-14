@@ -127,7 +127,7 @@ void NoteClassifier::process(int nsamples)
             Buf.length = mInBufSize;
 
             aubio_pitch_do(mPitchDetector, &Buf, m_pitchfreq);
-            if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 2.0)
+            if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 4.0)
             {
                 //Candidtate is valid
                 m_noteOnOffState = true;

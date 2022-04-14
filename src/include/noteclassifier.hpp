@@ -23,7 +23,7 @@
 #include <midioutput.hpp>
 #include <memory>
 
-#define FILTERORDER 2 // the real order is 2*MAXORDER
+#define FILTERORDER 1 // the real order is 2*MAXORDER
 #define MAXORDER 2 // the real order is 2*MAXORDER
 using namespace std;
 /**
