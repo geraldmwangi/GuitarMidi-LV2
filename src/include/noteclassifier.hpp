@@ -75,7 +75,7 @@ private:
 
     /**
      * @brief m_pitchfreq: The result of the pitch estimator
-     * 
+     * >
      */
     fvec_t* m_pitchfreq;
 
@@ -119,7 +119,7 @@ private:
      * @brief m_filter: array of elliptic filters
      * 
      */
-    Dsp::SimpleFilter <Dsp::Elliptic::BandPass<MAXORDER>, 1,Dsp::DirectFormI> m_filter[FILTERORDER];
+    Dsp::SimpleFilter <Dsp::Butterworth::BandPass<MAXORDER>, 1,Dsp::DirectFormI> m_filter[FILTERORDER];
 
 
     /**

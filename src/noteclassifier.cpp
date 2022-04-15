@@ -47,7 +47,8 @@ void NoteClassifier::initialize()
     for (int i = 0; i < FILTERORDER; i++)
     {
         m_filter[i].reset();
-        m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+        //m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+        m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth);
     }
 
     //Setup a schmitt trigger as pitchdetector
