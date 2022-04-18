@@ -16,5 +16,6 @@ set(DSPFiltersSRCs ${DSPFiltersDir}/source/Cascade.cpp
 add_library(dsp STATIC ${DSPFiltersSRCs})
 
 add_subdirectory(src)
+add_subdirectory(AnalysisApp)
 
 
