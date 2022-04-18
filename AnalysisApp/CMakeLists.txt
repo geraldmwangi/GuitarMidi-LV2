@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 project("GuitarMidiAnalysisApp")
-# use pkg-config (https://cmake.org/cmake/help/latest/module/FindPkgConfig.html)
+
 find_package(PkgConfig)
 
 pkg_check_modules (FT freetype2)
@@ -12,7 +12,8 @@ pkg_check_modules (GTKX11 gtk+-x11-3.0)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
-
+# I should use pkg-config (https://cmake.org/cmake/help/latest/module/FindPkgConfig.html) to find all modules for juce, since pkg-config is used 
+#in the juce make file
 
 include_directories(${CMAKE_SOURCE_DIR}/JuceLibraryCode ${CMAKE_SOURCE_DIR}/JuceLibraryCode/modules ${FT_INCLUDE_DIRS} ${ALSA_INCLUDE_DIRS} 
     ${CURL_INCLUDE_DIRS} ${WEBKITGTK_INCLUDE_DIRS} ${GTKX11_INCLUDE_DIRS})
