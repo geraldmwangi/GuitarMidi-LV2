@@ -15,8 +15,14 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "")
 # I should use pkg-config (https://cmake.org/cmake/help/latest/module/FindPkgConfig.html) to find all modules for juce, since pkg-config is used 
 #in the juce make file
 
-include_directories(${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode ${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/modules ${FT_INCLUDE_DIRS} ${ALSA_INCLUDE_DIRS} 
-    ${CURL_INCLUDE_DIRS} ${WEBKITGTK_INCLUDE_DIRS} ${GTKX11_INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode 
+${CMAKE_SOURCE_DIR}/AnalysisApp/Source
+${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/modules 
+${FT_INCLUDE_DIRS} 
+${ALSA_INCLUDE_DIRS} 
+${CURL_INCLUDE_DIRS} 
+${WEBKITGTK_INCLUDE_DIRS} 
+${GTKX11_INCLUDE_DIRS})
 
 set(JUCELIBSRC ${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_audio_basics.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_audio_devices.cpp
@@ -34,7 +40,7 @@ ${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_gui_extra.cpp )
 
 set(SRCS ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/Main.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/MainComponent.cpp
-${CMAKE_SOURCE_DIR}/AnalysisApp/Source/FFTElement.cpp)
+${CMAKE_SOURCE_DIR}/AnalysisApp/Source/FilterResponse.cpp)
 
 
 
