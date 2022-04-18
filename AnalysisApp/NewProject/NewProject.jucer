@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="vEIvyG" name="GuitarMidiAnalysisApp" projectType="guiapp"
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+  <MAINGROUP id="yjG5xJ" name="GuitarMidiAnalysisApp">
+    <GROUP id="{A85932A5-5565-7E4A-5BFE-2060717F6B2C}" name="Source">
+      <FILE id="LNusNU" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="hazQzE" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+      <FILE id="bxV6vK" name="MainComponent.cpp" compile="1" resource="0"
+            file="Source/MainComponent.cpp"/>
+    </GROUP>
+    <FILE id="DuQeNf" name="FFTElement.cpp" compile="1" resource="0" file="Source/FFTElement.cpp"/>
+    <FILE id="QoQqAb" name="FFTElement.h" compile="0" resource="0" file="Source/FFTElement.h"/>
+  </MAINGROUP>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
+  <EXPORTFORMATS>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="GuitarMidiAnalysisApp"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="GuitarMidiAnalysisApp"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../sdk's/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../sdk's/JUCE/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+  </MODULES>
+</JUCERPROJECT>
