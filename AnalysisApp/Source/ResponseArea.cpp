@@ -58,7 +58,6 @@ void ResponseArea::drawSpectrum()
         for (int x = 0; x < m_spectrogramImage.getWidth(); x++)
         {
             float f = (maxf-minf)/(m_spectrogramImage.getWidth()-1.0)*x+minf;
-            f/=48000;
             Dsp::complex_t c = m_noteclassifier->filterResponse(f);
             float resp = float(std::abs(c));
             maxresp = (resp > maxresp) ? resp : maxresp;
@@ -67,7 +66,6 @@ void ResponseArea::drawSpectrum()
         for (int x = 0; x < m_spectrogramImage.getWidth(); x++)
         {
             float f = (maxf-minf)/(m_spectrogramImage.getWidth()-1.0)*x+minf;
-            f/=48000;
             Dsp::complex_t c = m_noteclassifier->filterResponse(f );
             float resp = float(std::abs(c));
             float y = (m_spectrogramImage.getHeight() - 1.0) / maxresp * resp;

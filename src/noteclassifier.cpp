@@ -83,7 +83,7 @@ void NoteClassifier::finalize()
 
 Dsp::complex_t NoteClassifier::filterResponse(float freq)
 {
-    return m_filter[0].response(freq);
+    return m_filter[0].response(freq/m_samplerate);
 }
 
 void NoteClassifier::process(int nsamples)
