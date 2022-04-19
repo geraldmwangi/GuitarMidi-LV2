@@ -160,6 +160,8 @@ public:
      */
     void process(int nsamples);
 
+    Dsp::complex_t filterResponse(float freq);
+
     /**
      * @brief pointer to input audio buffer
      * 

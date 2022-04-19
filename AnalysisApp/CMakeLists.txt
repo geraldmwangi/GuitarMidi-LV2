@@ -18,6 +18,7 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "")
 include_directories(${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode 
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source
 ${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/modules 
+${CMAKE_SOURCE_DIR}/src/include
 ${FT_INCLUDE_DIRS} 
 ${ALSA_INCLUDE_DIRS} 
 ${CURL_INCLUDE_DIRS} 
@@ -40,10 +41,12 @@ ${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_gui_extra.cpp )
 
 set(SRCS ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/Main.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/MainComponent.cpp
-${CMAKE_SOURCE_DIR}/AnalysisApp/Source/FilterResponse.cpp)
+${CMAKE_SOURCE_DIR}/AnalysisApp/Source/MainArea.cpp
+${CMAKE_SOURCE_DIR}/AnalysisApp/Source/FilterResponse.cpp
+${CMAKE_SOURCE_DIR}/AnalysisApp/Source/ResponseArea.cpp)
 
 
 
 add_executable(GuitarMidiAnalysisApp ${SRCS} ${JUCELIBSRC})
 
-target_link_libraries(GuitarMidiAnalysisApp dl rt pthread ${ALSA_LIBRARIES}  ${FT_LIBRARIES} ${CURL_LIBRARIES} ${WEBKITGTK_LIBRARIES})
+target_link_libraries(GuitarMidiAnalysisApp guitarmidi dsp dl rt pthread ${ALSA_LIBRARIES}  ${FT_LIBRARIES} ${CURL_LIBRARIES} ${WEBKITGTK_LIBRARIES})

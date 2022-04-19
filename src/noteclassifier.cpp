@@ -80,6 +80,11 @@ void NoteClassifier::finalize()
         del_fvec(m_pitchfreq);
 }
 
+Dsp::complex_t NoteClassifier::filterResponse(float freq)
+{
+    return m_filter[0].response(freq);
+}
+
 void NoteClassifier::process(int nsamples)
 {
     //The filters work inplace so we have to initialize the output with the input data

@@ -4,13 +4,18 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="yjG5xJ" name="GuitarMidiAnalysisApp">
     <GROUP id="{A85932A5-5565-7E4A-5BFE-2060717F6B2C}" name="Source">
+      <FILE id="JuWCBe" name="ResponseArea.cpp" compile="1" resource="0"
+            file="Source/ResponseArea.cpp"/>
+      <FILE id="dImsyz" name="ResponseArea.h" compile="0" resource="0" file="Source/ResponseArea.h"/>
+      <FILE id="dvenxa" name="MainArea.cpp" compile="1" resource="0" file="Source/MainArea.cpp"/>
+      <FILE id="AYiVNF" name="MainArea.h" compile="0" resource="0" file="Source/MainArea.h"/>
+      <FILE id="DuQeNf" name="FFTElement.cpp" compile="1" resource="0" file="Source/FFTElement.cpp"/>
+      <FILE id="QoQqAb" name="FFTElement.h" compile="0" resource="0" file="Source/FFTElement.h"/>
       <FILE id="LNusNU" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="hazQzE" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="bxV6vK" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
     </GROUP>
-    <FILE id="DuQeNf" name="FFTElement.cpp" compile="1" resource="0" file="Source/FFTElement.cpp"/>
-    <FILE id="QoQqAb" name="FFTElement.h" compile="0" resource="0" file="Source/FFTElement.h"/>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
   <EXPORTFORMATS>
