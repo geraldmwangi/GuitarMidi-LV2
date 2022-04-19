@@ -12,6 +12,7 @@ message(${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
 set(DSPFiltersSRCs ${DSPFiltersDir}/source/Cascade.cpp
     ${DSPFiltersDir}/source/Biquad.cpp
     ${DSPFiltersDir}/source/Elliptic.cpp
+    ${DSPFiltersDir}/source/Butterworth.cpp
     ${DSPFiltersDir}/source/PoleFilter.cpp)
 add_library(dsp STATIC ${DSPFiltersSRCs})
 
