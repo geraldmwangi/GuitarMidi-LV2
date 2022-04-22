@@ -21,8 +21,8 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
-#include <noteclassifier.hpp>
-#include <GraphArea.h>
+#include <vector>
+#include <Graph.hpp>
 //[/Headers]
 
 
@@ -35,16 +35,16 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class ResponseArea  : public juce::Component
+class GraphArea  : public juce::Component
 {
 public:
     //==============================================================================
-    ResponseArea ();
-    ~ResponseArea() override;
+    GraphArea ();
+    ~GraphArea() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void drawSpectrum();
+    void addGraph(Graph graph);
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -54,16 +54,14 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    juce::Image m_spectrogramImage;
-    std::shared_ptr<NoteClassifier> m_noteclassifier;
-    std::unique_ptr<GraphArea> m_filterResponseGraph;
+  std::vector<Graph> m_graphs;
     //[/UserVariables]
 
     //==============================================================================
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResponseArea)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphArea)
 };
 
 //[EndFile] You can add extra defines here...
