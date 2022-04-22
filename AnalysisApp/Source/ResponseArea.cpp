@@ -57,23 +57,17 @@ void ResponseArea::drawSpectrum()
         float minf = 70.0;
         float maxf = 160.0;
         float maxresp = 0;
-        for (int x = 0; x < m_filterResponseGraph->getWidth(); x++)
-        {
-            float f = (maxf - minf) / (m_filterResponseGraph->getWidth() - 1.0) * x + minf;
-            Dsp::complex_t c = m_noteclassifier->filterResponse(f);
-            float resp = float(std::abs(c));
-            maxresp = (resp > maxresp) ? resp : maxresp;
-        }
 
-        for (int x = 0; x < m_filterResponseGraph->getWidth(); x++)
+
+        for (float f=minf;f<maxf;f+=1.0)
         {
-            float f = (maxf - minf) / (m_filterResponseGraph->getWidth() - 1.0) * x + minf;
+
             Dsp::complex_t c = m_noteclassifier->filterResponse(f);
             float resp = float(std::abs(c));
-            float y = (m_filterResponseGraph->getHeight() - 1.0) / maxresp * resp;
-            newspektrum.addFunctionPoint(x, y);
-            y = m_spectrogramImage.getHeight() - y;
-            m_spectrogramImage.setPixelAt(x, y, juce::Colour::fromRGB(255, 255, 255));
+
+            newspektrum.addFunctionPoint(f, resp);
+
+
         }
         m_filterResponseGraph->addGraph(newspektrum);
     }

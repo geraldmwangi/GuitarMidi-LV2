@@ -16,7 +16,8 @@ void Graph::addFunctionPoint(float x, float y)
         m_maxx = x;
         m_miny = y;
         m_maxy = y;
-        m_path.startNewSubPath(x, y);
+        //m_path.startNewSubPath(x, y);
+        m_path.lineTo(x, y);
     }
     else
     {

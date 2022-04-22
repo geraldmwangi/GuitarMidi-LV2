@@ -22,8 +22,10 @@ public:
     virtual ~Graph();
 
     void addFunctionPoint(float x,float y);
-    Path& getPath()
+    Path& getPath(juce::Rectangle<int> bounds)
     {
+   
+        m_path.scaleToFit((float)bounds.getX(),(float)bounds.getY(),(float)bounds.getWidth(),(float)bounds.getHeight(),false);
         return m_path;
     }
 };
