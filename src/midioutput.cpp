@@ -26,6 +26,7 @@ MidiOutput::MidiOutput(LV2_URID_Map *map)
         m_midiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
         m_frames = 0;
     }
+    m_midioutput=0;
 }
 
 bool MidiOutput::forge_midimessage(const uint8_t *const buffer,

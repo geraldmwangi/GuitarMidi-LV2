@@ -30,7 +30,13 @@
 MainArea::MainArea ()
 {
     //[Constructor_pre] You can add your own custom stuff here..
+    m_responseArea.reset(new ResponseArea());
     //[/Constructor_pre]
+
+    m_phaseResponseTab.reset (new juce::TabbedComponent (juce::TabbedButtonBar::TabsAtTop));
+    addAndMakeVisible (m_phaseResponseTab.get());
+    m_phaseResponseTab->setTabBarDepth (30);
+    m_phaseResponseTab->setCurrentTabIndex (-1);
 
     m_controlsArea.reset (new juce::GroupComponent ("controls",
                                                     TRANS("controls")));
@@ -45,17 +51,10 @@ MainArea::MainArea ()
     m_noteClSelector->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     m_noteClSelector->addListener (this);
 
-    m_responseArea.reset (new ResponseArea());
-    addAndMakeVisible (m_responseArea.get());
-    m_responseArea->setName ("responseArea");
-
-    juce__viewport.reset (new juce::Viewport ("new viewport"));
-    addAndMakeVisible (juce__viewport.get());
-
-    juce__viewport->setBounds (584, 40, 150, 150);
-
 
     //[UserPreSize]
+    m_phaseResponseTab->addTab (TRANS("Response"), juce::Colours::lightgrey, m_responseArea.get(), false);
+    m_phaseResponseTab->addTab (TRANS("Phase"), juce::Colours::lightgrey, 0, false);
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -70,10 +69,9 @@ MainArea::~MainArea()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
+    m_phaseResponseTab = nullptr;
     m_controlsArea = nullptr;
     m_noteClSelector = nullptr;
-    m_responseArea = nullptr;
-    juce__viewport = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -97,9 +95,9 @@ void MainArea::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
+    m_phaseResponseTab->setBounds (proportionOfWidth (0.0179f), proportionOfHeight (0.0184f), proportionOfWidth (0.9717f), proportionOfHeight (0.5511f));
     m_controlsArea->setBounds (0, proportionOfHeight (0.6005f), proportionOfWidth (1.0000f), proportionOfHeight (0.3995f));
     m_noteClSelector->setBounds (0 + juce::roundToInt (proportionOfWidth (1.0000f) * 0.0477f), proportionOfHeight (0.6005f) + juce::roundToInt (proportionOfHeight (0.3995f) * 0.1523f), juce::roundToInt (proportionOfWidth (1.0000f) * 0.1311f), juce::roundToInt (proportionOfHeight (0.3995f) * 0.0690f));
-    m_responseArea->setBounds (proportionOfWidth (0.0596f), proportionOfHeight (0.2756f), proportionOfWidth (0.9404f), proportionOfHeight (0.3249f));
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -139,6 +137,9 @@ BEGIN_JUCER_METADATA
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
+  <TABBEDCOMPONENT name="new tabbed component" id="d26db19854bd82c8" memberName="m_phaseResponseTab"
+                   virtualName="" explicitFocusOrder="0" pos="1.788% 1.837% 97.168% 55.109%"
+                   orientation="top" tabBarDepth="30" initialTab="-1"/>
   <GROUPCOMPONENT name="controls" id="5dfc032bfdecdadc" memberName="m_controlsArea"
                   virtualName="" explicitFocusOrder="0" pos="0 60.046% 100% 39.954%"
                   title="controls" textpos="36"/>
@@ -147,13 +148,6 @@ BEGIN_JUCER_METADATA
             posRelativeX="5dfc032bfdecdadc" posRelativeY="5dfc032bfdecdadc"
             posRelativeW="5dfc032bfdecdadc" posRelativeH="5dfc032bfdecdadc"
             editable="0" layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <GENERICCOMPONENT name="responseArea" id="93cfb025f2a0b2ff" memberName="m_responseArea"
-                    virtualName="" explicitFocusOrder="0" pos="5.961% 27.555% 94.039% 32.491%"
-                    class="ResponseArea" params=""/>
-  <VIEWPORT name="new viewport" id="cc836f2d38e6005e" memberName="juce__viewport"
-            virtualName="" explicitFocusOrder="0" pos="584 40 150 150" vscroll="1"
-            hscroll="1" scrollbarThickness="8" contentType="0" jucerFile=""
-            contentClass="" constructorParams=""/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

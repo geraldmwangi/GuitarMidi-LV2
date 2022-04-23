@@ -54,13 +54,13 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    unique_ptr<ResponseArea>    m_responseArea;
     //[/UserVariables]
 
     //==============================================================================
+    std::unique_ptr<juce::TabbedComponent> m_phaseResponseTab;
     std::unique_ptr<juce::GroupComponent> m_controlsArea;
     std::unique_ptr<juce::ComboBox> m_noteClSelector;
-    std::unique_ptr<ResponseArea> m_responseArea;
-    std::unique_ptr<juce::Viewport> juce__viewport;
 
 
     //==============================================================================

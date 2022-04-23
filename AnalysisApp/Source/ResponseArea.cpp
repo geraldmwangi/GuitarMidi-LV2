@@ -112,7 +112,7 @@ void ResponseArea::drawSpectrum()
 
         for(auto notecl:m_fretboard->getNoteClassifiers())
         {
- 
+
 
             shared_ptr<ResponseGraph> newspektrum=make_shared<ResponseGraph>(notecl);
             m_filterResponseGraph->addGraph(newspektrum);
