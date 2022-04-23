@@ -20,9 +20,12 @@
 
 MidiOutput::MidiOutput(LV2_URID_Map *map)
 {
-    lv2_atom_forge_init(&m_forge, map);
-    m_midiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
-    m_frames = 0;
+    if(map)
+    {
+        lv2_atom_forge_init(&m_forge, map);
+        m_midiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
+        m_frames = 0;
+    }
 }
 
 bool MidiOutput::forge_midimessage(const uint8_t *const buffer,

@@ -1,6 +1,6 @@
 #include <Graph.hpp>
 
-Graph::Graph() 
+Graph::Graph() : m_initialized(false)
 {
 }
 
@@ -10,14 +10,15 @@ Graph::~Graph()
 
 void Graph::addFunctionPoint(float x, float y)
 {
-    if (m_path.isEmpty())
+    if (!m_initialized)
     {
         m_minx = x;
         m_maxx = x;
         m_miny = y;
         m_maxy = y;
-        //m_path.startNewSubPath(x, y);
-        m_path.lineTo(x, y);
+        m_path.startNewSubPath(x, y);
+        m_initialized=true;
+        
     }
     else
     {

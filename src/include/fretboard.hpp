@@ -62,6 +62,11 @@ public:
      */
     void setAudioInput(const float *input);
 
+    vector<shared_ptr<NoteClassifier>>& getNoteClassifiers()
+    {
+        return m_noteClassifiers;
+    }
+
     /**
      * @brief Set the Audio Output buffer. This buffer is only used as an internal buffer until I know how to query lv2 for the framebuffersize
      * 

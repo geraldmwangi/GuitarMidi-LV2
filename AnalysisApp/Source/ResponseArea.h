@@ -21,7 +21,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
-#include <noteclassifier.hpp>
+#include <fretboard.hpp>
 #include <GraphArea.h>
 //[/Headers]
 
@@ -56,6 +56,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     juce::Image m_spectrogramImage;
     std::shared_ptr<NoteClassifier> m_noteclassifier;
+    std::shared_ptr<FretBoard> m_fretboard;
     std::unique_ptr<GraphArea> m_filterResponseGraph;
     //[/UserVariables]
 

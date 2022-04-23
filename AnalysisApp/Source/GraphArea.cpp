@@ -60,14 +60,14 @@ void GraphArea::paint (juce::Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colour::fromRGB(0,0,0));
+    g.fillAll (juce::Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
     for(Graph graph:m_graphs)
     {
-       
+
         g.setColour(juce::Colour::fromRGB(255,255,255));
-       
+
         g.strokePath(graph.getPath(getBounds()), PathStrokeType (5.0f));
     }
     //[/UserPaint]

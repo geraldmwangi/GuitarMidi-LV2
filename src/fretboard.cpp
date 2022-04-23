@@ -100,7 +100,8 @@ void FretBoard::setMidiOutput(LV2_Atom_Sequence *output)
 
 void FretBoard::initialize()
 {
-    m_midioutput->initializeSequence();
+    if(m_midioutput)
+        m_midioutput->initializeSequence();
     for (auto notecl : m_noteClassifiers)
         notecl->initialize();
 }

@@ -10,6 +10,7 @@ using namespace juce;
 class Graph
 {
 private:
+    bool m_initialized;
     Path m_path;
 
     float m_minx;
@@ -22,10 +23,20 @@ public:
     virtual ~Graph();
 
     void addFunctionPoint(float x,float y);
-    Path& getPath(juce::Rectangle<int> bounds)
+    Path getPath(juce::Rectangle<int> bounds)
     {
-   
-        m_path.scaleToFit((float)bounds.getX(),(float)bounds.getY(),(float)bounds.getWidth(),(float)bounds.getHeight(),false);
+        Path scaledPath=m_path;
+        scaledPath.scaleToFit((float)bounds.getX(),(float)bounds.getY(),(float)bounds.getWidth(),(float)bounds.getHeight(),false);
+        return scaledPath;
+    }
+
+    Path getPath()
+    {
         return m_path;
+    }
+
+    Rectangle<float> getBounds()
+    {
+        return m_path.getBounds();
     }
 };
