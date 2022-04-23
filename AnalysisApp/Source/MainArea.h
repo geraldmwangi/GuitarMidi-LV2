@@ -60,6 +60,7 @@ private:
     std::unique_ptr<juce::GroupComponent> m_controlsArea;
     std::unique_ptr<juce::ComboBox> m_noteClSelector;
     std::unique_ptr<ResponseArea> m_responseArea;
+    std::unique_ptr<juce::Viewport> juce__viewport;
 
 
     //==============================================================================

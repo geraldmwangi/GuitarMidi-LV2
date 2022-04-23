@@ -1,5 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
+#include <noteclassifier.hpp>
 
 using namespace juce;
 
@@ -10,17 +11,25 @@ using namespace juce;
 class Graph
 {
 private:
-    bool m_initialized;
+    
     Path m_path;
 
     float m_minx;
     float m_maxx;
     float m_miny;
     float m_maxy;
+    
+
+    protected:
+    bool m_initialized;
+    shared_ptr<NoteClassifier> m_notecl;
+    virtual void computeGraph()=0;
 
 public:
-    Graph();
+    Graph(shared_ptr<NoteClassifier> notecl);
     virtual ~Graph();
+
+    void processGraph();
 
     void addFunctionPoint(float x,float y);
     Path getPath(juce::Rectangle<int> bounds)

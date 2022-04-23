@@ -63,12 +63,12 @@ void GraphArea::paint (juce::Graphics& g)
     g.fillAll (juce::Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
-    for(Graph graph:m_graphs)
+    for(auto graph:m_graphs)
     {
 
         g.setColour(juce::Colour::fromRGB(255,255,255));
-
-        g.strokePath(graph.getPath(getBounds()), PathStrokeType (5.0f));
+        graph->processGraph();
+        g.strokePath(graph->getPath(getBounds()), PathStrokeType (5.0f));
     }
     //[/UserPaint]
 }
@@ -110,7 +110,7 @@ END_JUCER_METADATA
 
 
 //[EndFile] You can add extra defines here...
-void GraphArea::addGraph(Graph graph)
+void GraphArea::addGraph(shared_ptr<Graph> graph)
 {
     m_graphs.push_back(graph);
     repaint();

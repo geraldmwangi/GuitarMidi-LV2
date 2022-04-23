@@ -23,6 +23,7 @@
 #include <JuceHeader.h>
 #include <fretboard.hpp>
 #include <GraphArea.h>
+#include <ResponseGraph.hpp>
 //[/Headers]
 
 

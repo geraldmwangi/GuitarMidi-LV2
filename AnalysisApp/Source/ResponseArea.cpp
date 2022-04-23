@@ -112,16 +112,9 @@ void ResponseArea::drawSpectrum()
 
         for(auto notecl:m_fretboard->getNoteClassifiers())
         {
-            Graph newspektrum;
+ 
 
-            for (float f = minf; f < maxf; f += 1.0)
-            {
-
-                Dsp::complex_t c = notecl->filterResponse(f);
-                float resp = float(std::abs(c));
-
-                newspektrum.addFunctionPoint(f, 1.0-resp);
-            }
+            shared_ptr<ResponseGraph> newspektrum=make_shared<ResponseGraph>(notecl);
             m_filterResponseGraph->addGraph(newspektrum);
         }
     }

@@ -1,11 +1,16 @@
 #include <Graph.hpp>
 
-Graph::Graph() : m_initialized(false)
+Graph::Graph(shared_ptr<NoteClassifier> notecl) : m_initialized(false), m_notecl(notecl)
 {
 }
 
 Graph::~Graph()
 {
+}
+
+void Graph::processGraph()
+{
+    computeGraph();
 }
 
 void Graph::addFunctionPoint(float x, float y)
