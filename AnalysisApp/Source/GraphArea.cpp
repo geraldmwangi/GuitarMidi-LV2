@@ -64,15 +64,18 @@ void GraphArea::paint (juce::Graphics& g)
 
     //[UserPaint] Add your own custom painting code here..
     Rectangle<float> valueBounds;
+    int c=0;
     for(auto graph:m_graphs)
     {
 
-        g.setColour(juce::Colour::fromRGB(255,255,255));
+        g.setColour(juce::Colour::fromHSV((float)c/m_graphs.size(),1,1,1));
+        c++;
         graph->processGraph();
         valueBounds=valueBounds.getUnion(graph->getBounds());
         g.strokePath(graph->getPath(getBounds()), PathStrokeType (1.0f));
         //g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
     }
+    g.setColour(juce::Colour::fromRGB(255,255,255));
     Line<int> ordinate(getBounds().getTopLeft(),getBounds().getBottomLeft());
     g.drawLine(ordinate.getStartX(),ordinate.getStartY(),ordinate.getEndX(),ordinate.getEndY());
 
