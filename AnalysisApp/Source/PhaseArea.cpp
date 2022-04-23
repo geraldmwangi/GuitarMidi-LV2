@@ -107,7 +107,7 @@ void PhaseArea::drawPhaseDiagram()
 
             shared_ptr<PhaseGraph> newspektrum=make_shared<PhaseGraph>(notecl);
             m_filterPhaseGraph->addGraph(newspektrum);
-            break;
+            // break;
         }
     }
 }
