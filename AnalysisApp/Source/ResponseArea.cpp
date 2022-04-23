@@ -43,11 +43,8 @@ ResponseArea::ResponseArea ()
 
 
     //[Constructor] You can add your own custom stuff here..
-    m_spectrogramImage = juce::Image(juce::Image::RGB, getWidth() * 0.7, getHeight() * 0.7, true);
-
+ 
     m_filterResponseGraph->setSize(getWidth() * 0.7, getHeight() * 0.7);
-    m_noteclassifier = make_shared<NoteClassifier>(nullptr, 48000, 82.41, 10);
-    m_noteclassifier->initialize();
     m_fretboard=make_shared<FretBoard>(nullptr,48000);
     m_fretboard->initialize();
     drawSpectrum();
@@ -96,7 +93,7 @@ void ResponseArea::resized()
     // m_spectrogramImage.rescaled(getWidth()*0.7, getHeight()*0.7);
     // m_spectrogramImage=juce::Image(juce::Image::RGB, getWidth()*0.7, getHeight()*0.7, true);
     // drawSpectrum();
-    m_filterResponseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.9), proportionOfHeight(0.9));
+    m_filterResponseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.99), proportionOfHeight(0.99));
     //[/UserResized]
 }
 

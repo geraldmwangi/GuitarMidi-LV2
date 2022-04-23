@@ -44,9 +44,11 @@ ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/MainComponent.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/MainArea.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/FilterResponse.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/ResponseArea.cpp
+${CMAKE_SOURCE_DIR}/AnalysisApp/Source/PhaseArea.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/GraphArea.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/Graph.cpp
-${CMAKE_SOURCE_DIR}/AnalysisApp/Source/ResponseGraph.cpp)
+${CMAKE_SOURCE_DIR}/AnalysisApp/Source/ResponseGraph.cpp
+${CMAKE_SOURCE_DIR}/AnalysisApp/Source/PhaseGraph.cpp)
 
 
 

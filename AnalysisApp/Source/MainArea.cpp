@@ -31,6 +31,7 @@ MainArea::MainArea ()
 {
     //[Constructor_pre] You can add your own custom stuff here..
     m_responseArea.reset(new ResponseArea());
+    m_phaseArea.reset(new PhaseArea());
     //[/Constructor_pre]
 
     m_phaseResponseTab.reset (new juce::TabbedComponent (juce::TabbedButtonBar::TabsAtTop));
@@ -54,7 +55,7 @@ MainArea::MainArea ()
 
     //[UserPreSize]
     m_phaseResponseTab->addTab (TRANS("Response"), juce::Colours::lightgrey, m_responseArea.get(), false);
-    m_phaseResponseTab->addTab (TRANS("Phase"), juce::Colours::lightgrey, 0, false);
+    m_phaseResponseTab->addTab (TRANS("Phase"), juce::Colours::lightgrey, m_phaseArea.get(), false);
     //[/UserPreSize]
 
     setSize (600, 400);

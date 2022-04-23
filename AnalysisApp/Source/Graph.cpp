@@ -10,6 +10,8 @@ Graph::~Graph()
 
 void Graph::processGraph()
 {
+    m_initialized = false;
+    m_path.clear();
     computeGraph();
 }
 

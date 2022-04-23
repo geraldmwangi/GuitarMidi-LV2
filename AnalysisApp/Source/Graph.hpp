@@ -12,7 +12,7 @@ class Graph
 {
 private:
     
-    Path m_path;
+   
 
     float m_minx;
     float m_maxx;
@@ -21,6 +21,7 @@ private:
     
 
     protected:
+    Path m_path;
     bool m_initialized;
     shared_ptr<NoteClassifier> m_notecl;
     virtual void computeGraph()=0;

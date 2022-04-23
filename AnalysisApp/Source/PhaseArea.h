@@ -21,8 +21,9 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
-#include <ResponseArea.h>
-#include <PhaseArea.h>
+#include <fretboard.hpp>
+#include <GraphArea.h>
+#include <PhaseGraph.hpp>
 //[/Headers]
 
 
@@ -35,38 +36,34 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class MainArea  : public juce::Component,
-                  public juce::ComboBox::Listener
+class PhaseArea  : public juce::Component
 {
 public:
     //==============================================================================
-    MainArea ();
-    ~MainArea() override;
+    PhaseArea ();
+    ~PhaseArea() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void drawPhaseDiagram();
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
-    void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    unique_ptr<ResponseArea>    m_responseArea;
-    unique_ptr<PhaseArea>     m_phaseArea;
+    std::shared_ptr<FretBoard> m_fretboard;
+    std::unique_ptr<GraphArea> m_filterPhaseGraph;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<juce::TabbedComponent> m_phaseResponseTab;
-    std::unique_ptr<juce::GroupComponent> m_controlsArea;
-    std::unique_ptr<juce::ComboBox> m_noteClSelector;
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainArea)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PhaseArea)
 };
 
 //[EndFile] You can add extra defines here...

@@ -20,16 +20,18 @@
 //[Headers] You can add your own extra header files here...
 //[/Headers]
 
-#include "GraphArea.h"
+#include "PhaseArea.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-GraphArea::GraphArea ()
+PhaseArea::PhaseArea ()
 {
     //[Constructor_pre] You can add your own custom stuff here..
+    m_filterPhaseGraph.reset(new GraphArea());
+    addAndMakeVisible(m_filterPhaseGraph.get());
     //[/Constructor_pre]
 
 
@@ -40,10 +42,14 @@ GraphArea::GraphArea ()
 
 
     //[Constructor] You can add your own custom stuff here..
+        m_filterPhaseGraph->setSize(getWidth() * 0.7, getHeight() * 0.7);
+    m_fretboard=make_shared<FretBoard>(nullptr,48000);
+    m_fretboard->initialize();
+    drawPhaseDiagram();
     //[/Constructor]
 }
 
-GraphArea::~GraphArea()
+PhaseArea::~PhaseArea()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
@@ -55,50 +61,56 @@ GraphArea::~GraphArea()
 }
 
 //==============================================================================
-void GraphArea::paint (juce::Graphics& g)
+void PhaseArea::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colour (0xff323e44));
+    g.fillAll (juce::Colour (0xff473737));
+
+    {
+        float x = static_cast<float> (-1), y = static_cast<float> (-1), width = static_cast<float> (proportionOfWidth (1.0000f)), height = static_cast<float> (proportionOfHeight (1.0000f));
+        juce::Colour strokeColour = juce::Colours::white;
+        //[UserPaintCustomArguments] Customize the painting arguments here..
+        //[/UserPaintCustomArguments]
+        g.setColour (strokeColour);
+        g.drawRoundedRectangle (x, y, width, height, 10.000f, 5.000f);
+    }
 
     //[UserPaint] Add your own custom painting code here..
-    Rectangle<float> valueBounds;
-    for(auto graph:m_graphs)
-    {
-
-        g.setColour(juce::Colour::fromRGB(255,255,255));
-        graph->processGraph();
-        valueBounds=valueBounds.getUnion(graph->getBounds());
-        g.strokePath(graph->getPath(getBounds()), PathStrokeType (1.0f));
-        //g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
-    }
-    Line<int> ordinate(getBounds().getTopLeft(),getBounds().getBottomLeft());
-    g.drawLine(ordinate.getStartX(),ordinate.getStartY(),ordinate.getEndX(),ordinate.getEndY());
-
-    int numticks=10;
-    for(int i=0;i<numticks;i++)
-    {
-        float y=(ordinate.getEndY()-ordinate.getStartY())*((float)i)/numticks+ordinate.getStartY();
-        float valy=(valueBounds.getTopLeft().getY()-valueBounds.getBottomLeft().getY())*((float)i)/numticks+valueBounds.getBottomLeft().getY();
-        g.drawText(String(valy),ordinate.getStartX(),y,100,100,Justification::centred);
-
-    }
     //[/UserPaint]
 }
 
-void GraphArea::resized()
+void PhaseArea::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
+    m_filterPhaseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.99), proportionOfHeight(0.99));
     //[/UserResized]
 }
 
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void PhaseArea::drawPhaseDiagram()
+{
+    if (m_filterPhaseGraph)
+    {
+        float minf = 70.0;
+        float maxf = 500.0;
+
+        for(auto notecl:m_fretboard->getNoteClassifiers())
+        {
+
+
+            shared_ptr<PhaseGraph> newspektrum=make_shared<PhaseGraph>(notecl);
+            m_filterPhaseGraph->addGraph(newspektrum);
+            break;
+        }
+    }
+}
 //[/MiscUserCode]
 
 
@@ -111,11 +123,14 @@ void GraphArea::resized()
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="GraphArea" componentName=""
+<JUCER_COMPONENT documentType="Component" className="PhaseArea" componentName=""
                  parentClasses="public juce::Component" constructorParams="" variableInitialisers=""
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
-  <BACKGROUND backgroundColour="ff323e44"/>
+  <BACKGROUND backgroundColour="ff473737">
+    <ROUNDRECT pos="-1 -1 100% 100%" cornerSize="10.0" fill="solid: ffffff"
+               hasStroke="1" stroke="5, mitered, butt" strokeColour="solid: ffffffff"/>
+  </BACKGROUND>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
@@ -124,10 +139,5 @@ END_JUCER_METADATA
 
 
 //[EndFile] You can add extra defines here...
-void GraphArea::addGraph(shared_ptr<Graph> graph)
-{
-    m_graphs.push_back(graph);
-    repaint();
-}
 //[/EndFile]
 
