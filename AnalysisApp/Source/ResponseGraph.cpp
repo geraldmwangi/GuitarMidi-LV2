@@ -10,7 +10,7 @@ ResponseGraph::~ResponseGraph()
 
 void ResponseGraph::computeGraph()
 {
-    float minf = 70.0;
+    float minf = 0.0;
     float maxf = 500.0;
     m_initialized = false;
 

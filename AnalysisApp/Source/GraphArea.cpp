@@ -63,7 +63,7 @@ void GraphArea::paint (juce::Graphics& g)
     g.fillAll (juce::Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
-    Rectangle<float> valueBounds;
+
     int c=0;
     for(auto graph:m_graphs)
     {
@@ -71,22 +71,10 @@ void GraphArea::paint (juce::Graphics& g)
         g.setColour(juce::Colour::fromHSV((float)c/m_graphs.size(),1,1,1));
         c++;
         graph->processGraph();
-        valueBounds=valueBounds.getUnion(graph->getBounds());
-        g.strokePath(graph->getPath(getBounds()), PathStrokeType (1.0f));
+        g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType (1.0f));
         //g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
     }
-    g.setColour(juce::Colour::fromRGB(255,255,255));
-    Line<int> ordinate(getBounds().getTopLeft(),getBounds().getBottomLeft());
-    g.drawLine(ordinate.getStartX(),ordinate.getStartY(),ordinate.getEndX(),ordinate.getEndY());
 
-    int numticks=10;
-    for(int i=0;i<numticks;i++)
-    {
-        float y=(ordinate.getEndY()-ordinate.getStartY())*((float)i)/numticks+ordinate.getStartY();
-        float valy=(valueBounds.getTopLeft().getY()-valueBounds.getBottomLeft().getY())*((float)i)/numticks+valueBounds.getBottomLeft().getY();
-        g.drawText(String(valy),ordinate.getStartX(),y,100,100,Justification::centred);
-
-    }
     //[/UserPaint]
 }
 
@@ -102,6 +90,22 @@ void GraphArea::resized()
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void GraphArea::addGraph(shared_ptr<Graph> graph)
+{
+    m_graphs.push_back(graph);
+    repaint();
+}
+
+Rectangle<float> GraphArea::getGraphBounds()
+{
+    Rectangle<float> res;
+    for(auto gr:m_graphs)
+    {
+        res=res.getUnion(gr->getBounds());
+    }
+    return res;
+
+}
 //[/MiscUserCode]
 
 
@@ -127,10 +131,5 @@ END_JUCER_METADATA
 
 
 //[EndFile] You can add extra defines here...
-void GraphArea::addGraph(shared_ptr<Graph> graph)
-{
-    m_graphs.push_back(graph);
-    repaint();
-}
 //[/EndFile]
 

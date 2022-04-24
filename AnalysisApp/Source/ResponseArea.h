@@ -22,7 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include <fretboard.hpp>
-#include <GraphArea.h>
+#include <PlotArea.h>
 #include <ResponseGraph.hpp>
 //[/Headers]
 
@@ -58,7 +58,7 @@ private:
     juce::Image m_spectrogramImage;
     std::shared_ptr<NoteClassifier> m_noteclassifier;
     std::shared_ptr<FretBoard> m_fretboard;
-    std::unique_ptr<GraphArea> m_filterResponseGraph;
+    std::unique_ptr<PlotArea> m_filterResponseGraph;
     //[/UserVariables]
 
     //==============================================================================

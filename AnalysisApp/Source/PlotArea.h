@@ -21,8 +21,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
-#include <vector>
-#include <Graph.hpp>
+#include <GraphArea.h>
 //[/Headers]
 
 
@@ -35,17 +34,19 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class GraphArea  : public juce::Component
+class PlotArea  : public juce::Component
 {
 public:
     //==============================================================================
-    GraphArea ();
-    ~GraphArea() override;
+    PlotArea ();
+    ~PlotArea() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void addGraph(shared_ptr<Graph> graph);
-    Rectangle<float> getGraphBounds();
+    void addGraph(shared_ptr<Graph> graph)
+    {
+      m_graphArea->addGraph(graph);
+    }
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -55,14 +56,14 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-  std::vector<shared_ptr<Graph>> m_graphs;
+    std::unique_ptr<GraphArea> m_graphArea;
     //[/UserVariables]
 
     //==============================================================================
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphArea)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PlotArea)
 };
 
 //[EndFile] You can add extra defines here...

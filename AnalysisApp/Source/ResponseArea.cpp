@@ -30,7 +30,7 @@
 ResponseArea::ResponseArea ()
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    m_filterResponseGraph.reset(new GraphArea());
+    m_filterResponseGraph.reset(new PlotArea());
     addAndMakeVisible(m_filterResponseGraph.get());
     //[/Constructor_pre]
 
@@ -104,8 +104,7 @@ void ResponseArea::drawSpectrum()
 {
     if (m_filterResponseGraph)
     {
-        float minf = 70.0;
-        float maxf = 500.0;
+
 
         for(auto notecl:m_fretboard->getNoteClassifiers())
         {

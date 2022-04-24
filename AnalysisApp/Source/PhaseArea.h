@@ -22,7 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include <fretboard.hpp>
-#include <GraphArea.h>
+#include <PlotArea.h>
 #include <PhaseGraph.hpp>
 //[/Headers]
 
@@ -56,7 +56,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     std::shared_ptr<FretBoard> m_fretboard;
-    std::unique_ptr<GraphArea> m_filterPhaseGraph;
+    std::unique_ptr<PlotArea> m_filterPhaseGraph;
     //[/UserVariables]
 
     //==============================================================================

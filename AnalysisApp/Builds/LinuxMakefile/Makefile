@@ -68,8 +68,9 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS_APP := \
-  $(JUCE_OBJDIR)/GraphArea_14e84edc.o \
+  $(JUCE_OBJDIR)/PlotArea_721c7c97.o \
   $(JUCE_OBJDIR)/PhaseArea_4aa21a09.o \
+  $(JUCE_OBJDIR)/GraphArea_14e84edc.o \
   $(JUCE_OBJDIR)/ResponseArea_727d99f7.o \
   $(JUCE_OBJDIR)/MainArea_c1e09d6f.o \
   $(JUCE_OBJDIR)/Main_90ebc5c2.o \
@@ -100,14 +101,19 @@ $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) : $(OBJECTS_APP) $(RESOURCES)
 	-$(V_AT)mkdir -p $(JUCE_OUTDIR)
 	$(V_AT)$(CXX) -o $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) $(OBJECTS_APP) $(JUCE_LDFLAGS) $(JUCE_LDFLAGS_APP) $(RESOURCES) $(TARGET_ARCH)
 
-$(JUCE_OBJDIR)/GraphArea_14e84edc.o: ../../Source/GraphArea.cpp
+$(JUCE_OBJDIR)/PlotArea_721c7c97.o: ../../Source/PlotArea.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling GraphArea.cpp"
+	@echo "Compiling PlotArea.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/PhaseArea_4aa21a09.o: ../../Source/PhaseArea.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling PhaseArea.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/GraphArea_14e84edc.o: ../../Source/GraphArea.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling GraphArea.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/ResponseArea_727d99f7.o: ../../Source/ResponseArea.cpp
