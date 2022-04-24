@@ -40,6 +40,8 @@ public:
         return scaledPath;
     }
 
+    Path getFrequencyLine(juce::Rectangle<int> bounds);
+
     Path getPath()
     {
         return m_path;

@@ -22,21 +22,24 @@
 
 #include "PlotArea.h"
 
+
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-PlotArea::PlotArea()
+PlotArea::PlotArea ()
 {
     //[Constructor_pre] You can add your own custom stuff here..
     m_graphArea.reset(new GraphArea());
     addAndMakeVisible(m_graphArea.get());
     //[/Constructor_pre]
 
+
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize(600, 400);
+    setSize (600, 400);
+
 
     //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
@@ -47,23 +50,25 @@ PlotArea::~PlotArea()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
+
+
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void PlotArea::paint(juce::Graphics &g)
+void PlotArea::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll(juce::Colour(0xff323e44));
+    g.fillAll (juce::Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
     Rectangle<float> valueBounds = m_graphArea->getGraphBounds();
     g.setColour(juce::Colour::fromRGB(255, 255, 255));
-    //Line<int> ordinate(getBounds().getTopLeft(), getBounds().getBottomLeft());
-     Line<int> ordinate(proportionOfWidth(0.1),proportionOfHeight(0.0),proportionOfWidth(0.1),proportionOfHeight(0.9));
+    // Line<int> ordinate(getBounds().getTopLeft(), getBounds().getBottomLeft());
+    Line<int> ordinate(m_graphArea->getBounds().getTopLeft(), m_graphArea->getBounds().getBottomLeft());
     g.drawLine(ordinate.getStartX(), ordinate.getStartY(), ordinate.getEndX(), ordinate.getEndY());
 
     int numticks = 10;
@@ -71,19 +76,22 @@ void PlotArea::paint(juce::Graphics &g)
     {
         float y = (ordinate.getEndY() - ordinate.getStartY()) * ((float)i) / numticks + ordinate.getStartY();
         float valy = (valueBounds.getTopLeft().getY() - valueBounds.getBottomLeft().getY()) * ((float)i) / numticks + valueBounds.getBottomLeft().getY();
-        
-        g.drawText(String(valy), ordinate.getStartX()-50, y, 50, 100, Justification::topLeft);
+
+        g.drawText(String(valy), ordinate.getStartX() - 50, y, 50, 100, Justification::topLeft);
+        g.drawLine(ordinate.getEndX()-10,y,ordinate.getEndX(),y);
     }
 
-    Line<int> abscisse(proportionOfWidth(0.1),proportionOfHeight(0.9),proportionOfWidth(0.9),proportionOfHeight(0.9));
+
+    Line<int> abscisse(m_graphArea->getBounds().getBottomLeft(), m_graphArea->getBounds().getBottomRight());
     g.drawLine(abscisse.getStartX(), abscisse.getStartY(), abscisse.getEndX(), abscisse.getEndY());
 
     for (int i = 0; i < numticks; i++)
     {
         float x = (abscisse.getEndX() - abscisse.getStartX()) * ((float)i) / numticks + abscisse.getStartX();
         float valx = (valueBounds.getBottomRight().getX() - valueBounds.getBottomLeft().getX()) * ((float)i) / numticks + valueBounds.getBottomLeft().getX();
-        
-        g.drawText(String(valx), x,abscisse.getStartY(), 50, 100, Justification::topLeft);
+
+        g.drawText(String(valx), x, abscisse.getEndY()+10, 50, 100, Justification::topLeft);
+        g.drawLine(x,abscisse.getEndY()+10,x,abscisse.getEndY());
     }
     //[/UserPaint]
 }
@@ -98,8 +106,11 @@ void PlotArea::resized()
     //[/UserResized]
 }
 
+
+
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 //[/MiscUserCode]
+
 
 //==============================================================================
 #if 0
@@ -121,5 +132,7 @@ END_JUCER_METADATA
 */
 #endif
 
+
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

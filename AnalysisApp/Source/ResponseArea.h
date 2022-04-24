@@ -40,12 +40,16 @@ class ResponseArea  : public juce::Component
 {
 public:
     //==============================================================================
-    ResponseArea ();
+    ResponseArea (shared_ptr<FretBoard> fretboard);
     ~ResponseArea() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void drawSpectrum();
+  void drawSpectrum();
+  void setCurrentGraph(int graph_index)
+  {
+    m_filterResponseGraph->setCurrentGraph(graph_index);
+  }
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -55,10 +59,10 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    juce::Image m_spectrogramImage;
-    std::shared_ptr<NoteClassifier> m_noteclassifier;
-    std::shared_ptr<FretBoard> m_fretboard;
-    std::unique_ptr<PlotArea> m_filterResponseGraph;
+  juce::Image m_spectrogramImage;
+  std::shared_ptr<NoteClassifier> m_noteclassifier;
+  std::shared_ptr<FretBoard> m_fretboard;
+  std::unique_ptr<PlotArea> m_filterResponseGraph;
     //[/UserVariables]
 
     //==============================================================================

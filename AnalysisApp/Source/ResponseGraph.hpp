@@ -1,11 +1,12 @@
 #pragma once
 #include <Graph.hpp>
 
-class ResponseGraph: public Graph
+class ResponseGraph : public Graph
 {
-    protected:
+protected:
     virtual void computeGraph();
-    public:
+
+public:
     ResponseGraph(shared_ptr<NoteClassifier> notecl);
     virtual ~ResponseGraph();
 };

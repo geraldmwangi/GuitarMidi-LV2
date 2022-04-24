@@ -23,6 +23,7 @@
 #include <JuceHeader.h>
 #include <ResponseArea.h>
 #include <PhaseArea.h>
+
 //[/Headers]
 
 
@@ -57,6 +58,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     unique_ptr<ResponseArea>    m_responseArea;
     unique_ptr<PhaseArea>     m_phaseArea;
+    shared_ptr<FretBoard>     m_fretboard;
     //[/UserVariables]
 
     //==============================================================================

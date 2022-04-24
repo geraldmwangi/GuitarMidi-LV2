@@ -27,7 +27,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PhaseArea::PhaseArea ()
+PhaseArea::PhaseArea (shared_ptr<FretBoard> fretboard)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     m_filterPhaseGraph.reset(new PlotArea());
@@ -42,9 +42,8 @@ PhaseArea::PhaseArea ()
 
 
     //[Constructor] You can add your own custom stuff here..
-        m_filterPhaseGraph->setSize(getWidth() * 0.7, getHeight() * 0.7);
-    m_fretboard=make_shared<FretBoard>(nullptr,48000);
-    m_fretboard->initialize();
+    m_filterPhaseGraph->setSize(getWidth() * 0.7, getHeight() * 0.7);
+    m_fretboard =fretboard;
     drawPhaseDiagram();
     //[/Constructor]
 }
@@ -87,7 +86,7 @@ void PhaseArea::resized()
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
-    m_filterPhaseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.99), proportionOfHeight(0.99));
+    m_filterPhaseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.9), proportionOfHeight(0.9));
     //[/UserResized]
 }
 
@@ -101,11 +100,10 @@ void PhaseArea::drawPhaseDiagram()
         float minf = 70.0;
         float maxf = 500.0;
 
-        for(auto notecl:m_fretboard->getNoteClassifiers())
+        for (auto notecl : m_fretboard->getNoteClassifiers())
         {
 
-
-            shared_ptr<PhaseGraph> newspektrum=make_shared<PhaseGraph>(notecl);
+            shared_ptr<PhaseGraph> newspektrum = make_shared<PhaseGraph>(notecl);
             m_filterPhaseGraph->addGraph(newspektrum);
             // break;
         }
@@ -124,9 +122,9 @@ void PhaseArea::drawPhaseDiagram()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PhaseArea" componentName=""
-                 parentClasses="public juce::Component" constructorParams="" variableInitialisers=""
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="400">
+                 parentClasses="public juce::Component" constructorParams="shared_ptr&lt;FretBoard&gt; fretboard"
+                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
+                 overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff473737">
     <ROUNDRECT pos="-1 -1 100% 100%" cornerSize="10.0" fill="solid: ffffff"
                hasStroke="1" stroke="5, mitered, butt" strokeColour="solid: ffffffff"/>

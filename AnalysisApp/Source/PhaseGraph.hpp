@@ -1,11 +1,12 @@
 #pragma once
 #include <Graph.hpp>
 
-class PhaseGraph: public Graph
+class PhaseGraph : public Graph
 {
-    protected:
+protected:
     virtual void computeGraph();
-    public:
+
+public:
     PhaseGraph(shared_ptr<NoteClassifier> notecl);
     virtual ~PhaseGraph();
 };

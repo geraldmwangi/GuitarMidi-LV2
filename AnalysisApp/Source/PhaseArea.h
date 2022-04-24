@@ -26,8 +26,6 @@
 #include <PhaseGraph.hpp>
 //[/Headers]
 
-
-
 //==============================================================================
 /**
                                                                     //[Comments]
@@ -36,36 +34,36 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class PhaseArea  : public juce::Component
+class PhaseArea : public juce::Component
 {
 public:
-    //==============================================================================
-    PhaseArea ();
-    ~PhaseArea() override;
+  //==============================================================================
+  PhaseArea(shared_ptr<FretBoard> fretboard);
+  ~PhaseArea() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
-    void drawPhaseDiagram();
-    //[/UserMethods]
+  //==============================================================================
+  //[UserMethods]     -- You can add your own custom methods in this section.
+  void drawPhaseDiagram();
+  void setCurrentGraph(int graph_index)
+  {
+    m_filterPhaseGraph->setCurrentGraph(graph_index);
+  }
+  //[/UserMethods]
 
-    void paint (juce::Graphics& g) override;
-    void resized() override;
-
-
+  void paint(juce::Graphics &g) override;
+  void resized() override;
 
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
-    std::shared_ptr<FretBoard> m_fretboard;
-    std::unique_ptr<PlotArea> m_filterPhaseGraph;
-    //[/UserVariables]
+  //[UserVariables]   -- You can add your own custom variables in this section.
+  std::shared_ptr<FretBoard> m_fretboard;
+  std::unique_ptr<PlotArea> m_filterPhaseGraph;
+  //[/UserVariables]
 
-    //==============================================================================
+  //==============================================================================
 
-
-    //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PhaseArea)
+  //==============================================================================
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PhaseArea)
 };
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

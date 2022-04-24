@@ -30,8 +30,10 @@
 MainArea::MainArea ()
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    m_responseArea.reset(new ResponseArea());
-    m_phaseArea.reset(new PhaseArea());
+    m_fretboard = make_shared<FretBoard>(nullptr, 48000);
+    m_fretboard->initialize();
+    m_responseArea.reset(new ResponseArea(m_fretboard));
+    m_phaseArea.reset(new PhaseArea(m_fretboard));
     //[/Constructor_pre]
 
     m_phaseResponseTab.reset (new juce::TabbedComponent (juce::TabbedButtonBar::TabsAtTop));
@@ -56,6 +58,14 @@ MainArea::MainArea ()
     //[UserPreSize]
     m_phaseResponseTab->addTab (TRANS("Response"), juce::Colours::lightgrey, m_responseArea.get(), false);
     m_phaseResponseTab->addTab (TRANS("Phase"), juce::Colours::lightgrey, m_phaseArea.get(), false);
+
+    m_noteClSelector->addItem("ALL",ALL_NOTECLS);
+    for(int n=0;n<m_fretboard->getNoteClassifiers().size();n++)
+    {
+        auto notecl=m_fretboard->getNoteClassifiers()[n];
+        m_noteClSelector->addItem(String(notecl->getCenterFrequency()),n);
+
+    }
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -111,6 +121,9 @@ void MainArea::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == m_noteClSelector.get())
     {
         //[UserComboBoxCode_m_noteClSelector] -- add your combo box handling code here..
+        int id=comboBoxThatHasChanged->getSelectedId();
+        m_responseArea->setCurrentGraph(id);
+        m_phaseArea->setCurrentGraph(id);
         //[/UserComboBoxCode_m_noteClSelector]
     }
 

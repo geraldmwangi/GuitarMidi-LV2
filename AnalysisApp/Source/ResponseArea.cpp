@@ -27,7 +27,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-ResponseArea::ResponseArea ()
+ResponseArea::ResponseArea (shared_ptr<FretBoard> fretboard)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     m_filterResponseGraph.reset(new PlotArea());
@@ -43,10 +43,9 @@ ResponseArea::ResponseArea ()
 
 
     //[Constructor] You can add your own custom stuff here..
- 
+
     m_filterResponseGraph->setSize(getWidth() * 0.7, getHeight() * 0.7);
-    m_fretboard=make_shared<FretBoard>(nullptr,48000);
-    m_fretboard->initialize();
+    m_fretboard =fretboard;
     drawSpectrum();
     //[/Constructor]
 }
@@ -93,7 +92,7 @@ void ResponseArea::resized()
     // m_spectrogramImage.rescaled(getWidth()*0.7, getHeight()*0.7);
     // m_spectrogramImage=juce::Image(juce::Image::RGB, getWidth()*0.7, getHeight()*0.7, true);
     // drawSpectrum();
-    m_filterResponseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.99), proportionOfHeight(0.99));
+    m_filterResponseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.9), proportionOfHeight(0.9));
     //[/UserResized]
 }
 
@@ -105,12 +104,10 @@ void ResponseArea::drawSpectrum()
     if (m_filterResponseGraph)
     {
 
-
-        for(auto notecl:m_fretboard->getNoteClassifiers())
+        for (auto notecl : m_fretboard->getNoteClassifiers())
         {
 
-
-            shared_ptr<ResponseGraph> newspektrum=make_shared<ResponseGraph>(notecl);
+            shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl);
             m_filterResponseGraph->addGraph(newspektrum);
         }
     }
@@ -128,9 +125,9 @@ void ResponseArea::drawSpectrum()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ResponseArea" componentName=""
-                 parentClasses="public juce::Component" constructorParams="" variableInitialisers=""
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="400">
+                 parentClasses="public juce::Component" constructorParams="shared_ptr&lt;FretBoard&gt; fretboard"
+                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
+                 overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44">
     <ROUNDRECT pos="0 0 100% 100%" cornerSize="10.0" fill="solid: 2aa55e" hasStroke="1"
                stroke="5, mitered, butt" strokeColour="solid: ffffffff"/>

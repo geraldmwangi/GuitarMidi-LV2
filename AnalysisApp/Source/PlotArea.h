@@ -43,10 +43,14 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void addGraph(shared_ptr<Graph> graph)
-    {
-      m_graphArea->addGraph(graph);
-    }
+  void addGraph(shared_ptr<Graph> graph)
+  {
+    m_graphArea->addGraph(graph);
+  }
+  void setCurrentGraph(int graph_index)
+  {
+    m_graphArea->setCurrentGraph(graph_index);
+  }
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -56,7 +60,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    std::unique_ptr<GraphArea> m_graphArea;
+  std::unique_ptr<GraphArea> m_graphArea;
     //[/UserVariables]
 
     //==============================================================================

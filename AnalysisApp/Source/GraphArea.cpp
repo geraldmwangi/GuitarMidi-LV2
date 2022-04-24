@@ -22,24 +22,22 @@
 
 #include "GraphArea.h"
 
-
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-GraphArea::GraphArea ()
+GraphArea::GraphArea()
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (600, 400);
-
+    setSize(600, 400);
 
     //[Constructor] You can add your own custom stuff here..
+    m_currentGraphIndex = ALL_NOTECLS;
     //[/Constructor]
 }
 
@@ -48,31 +46,41 @@ GraphArea::~GraphArea()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-
-
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void GraphArea::paint (juce::Graphics& g)
+void GraphArea::paint(juce::Graphics &g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colour (0xff323e44));
+    g.fillAll(juce::Colour(0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
 
-    int c=0;
-    for(auto graph:m_graphs)
-    {
+    int c = 0;
+    if (m_currentGraphIndex == ALL_NOTECLS)
+        for (auto graph : m_graphs)
+        {
 
-        g.setColour(juce::Colour::fromHSV((float)c/m_graphs.size(),1,1,1));
+            g.setColour(juce::Colour::fromHSV((float)c / m_graphs.size(), 1, 1, 1));
+            c++;
+            graph->processGraph();
+            g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType(1.0f));
+            g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
+            // g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
+        }
+    else
+    {
+        auto graph = m_graphs[m_currentGraphIndex];
+        g.setColour(juce::Colour::fromRGB(255,255,255));
         c++;
         graph->processGraph();
-        g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType (1.0f));
-        //g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
+        g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType(1.0f));
+        g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
+        // g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
     }
 
     //[/UserPaint]
@@ -87,8 +95,6 @@ void GraphArea::resized()
     //[/UserResized]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void GraphArea::addGraph(shared_ptr<Graph> graph)
 {
@@ -99,15 +105,13 @@ void GraphArea::addGraph(shared_ptr<Graph> graph)
 Rectangle<float> GraphArea::getGraphBounds()
 {
     Rectangle<float> res;
-    for(auto gr:m_graphs)
+    for (auto gr : m_graphs)
     {
-        res=res.getUnion(gr->getBounds());
+        res = res.getUnion(gr->getBounds());
     }
     return res;
-
 }
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -129,7 +133,5 @@ END_JUCER_METADATA
 */
 #endif
 
-
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

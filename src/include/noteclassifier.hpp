@@ -180,4 +180,9 @@ public:
      * @param output pointer to midi output buffer provided by the host
      */
     void setMidiOutput(shared_ptr<MidiOutput> output);
+
+    float getCenterFrequency()
+    {
+        return m_centerfreq;
+    }
 };

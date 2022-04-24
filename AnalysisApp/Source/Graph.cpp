@@ -15,6 +15,25 @@ void Graph::processGraph()
     computeGraph();
 }
 
+Path Graph::getFrequencyLine(juce::Rectangle<int> bounds)
+{
+    //fmax=m*xmax+b
+    //fmin=m*xmin+b
+    //m=(fmax-fmin)/(xmax-xmin)
+    //b=fmax-m*xmax
+
+    float m=(bounds.getWidth())/(m_maxx-m_minx);
+    float b=bounds.getBottomRight().getX()-m*m_maxx;
+
+    float f=m*m_notecl->getCenterFrequency()+b;
+    Line<float> line(f,bounds.getBottomLeft().getY(),f,bounds.getTopLeft().getY());
+    
+    Path path;
+    path.addLineSegment(line,1.0);
+    
+    return path;
+}
+
 void Graph::addFunctionPoint(float x, float y)
 {
     if (!m_initialized)

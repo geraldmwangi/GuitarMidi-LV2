@@ -11,7 +11,7 @@ PhaseGraph::~PhaseGraph()
 
 void PhaseGraph::computeGraph()
 {
-    float minf = 70.0;
+    float minf = 0.0;
     float maxf = 500.0;
 
     for (float f = minf; f < maxf; f += 1.0)
@@ -19,7 +19,7 @@ void PhaseGraph::computeGraph()
 
         Dsp::complex_t c = m_notecl->filterResponse(f);
         float phase = 0;
-        if(fabs(c)>0)
+        if (fabs(c) > 0)
         {
             if (c.real() > 0)
                 phase = atan2(c.imag(), c.real());
