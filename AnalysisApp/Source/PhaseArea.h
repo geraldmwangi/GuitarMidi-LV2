@@ -43,10 +43,29 @@ public:
 
   //==============================================================================
   //[UserMethods]     -- You can add your own custom methods in this section.
-  void drawPhaseDiagram();
-  void setCurrentGraph(int graph_index)
+  void drawGraphs(int graph_index)
   {
-    m_filterPhaseGraph->setCurrentGraph(graph_index);
+    if (m_filterPhaseGraph)
+    {
+      shared_ptr<GraphVector> graphs = make_shared<GraphVector>();
+      if (graph_index == ALL_NOTECLS)
+      {
+
+        for (auto notecl : m_fretboard->getNoteClassifiers())
+        {
+
+          shared_ptr<PhaseGraph> newspektrum = make_shared<PhaseGraph>(notecl);
+          graphs->push_back(newspektrum);
+        }
+      }
+      else
+      {
+        auto notecl = m_fretboard->getNoteClassifiers()[graph_index];
+        shared_ptr<PhaseGraph> newspektrum = make_shared<PhaseGraph>(notecl);
+        graphs->push_back(newspektrum);
+      }
+      m_filterPhaseGraph->drawGraphs(graphs);
+    }
   }
   //[/UserMethods]
 

@@ -44,7 +44,7 @@ PhaseArea::PhaseArea (shared_ptr<FretBoard> fretboard)
     //[Constructor] You can add your own custom stuff here..
     m_filterPhaseGraph->setSize(getWidth() * 0.7, getHeight() * 0.7);
     m_fretboard =fretboard;
-    drawPhaseDiagram();
+
     //[/Constructor]
 }
 
@@ -86,29 +86,13 @@ void PhaseArea::resized()
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
-    m_filterPhaseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.9), proportionOfHeight(0.9));
+    m_filterPhaseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.98), proportionOfHeight(0.98));
     //[/UserResized]
 }
 
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void PhaseArea::drawPhaseDiagram()
-{
-    if (m_filterPhaseGraph)
-    {
-        float minf = 70.0;
-        float maxf = 500.0;
-
-        for (auto notecl : m_fretboard->getNoteClassifiers())
-        {
-
-            shared_ptr<PhaseGraph> newspektrum = make_shared<PhaseGraph>(notecl);
-            m_filterPhaseGraph->addGraph(newspektrum);
-            // break;
-        }
-    }
-}
 //[/MiscUserCode]
 
 

@@ -181,6 +181,8 @@ public:
      */
     void setMidiOutput(shared_ptr<MidiOutput> output);
 
+    void setFilterParameters(float bandwidth = 20, float passbandatten = 1);
+
     float getCenterFrequency()
     {
         return m_centerfreq;

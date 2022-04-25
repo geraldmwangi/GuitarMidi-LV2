@@ -35,6 +35,17 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_noteOnOffState = false;
 }
 
+void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten)
+{
+    m_bandwidth=bandwidth;
+    for (int i = 0; i < FILTERORDER; i++)
+    {
+        m_filter[i].reset();
+        // m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+        m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth);
+    }
+}
+
 void NoteClassifier::setMidiOutput(shared_ptr<MidiOutput> output)
 {
     //Set midi output

@@ -37,7 +37,8 @@
                                                                     //[/Comments]
 */
 class MainArea  : public juce::Component,
-                  public juce::ComboBox::Listener
+                  public juce::ComboBox::Listener,
+                  public juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -51,6 +52,7 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
@@ -59,12 +61,14 @@ private:
     unique_ptr<ResponseArea>    m_responseArea;
     unique_ptr<PhaseArea>     m_phaseArea;
     shared_ptr<FretBoard>     m_fretboard;
+    int m_currentNoteCl;
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<juce::TabbedComponent> m_phaseResponseTab;
     std::unique_ptr<juce::GroupComponent> m_controlsArea;
     std::unique_ptr<juce::ComboBox> m_noteClSelector;
+    std::unique_ptr<juce::Slider> m_bandwidthInput;
 
 
     //==============================================================================

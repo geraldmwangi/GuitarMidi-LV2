@@ -46,7 +46,6 @@ ResponseArea::ResponseArea (shared_ptr<FretBoard> fretboard)
 
     m_filterResponseGraph->setSize(getWidth() * 0.7, getHeight() * 0.7);
     m_fretboard =fretboard;
-    drawSpectrum();
     //[/Constructor]
 }
 
@@ -92,26 +91,13 @@ void ResponseArea::resized()
     // m_spectrogramImage.rescaled(getWidth()*0.7, getHeight()*0.7);
     // m_spectrogramImage=juce::Image(juce::Image::RGB, getWidth()*0.7, getHeight()*0.7, true);
     // drawSpectrum();
-    m_filterResponseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.9), proportionOfHeight(0.9));
+    m_filterResponseGraph->setBounds(proportionOfWidth(0.01), proportionOfHeight(0.01), proportionOfWidth(0.98), proportionOfHeight(0.98));
     //[/UserResized]
 }
 
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void ResponseArea::drawSpectrum()
-{
-    if (m_filterResponseGraph)
-    {
-
-        for (auto notecl : m_fretboard->getNoteClassifiers())
-        {
-
-            shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl);
-            m_filterResponseGraph->addGraph(newspektrum);
-        }
-    }
-}
 //[/MiscUserCode]
 
 

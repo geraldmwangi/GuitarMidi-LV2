@@ -24,9 +24,8 @@
 #include <vector>
 #include <Graph.hpp>
 #define ALL_NOTECLS -1
+typedef std::vector<shared_ptr<Graph>> GraphVector;
 //[/Headers]
-
-
 
 //==============================================================================
 /**
@@ -36,43 +35,32 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class GraphArea  : public juce::Component
+class GraphArea : public juce::Component
 {
 public:
-    //==============================================================================
-    GraphArea ();
-    ~GraphArea() override;
+  //==============================================================================
+  GraphArea();
+  ~GraphArea() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
-    void addGraph(shared_ptr<Graph> graph);
-    Rectangle<float> getGraphBounds();
-    void setCurrentGraph(int graph_index)
-    {
-      //assert(m_graphs.size()>graph_index);
-      m_currentGraphIndex=graph_index;
-      repaint();
-    }
-    //[/UserMethods]
+  //==============================================================================
+  //[UserMethods]     -- You can add your own custom methods in this section.
+  void drawGraphs(shared_ptr<GraphVector> graph);
+  Rectangle<float> getGraphBounds();
+  //[/UserMethods]
 
-    void paint (juce::Graphics& g) override;
-    void resized() override;
-
-
+  void paint(juce::Graphics &g) override;
+  void resized() override;
 
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
-  std::vector<shared_ptr<Graph>> m_graphs;
-  int m_currentGraphIndex;
-    //[/UserVariables]
+  //[UserVariables]   -- You can add your own custom variables in this section.
+  shared_ptr<GraphVector> m_graphs;
+  //[/UserVariables]
 
-    //==============================================================================
+  //==============================================================================
 
-
-    //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphArea)
+  //==============================================================================
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GraphArea)
 };
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

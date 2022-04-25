@@ -37,7 +37,6 @@ GraphArea::GraphArea()
     setSize(600, 400);
 
     //[Constructor] You can add your own custom stuff here..
-    m_currentGraphIndex = ALL_NOTECLS;
     //[/Constructor]
 }
 
@@ -60,28 +59,33 @@ void GraphArea::paint(juce::Graphics &g)
 
     //[UserPaint] Add your own custom painting code here..
 
-    int c = 0;
-    if (m_currentGraphIndex == ALL_NOTECLS)
-        for (auto graph : m_graphs)
-        {
-
-            g.setColour(juce::Colour::fromHSV((float)c / m_graphs.size(), 1, 1, 1));
-            c++;
-            graph->processGraph();
-            g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType(1.0f));
-            g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
-            // g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
-        }
-    else
+    if(m_graphs&&(*m_graphs).size())
     {
-        auto graph = m_graphs[m_currentGraphIndex];
-        g.setColour(juce::Colour::fromRGB(255,255,255));
-        c++;
+        if((*m_graphs).size()==1)
+        {
+            auto graph=(*m_graphs)[0];
+                    g.setColour(juce::Colour::fromRGB(255,255,255));
         graph->processGraph();
         g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType(1.0f));
         g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
-        // g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
+        }
+        else
+        {
+            int c = 0;
+            for (auto graph : (*m_graphs))
+            {
+
+                g.setColour(juce::Colour::fromHSV((float)c / (*m_graphs).size(), 1, 1, 1));
+                c++;
+                graph->processGraph();
+                g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType(1.0f));
+                g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
+                // g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
+            }
+        }
     }
+    
+
 
     //[/UserPaint]
 }
@@ -96,18 +100,21 @@ void GraphArea::resized()
 }
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void GraphArea::addGraph(shared_ptr<Graph> graph)
+void GraphArea::drawGraphs(shared_ptr<GraphVector> graphs)
 {
-    m_graphs.push_back(graph);
+    m_graphs=graphs;
     repaint();
 }
 
 Rectangle<float> GraphArea::getGraphBounds()
 {
     Rectangle<float> res;
-    for (auto gr : m_graphs)
+    if(m_graphs)
     {
-        res = res.getUnion(gr->getBounds());
+        for (auto gr : *m_graphs)
+        {
+            res = res.getUnion(gr->getBounds());
+        }
     }
     return res;
 }
