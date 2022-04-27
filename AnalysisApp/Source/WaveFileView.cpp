@@ -20,82 +20,52 @@
 //[Headers] You can add your own extra header files here...
 //[/Headers]
 
-#include "GraphArea.h"
-
+#include "WaveFileView.h"
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-GraphArea::GraphArea ()
+WaveFileView::WaveFileView() : m_thumbnailCache(1), m_thumbnail(512, m_formatManager, m_thumbnailCache)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (600, 400);
-
+    setSize(600, 400);
 
     //[Constructor] You can add your own custom stuff here..
+    m_formatManager.registerBasicFormats();
+    m_thumbnail.setSource(new juce::FileInputSource(juce::File(juce::String("/home/gerald/Music/i need some_final mix more punch_r1_session.wav"))));
     //[/Constructor]
 }
 
-GraphArea::~GraphArea()
+WaveFileView::~WaveFileView()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
-
-
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void GraphArea::paint (juce::Graphics& g)
+void WaveFileView::paint(juce::Graphics &g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colour (0xff323e44));
+    //g.fillAll(juce::Colour::fromRGB(255, 0, 0));
 
     //[UserPaint] Add your own custom painting code here..
-
-    if(m_graphs&&(*m_graphs).size())
-    {
-        if((*m_graphs).size()==1)
-        {
-            auto graph=(*m_graphs)[0];
-                    g.setColour(juce::Colour::fromRGB(255,255,255));
-        graph->processGraph();
-        g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType(1.0f));
-        g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
-        }
-        else
-        {
-            int c = 0;
-            for (auto graph : (*m_graphs))
-            {
-
-                g.setColour(juce::Colour::fromHSV((float)c / (*m_graphs).size(), 1, 1, 1));
-                c++;
-                graph->processGraph();
-                g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType(1.0f));
-                g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
-                // g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
-            }
-        }
-    }
-
-
-
+    
+    m_thumbnail.drawChannels(g,getBounds(),0,m_thumbnail.getTotalLength(),0.5f);
     //[/UserPaint]
 }
 
-void GraphArea::resized()
+void WaveFileView::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
@@ -104,29 +74,47 @@ void GraphArea::resized()
     //[/UserResized]
 }
 
+void WaveFileView::mouseMove(const juce::MouseEvent &e)
+{
+    //[UserCode_mouseMove] -- Add your code here...
+    //[/UserCode_mouseMove]
+}
 
+void WaveFileView::mouseEnter(const juce::MouseEvent &e)
+{
+    //[UserCode_mouseEnter] -- Add your code here...
+    //[/UserCode_mouseEnter]
+}
+
+void WaveFileView::mouseExit(const juce::MouseEvent &e)
+{
+    //[UserCode_mouseExit] -- Add your code here...
+    //[/UserCode_mouseExit]
+}
+
+void WaveFileView::mouseDown(const juce::MouseEvent &e)
+{
+    //[UserCode_mouseDown] -- Add your code here...
+    std::cout<<"WaveFileView::mouseDown"<<std::endl;
+    //[/UserCode_mouseDown]
+}
+
+void WaveFileView::mouseDrag(const juce::MouseEvent &e)
+{
+    //[UserCode_mouseDrag] -- Add your code here...
+    //[/UserCode_mouseDrag]
+}
+
+void WaveFileView::mouseUp(const juce::MouseEvent &e)
+{
+    //[UserCode_mouseUp] -- Add your code here...
+    
+    std::cout<<"WaveFileView::mouseUp"<<std::endl;
+    //[/UserCode_mouseUp]
+}
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void GraphArea::drawGraphs(shared_ptr<GraphVector> graphs)
-{
-    m_graphs=graphs;
-    repaint();
-}
-
-Rectangle<float> GraphArea::getGraphBounds()
-{
-    Rectangle<float> res;
-    if(m_graphs)
-    {
-        for (auto gr : *m_graphs)
-        {
-            res = res.getUnion(gr->getBounds());
-        }
-    }
-    return res;
-}
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -137,10 +125,18 @@ Rectangle<float> GraphArea::getGraphBounds()
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="GraphArea" componentName=""
+<JUCER_COMPONENT documentType="Component" className="WaveFileView" componentName=""
                  parentClasses="public juce::Component" constructorParams="" variableInitialisers=""
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
+  <METHODS>
+    <METHOD name="mouseMove (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseEnter (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseExit (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseDown (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseDrag (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseUp (const juce::MouseEvent&amp; e)"/>
+  </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
 </JUCER_COMPONENT>
 
@@ -148,7 +144,5 @@ END_JUCER_METADATA
 */
 #endif
 
-
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

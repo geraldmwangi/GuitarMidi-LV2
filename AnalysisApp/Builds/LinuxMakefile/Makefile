@@ -69,6 +69,7 @@ endif
 
 OBJECTS_APP := \
   $(JUCE_OBJDIR)/PlotArea_721c7c97.o \
+  $(JUCE_OBJDIR)/WaveFileView_b18ae7e3.o \
   $(JUCE_OBJDIR)/PhaseArea_4aa21a09.o \
   $(JUCE_OBJDIR)/GraphArea_14e84edc.o \
   $(JUCE_OBJDIR)/ResponseArea_727d99f7.o \
@@ -104,6 +105,11 @@ $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) : $(OBJECTS_APP) $(RESOURCES)
 $(JUCE_OBJDIR)/PlotArea_721c7c97.o: ../../Source/PlotArea.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling PlotArea.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/WaveFileView_b18ae7e3.o: ../../Source/WaveFileView.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling WaveFileView.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/PhaseArea_4aa21a09.o: ../../Source/PhaseArea.cpp

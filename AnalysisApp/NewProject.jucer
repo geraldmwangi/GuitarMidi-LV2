@@ -6,6 +6,9 @@
     <GROUP id="{A85932A5-5565-7E4A-5BFE-2060717F6B2C}" name="Source">
       <FILE id="iTmA4V" name="PlotArea.cpp" compile="1" resource="0" file="Source/PlotArea.cpp"/>
       <FILE id="cO71Fr" name="PlotArea.h" compile="0" resource="0" file="Source/PlotArea.h"/>
+      <FILE id="wxsJ72" name="WaveFileView.cpp" compile="1" resource="0"
+            file="Source/WaveFileView.cpp"/>
+      <FILE id="OUzBIo" name="WaveFileView.h" compile="0" resource="0" file="Source/WaveFileView.h"/>
       <FILE id="NNqaPD" name="PhaseArea.h" compile="0" resource="0" file="Source/PhaseArea.h"/>
       <FILE id="f88IdF" name="PhaseArea.cpp" compile="1" resource="0" file="Source/PhaseArea.cpp"/>
       <FILE id="LMz5SI" name="GraphArea.cpp" compile="1" resource="0" file="Source/GraphArea.cpp"/>
