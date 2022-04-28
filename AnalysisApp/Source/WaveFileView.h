@@ -33,7 +33,7 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class WaveFileView  : public juce::Component
+class WaveFileView  : public juce::Component, public juce::ChangeListener
 {
 public:
     //==============================================================================
@@ -42,6 +42,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    virtual void changeListenerCallback (juce::ChangeBroadcaster* source);
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;

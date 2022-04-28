@@ -39,6 +39,7 @@ WaveFileView::WaveFileView() : m_thumbnailCache(1), m_thumbnail(512, m_formatMan
     //[Constructor] You can add your own custom stuff here..
     m_formatManager.registerBasicFormats();
     m_thumbnail.setSource(new juce::FileInputSource(juce::File(juce::String("/home/gerald/Music/i need some_final mix more punch_r1_session.wav"))));
+    m_thumbnail.addChangeListener(this);
     //[/Constructor]
 }
 
@@ -71,6 +72,7 @@ void WaveFileView::resized()
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
+   
     //[/UserResized]
 }
 
@@ -96,12 +98,15 @@ void WaveFileView::mouseDown(const juce::MouseEvent &e)
 {
     //[UserCode_mouseDown] -- Add your code here...
     std::cout<<"WaveFileView::mouseDown"<<std::endl;
+    std::cout<<e.getMouseDownX()<<"x"<<e.getMouseDownScreenY()<<std::endl;
     //[/UserCode_mouseDown]
 }
 
 void WaveFileView::mouseDrag(const juce::MouseEvent &e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
+    std::cout<<"WaveFileView::mouseDrag"<<std::endl;
+    std::cout<<e.getDistanceFromDragStartX()<<"x"<<e.getDistanceFromDragStartY()<<std::endl;
     //[/UserCode_mouseDrag]
 }
 
@@ -114,6 +119,11 @@ void WaveFileView::mouseUp(const juce::MouseEvent &e)
 }
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void WaveFileView::changeListenerCallback(juce::ChangeBroadcaster* source)
+{
+     //std::cout<<"WaveFileView::changeListenerCallback"<<std::endl;
+     repaint();
+}
 //[/MiscUserCode]
 
 //==============================================================================
