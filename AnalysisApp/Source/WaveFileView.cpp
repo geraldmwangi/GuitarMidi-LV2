@@ -38,7 +38,7 @@ WaveFileView::WaveFileView() : m_thumbnailCache(1), m_thumbnail(512, m_formatMan
 
     //[Constructor] You can add your own custom stuff here..
     m_formatManager.registerBasicFormats();
-    juce::String file = juce::String("/home/gerald/Music/i need some_final mix more punch_r1_session.wav");
+    juce::String file = juce::String("/home/gerald/Downloads/gtr-jaz-2.wav");
     auto *reader = m_formatManager.createReaderFor(file);
     std::cout << "Loading file: " << file << std::endl;
     std::cout << "Samplerate: " << reader->sampleRate << " Hz" << std::endl;
@@ -115,6 +115,9 @@ void WaveFileView::mouseDown(const juce::MouseEvent &e)
     m_offsetX = e.getMouseDownX();
     m_linePositionX = m_offsetX;
 
+    double pos_secs=((float)m_linePositionX)/(getLocalBounds().getWidth())*m_transportSource.getLengthInSeconds();
+
+    std::cout<<"Line position: "<<pos_secs<<" s"<<std::endl;
     repaint();
     //[/UserCode_mouseDown]
 }
@@ -126,6 +129,9 @@ void WaveFileView::mouseDrag(const juce::MouseEvent &e)
     std::cout << e.getDistanceFromDragStartX() << "x" << e.getDistanceFromDragStartY() << std::endl;
     if (e.mouseWasDraggedSinceMouseDown())
         m_linePositionX = m_offsetX + e.getDistanceFromDragStartX();
+    double pos_secs=((float)m_linePositionX)/(getLocalBounds().getWidth())*m_transportSource.getLengthInSeconds();
+
+    std::cout<<"Line position: "<<pos_secs<<" s"<<std::endl;
     repaint();
     //[/UserCode_mouseDrag]
 }
@@ -135,7 +141,7 @@ void WaveFileView::mouseUp(const juce::MouseEvent &e)
     //[UserCode_mouseUp] -- Add your code here...
 
     std::cout << "WaveFileView::mouseUp" << std::endl;
-    m_linePositionX = -1;
+    //m_linePositionX = -1;
     repaint();
     //[/UserCode_mouseUp]
 }
