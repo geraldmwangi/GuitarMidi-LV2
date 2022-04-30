@@ -128,6 +128,7 @@ void MainArea::resized()
     m_bandwidthInput->setBounds (proportionOfWidth (0.2496f), proportionOfHeight (0.6710f), proportionOfWidth (0.2049f), proportionOfHeight (0.1328f));
     m_waveFileGroup->setBounds (proportionOfWidth (0.4590f), proportionOfHeight (0.6769f), proportionOfWidth (0.5067f), proportionOfHeight (0.1763f));
     //[UserResized] Add your own custom resize handling here..
+    m_waveFileView->setBounds(m_waveFileGroup->getLocalBounds());
     //[/UserResized]
 }
 

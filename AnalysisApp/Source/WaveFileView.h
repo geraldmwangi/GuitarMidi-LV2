@@ -60,7 +60,11 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     juce::AudioThumbnail m_thumbnail;
     juce::AudioFormatManager m_formatManager;
-    juce::AudioThumbnailCache m_thumbnailCache;
+    juce::AudioThumbnailCache m_thumbnailCache;                  // [3]
+    std::unique_ptr<juce::AudioFormatReaderSource> m_readerSource;
+    juce::AudioTransportSource m_transportSource;
+    int m_linePositionX;
+    int m_offsetX;
     //[/UserVariables]
 
     //==============================================================================
