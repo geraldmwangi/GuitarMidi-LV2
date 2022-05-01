@@ -46,7 +46,7 @@ void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten)
     }
 }
 
-void NoteClassifier::setMidiOutput(shared_ptr<MidiOutput> output)
+void NoteClassifier::setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output)
 {
     //Set midi output
     m_midiOutput=output;

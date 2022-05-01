@@ -35,24 +35,25 @@
  * @brief MidiOutput abstracts lv2's midi messaging. It needs some debugging
  * 
  */
-class MidiOutput
-{
-private:
-    /* atom-forge and URI mapping */
-    LV2_Atom_Forge m_forge;
-    LV2_Atom_Forge_Frame m_frame;
-    LV2_URID m_midiEvent;
-    LV2_Atom_Sequence *m_midioutput;
-    int64_t m_frames;
+namespace GuitarMidi {
+    class MidiOutput
+    {
+    private:
+        /* atom-forge and URI mapping */
+        LV2_Atom_Forge m_forge;
+        LV2_Atom_Forge_Frame m_frame;
+        LV2_URID m_midiEvent;
+        LV2_Atom_Sequence *m_midioutput;
+        int64_t m_frames;
 
-    bool forge_midimessage(
-        const uint8_t *const buffer,
-        uint32_t size,int64_t frames);
+        bool forge_midimessage(
+            const uint8_t *const buffer,
+            uint32_t size, int64_t frames);
 
-public:
-    MidiOutput(LV2_URID_Map *map);
-    void setMidiOutput(LV2_Atom_Sequence* output);
-    void initializeSequence();
-    void sendMidiMessage(uint8_t midinote[3],int64_t frames);
-    
-};
+    public:
+        MidiOutput(LV2_URID_Map *map);
+        void setMidiOutput(LV2_Atom_Sequence *output);
+        void initializeSequence();
+        void sendMidiMessage(uint8_t midinote[3], int64_t frames);
+    };
+}

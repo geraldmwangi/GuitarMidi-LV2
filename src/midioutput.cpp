@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301  USA
  */
 #include <midioutput.hpp>
-
+using namespace GuitarMidi;
 MidiOutput::MidiOutput(LV2_URID_Map *map)
 {
     if(map)

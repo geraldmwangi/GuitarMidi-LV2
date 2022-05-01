@@ -43,7 +43,7 @@ private:
      */
     vector<shared_ptr<NoteClassifier>> m_noteClassifiers;
 
-    shared_ptr<MidiOutput> m_midioutput;
+    shared_ptr<GuitarMidi::MidiOutput> m_midioutput;
 
 public:
     /**

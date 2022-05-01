@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301  USA
  */
 #include <fretboard.hpp>
-
+using namespace GuitarMidi;
 FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
 {
     m_midioutput=make_shared<MidiOutput>(map);

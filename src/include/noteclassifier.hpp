@@ -126,7 +126,7 @@ private:
      * @brief m_midiOutput: The midioutput object
      * 
      */
-    std::shared_ptr<MidiOutput> m_midiOutput;
+    std::shared_ptr<GuitarMidi::MidiOutput> m_midiOutput;
 
 public:
 
@@ -188,7 +188,7 @@ public:
      * 
      * @param output pointer to midi output buffer provided by the host
      */
-    void setMidiOutput(shared_ptr<MidiOutput> output);
+    void setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output);
 
     void setFilterParameters(float bandwidth = 20, float passbandatten = 1);
 
