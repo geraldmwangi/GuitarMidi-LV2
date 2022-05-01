@@ -147,7 +147,7 @@ void MainArea::comboBoxChanged(juce::ComboBox *comboBoxThatHasChanged)
             for (auto notecl : m_fretboard->getNoteClassifiers())
             {
 
-                shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl);
+                shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl,m_waveFileView->getCurrentAudioSlice());
                 shared_ptr<PhaseGraph> newphase = make_shared<PhaseGraph>(notecl);
                 responseGraphs->push_back(newspektrum);
                 phaseGraphs->push_back(newphase);
@@ -156,7 +156,7 @@ void MainArea::comboBoxChanged(juce::ComboBox *comboBoxThatHasChanged)
         else
         {
             auto notecl = m_fretboard->getNoteClassifiers()[m_currentNoteCl];
-            shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl);
+            shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl,m_waveFileView->getCurrentAudioSlice());
             shared_ptr<PhaseGraph> newphase = make_shared<PhaseGraph>(notecl);
             responseGraphs->push_back(newspektrum);
             phaseGraphs->push_back(newphase);

@@ -56,6 +56,7 @@ WaveFileView::WaveFileView ()
     m_thumbnail.setSource(new juce::FileInputSource(juce::File(file)));
     m_thumbnail.addChangeListener(this);
     m_linePositionX = -1;
+    m_audioSlice.setSize(1,512);
     //[/Constructor]
 }
 
@@ -128,6 +129,8 @@ void WaveFileView::mouseDown (const juce::MouseEvent& e)
     pos_sample=(pos_sample<0)?0:pos_sample;
 
     std::cout<<"Line position: "<<pos_secs<<" s"<<", "<<pos_sample<<" samples"<<std::endl;
+
+    m_audioSlice.copyFrom(0,0,m_buffer,0,pos_sample,512);
     m_transportSource.setPosition(pos_secs);
     juce::AudioSourceChannelInfo info;
     m_transportSource.getNextAudioBlock(info);
@@ -151,7 +154,7 @@ void WaveFileView::mouseDrag (const juce::MouseEvent& e)
     std::cout<<"Line position: "<<pos_secs<<" s"<<std::endl;
     std::cout<<"Line position: "<<pos_secs<<" s"<<", "<<pos_sample<<" samples"<<std::endl;
 
-    
+    m_audioSlice.copyFrom(0,0,m_buffer,0,pos_sample,512);
     sendSynchronousChangeMessage();
  
     repaint();
@@ -176,6 +179,11 @@ void WaveFileView::changeListenerCallback(juce::ChangeBroadcaster *source)
     std::cout << "WaveFileView::changeListenerCallback" << std::endl;
 
     repaint();
+}
+
+juce::AudioSampleBuffer WaveFileView::getCurrentAudioSlice()
+{
+    return m_audioSlice;
 }
 //[/MiscUserCode]
 

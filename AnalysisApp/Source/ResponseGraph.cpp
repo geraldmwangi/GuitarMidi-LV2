@@ -1,7 +1,8 @@
 #include <ResponseGraph.hpp>
 
-ResponseGraph::ResponseGraph(shared_ptr<NoteClassifier> notecl) : Graph(notecl)
+ResponseGraph::ResponseGraph(shared_ptr<NoteClassifier> notecl, juce::AudioSampleBuffer audioslice) : Graph(notecl)
 {
+    m_audioslice=audioslice;
 }
 
 ResponseGraph::~ResponseGraph()

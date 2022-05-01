@@ -45,6 +45,7 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
   virtual void changeListenerCallback(juce::ChangeBroadcaster *source);
+  juce::AudioSampleBuffer getCurrentAudioSlice();
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -65,6 +66,7 @@ private:
   juce::AudioThumbnailCache m_thumbnailCache; // [3]
   std::unique_ptr<juce::AudioFormatReaderSource> m_readerSource;
   juce::AudioTransportSource m_transportSource;
+  juce::AudioSampleBuffer m_audioSlice;
   int m_linePositionX;
   int m_offsetX;
   juce::AudioSampleBuffer m_buffer;
