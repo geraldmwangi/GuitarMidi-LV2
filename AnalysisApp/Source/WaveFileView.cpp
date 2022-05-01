@@ -131,6 +131,7 @@ void WaveFileView::mouseDown (const juce::MouseEvent& e)
     m_transportSource.setPosition(pos_secs);
     juce::AudioSourceChannelInfo info;
     m_transportSource.getNextAudioBlock(info);
+    sendSynchronousChangeMessage();
     repaint();
     //[/UserCode_mouseDown]
 }
@@ -151,7 +152,7 @@ void WaveFileView::mouseDrag (const juce::MouseEvent& e)
     std::cout<<"Line position: "<<pos_secs<<" s"<<", "<<pos_sample<<" samples"<<std::endl;
 
     
-
+    sendSynchronousChangeMessage();
  
     repaint();
     //[/UserCode_mouseDrag]

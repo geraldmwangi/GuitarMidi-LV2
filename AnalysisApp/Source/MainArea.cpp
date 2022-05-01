@@ -69,6 +69,7 @@ MainArea::MainArea()
 
     m_waveFileGroup->addChildComponent(m_waveFileView.get());
     m_waveFileView->setVisible(true);
+    m_waveFileView->addChangeListener(this);
     m_phaseResponseTab->addTab(TRANS("Response"), juce::Colours::lightgrey, m_responseArea.get(), false);
     m_phaseResponseTab->addTab(TRANS("Phase"), juce::Colours::lightgrey, m_phaseArea.get(), false);
 
@@ -203,6 +204,10 @@ void MainArea::sliderValueChanged(juce::Slider *sliderThatWasMoved)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void MainArea::changeListenerCallback(ChangeBroadcaster *source)
 {
+    if(source==dynamic_cast<ChangeBroadcaster*>(m_waveFileView.get()))
+    {
+        cout<<"MainArea waveFileView changed"<<endl;
+    }
 }
 //[/MiscUserCode]
 
