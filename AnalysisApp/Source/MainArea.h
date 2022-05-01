@@ -21,8 +21,10 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
-#include <ResponseArea.h>
-#include <PhaseArea.h>
+#include <PlotArea.h>
+#include <ResponseGraph.hpp>
+#include <PhaseGraph.hpp>
+#include <fretboard.hpp>
 #include <WaveFileView.h>
 //[/Headers]
 
@@ -37,6 +39,7 @@
                                                                     //[/Comments]
 */
 class MainArea  : public juce::Component,
+                  public juce::ChangeListener,
                   public juce::ComboBox::Listener,
                   public juce::Slider::Listener
 {
@@ -47,6 +50,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    virtual void changeListenerCallback (ChangeBroadcaster* source);
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -58,8 +62,8 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    unique_ptr<ResponseArea>    m_responseArea;
-    unique_ptr<PhaseArea>     m_phaseArea;
+    unique_ptr<PlotArea>    m_responseArea;
+    unique_ptr<PlotArea>     m_phaseArea;
     shared_ptr<FretBoard>     m_fretboard;
     int m_currentNoteCl;
     unique_ptr<WaveFileView> m_waveFileView;

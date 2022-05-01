@@ -22,19 +22,23 @@
 
 #include "WaveFileView.h"
 
+
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-WaveFileView::WaveFileView() : m_thumbnailCache(1), m_thumbnail(512, m_formatManager, m_thumbnailCache)
+WaveFileView::WaveFileView ()
+    : m_thumbnailCache(1), m_thumbnail(512, m_formatManager, m_thumbnailCache)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
+
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize(300, 400);
+    setSize (600, 400);
+
 
     //[Constructor] You can add your own custom stuff here..
     m_formatManager.registerBasicFormats();
@@ -43,9 +47,12 @@ WaveFileView::WaveFileView() : m_thumbnailCache(1), m_thumbnail(512, m_formatMan
     std::cout << "Loading file: " << file << std::endl;
     std::cout << "Samplerate: " << reader->sampleRate << " Hz" << std::endl;
     std::cout << "Length: " << reader->lengthInSamples << " samples" << std::endl;
+    m_buffer.setSize(1,reader->lengthInSamples);
+    reader->read(&m_buffer,0,reader->lengthInSamples,0,true,false);
     m_readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
 
     m_transportSource.setSource(m_readerSource.get(), 0, nullptr, reader->sampleRate);
+    m_transportSource.prepareToPlay(512,48000);
     m_thumbnail.setSource(new juce::FileInputSource(juce::File(file)));
     m_thumbnail.addChangeListener(this);
     m_linePositionX = -1;
@@ -57,17 +64,17 @@ WaveFileView::~WaveFileView()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
+
+
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void WaveFileView::paint(juce::Graphics &g)
+void WaveFileView::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
-
-    // g.fillAll(juce::Colour::fromRGB(255, 0, 0));
 
     //[UserPaint] Add your own custom painting code here..
 
@@ -89,25 +96,25 @@ void WaveFileView::resized()
     //[/UserResized]
 }
 
-void WaveFileView::mouseMove(const juce::MouseEvent &e)
+void WaveFileView::mouseMove (const juce::MouseEvent& e)
 {
     //[UserCode_mouseMove] -- Add your code here...
     //[/UserCode_mouseMove]
 }
 
-void WaveFileView::mouseEnter(const juce::MouseEvent &e)
+void WaveFileView::mouseEnter (const juce::MouseEvent& e)
 {
     //[UserCode_mouseEnter] -- Add your code here...
     //[/UserCode_mouseEnter]
 }
 
-void WaveFileView::mouseExit(const juce::MouseEvent &e)
+void WaveFileView::mouseExit (const juce::MouseEvent& e)
 {
     //[UserCode_mouseExit] -- Add your code here...
     //[/UserCode_mouseExit]
 }
 
-void WaveFileView::mouseDown(const juce::MouseEvent &e)
+void WaveFileView::mouseDown (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
     std::cout << "WaveFileView::mouseDown" << std::endl;
@@ -116,13 +123,19 @@ void WaveFileView::mouseDown(const juce::MouseEvent &e)
     m_linePositionX = m_offsetX;
 
     double pos_secs=((float)m_linePositionX)/(getLocalBounds().getWidth())*m_transportSource.getLengthInSeconds();
+    double pos_sample=((float)m_linePositionX)/(getLocalBounds().getWidth())*m_buffer.getNumSamples()-1;
+    pos_sample=(pos_sample>=m_buffer.getNumSamples())?(m_buffer.getNumSamples()-1):pos_sample;
+    pos_sample=(pos_sample<0)?0:pos_sample;
 
-    std::cout<<"Line position: "<<pos_secs<<" s"<<std::endl;
+    std::cout<<"Line position: "<<pos_secs<<" s"<<", "<<pos_sample<<" samples"<<std::endl;
+    m_transportSource.setPosition(pos_secs);
+    juce::AudioSourceChannelInfo info;
+    m_transportSource.getNextAudioBlock(info);
     repaint();
     //[/UserCode_mouseDown]
 }
 
-void WaveFileView::mouseDrag(const juce::MouseEvent &e)
+void WaveFileView::mouseDrag (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
     std::cout << "WaveFileView::mouseDrag" << std::endl;
@@ -130,13 +143,21 @@ void WaveFileView::mouseDrag(const juce::MouseEvent &e)
     if (e.mouseWasDraggedSinceMouseDown())
         m_linePositionX = m_offsetX + e.getDistanceFromDragStartX();
     double pos_secs=((float)m_linePositionX)/(getLocalBounds().getWidth())*m_transportSource.getLengthInSeconds();
+    double pos_sample=((float)m_linePositionX)/(getLocalBounds().getWidth())*m_buffer.getNumSamples()-1;
+    pos_sample=(pos_sample>=m_buffer.getNumSamples())?(m_buffer.getNumSamples()-1):pos_sample;
+    pos_sample=(pos_sample<0)?0:pos_sample;
 
     std::cout<<"Line position: "<<pos_secs<<" s"<<std::endl;
+    std::cout<<"Line position: "<<pos_secs<<" s"<<", "<<pos_sample<<" samples"<<std::endl;
+
+    
+
+ 
     repaint();
     //[/UserCode_mouseDrag]
 }
 
-void WaveFileView::mouseUp(const juce::MouseEvent &e)
+void WaveFileView::mouseUp (const juce::MouseEvent& e)
 {
     //[UserCode_mouseUp] -- Add your code here...
 
@@ -146,6 +167,8 @@ void WaveFileView::mouseUp(const juce::MouseEvent &e)
     //[/UserCode_mouseUp]
 }
 
+
+
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void WaveFileView::changeListenerCallback(juce::ChangeBroadcaster *source)
 {
@@ -154,6 +177,7 @@ void WaveFileView::changeListenerCallback(juce::ChangeBroadcaster *source)
     repaint();
 }
 //[/MiscUserCode]
+
 
 //==============================================================================
 #if 0
@@ -165,7 +189,8 @@ void WaveFileView::changeListenerCallback(juce::ChangeBroadcaster *source)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="WaveFileView" componentName=""
-                 parentClasses="public juce::Component" constructorParams="" variableInitialisers=""
+                 parentClasses="public juce::Component, public juce::ChangeListener, public juce::ChangeBroadcaster"
+                 constructorParams="" variableInitialisers=" m_thumbnailCache(1), m_thumbnail(512, m_formatManager, m_thumbnailCache)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <METHODS>
@@ -176,12 +201,14 @@ BEGIN_JUCER_METADATA
     <METHOD name="mouseDrag (const juce::MouseEvent&amp; e)"/>
     <METHOD name="mouseUp (const juce::MouseEvent&amp; e)"/>
   </METHODS>
-  <BACKGROUND backgroundColour="ff323e44"/>
+  <BACKGROUND backgroundColour="323e44"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
 */
 #endif
 
+
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+
