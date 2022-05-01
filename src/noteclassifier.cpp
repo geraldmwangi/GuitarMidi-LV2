@@ -97,19 +97,10 @@ Dsp::complex_t NoteClassifier::filterResponse(float freq)
     return m_filter[0].response(freq/m_samplerate);
 }
 
-void NoteClassifier::process(int nsamples)
+float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples)
 {
-    //The filters work inplace so we have to initialize the output with the input data
-    memcpy(output, input, nsamples * sizeof(float));
-
-    m_noteOnOffState = m_oldNoteOnOffState;
-
-    //Increase gain to increase the response in the passband
-    for (int s = 0; s < nsamples; s++)
-        output[s] = 10 * output[s];
-
-    for (int i = 0; i < FILTERORDER; i++)
-        m_filter[i].process(nsamples, &output);
+        for (int i = 0; i < FILTERORDER; i++)
+        m_filter[i].process(nsamples, &buffer);
 
     float meanenv = 0;
     int count = 0;
@@ -127,6 +118,19 @@ void NoteClassifier::process(int nsamples)
     }
     // if (count)
     //     meanenv /= count;
+}
+void NoteClassifier::process(int nsamples)
+{
+    //The filters work inplace so we have to initialize the output with the input data
+    memcpy(output, input, nsamples * sizeof(float));
+
+    m_noteOnOffState = m_oldNoteOnOffState;
+
+    //Increase gain to increase the response in the passband
+    for (int s = 0; s < nsamples; s++)
+        output[s] = 10 * output[s];
+
+    float meanenv=filterAndComputeMeanEnv(output,nsamples);
 
     //If envelope greater then threshold consider these nsamples a candidate 
     if (meanenv > 0.1)

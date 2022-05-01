@@ -160,6 +160,15 @@ public:
      */
     void process(int nsamples);
 
+    /**
+     * @brief Filter incomming audio and compute the average response
+     * 
+     * @param buffer 
+     * @param nsamples 
+     * @return float 
+     */
+    float filterAndComputeMeanEnv(float *buffer,int nsamples);
+
     Dsp::complex_t filterResponse(float freq);
 
     /**
