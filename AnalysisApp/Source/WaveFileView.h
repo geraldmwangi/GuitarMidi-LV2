@@ -68,6 +68,7 @@ private:
   juce::AudioTransportSource m_transportSource;
   juce::AudioSampleBuffer m_audioSlice;
   int m_linePositionX;
+  int m_lastPosSample;
   int m_offsetX;
   juce::AudioSampleBuffer m_buffer;
     //[/UserVariables]

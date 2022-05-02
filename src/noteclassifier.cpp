@@ -38,11 +38,15 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
 void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten)
 {
     m_bandwidth=bandwidth;
+    m_passbandatten=passbandatten;
     for (int i = 0; i < FILTERORDER; i++)
     {
         m_filter[i].reset();
-        // m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+        #ifdef USE_ELLIPTIC
+        m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+        #else
         m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth);
+        #endif
     }
 }
 
@@ -58,8 +62,11 @@ void NoteClassifier::initialize()
     for (int i = 0; i < FILTERORDER; i++)
     {
         m_filter[i].reset();
-        //m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+        #ifdef USE_ELLIPTIC
+        m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+        #else
         m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth);
+        #endif
     }
 
     //Setup a schmitt trigger as pitchdetector
@@ -97,27 +104,33 @@ Dsp::complex_t NoteClassifier::filterResponse(float freq)
     return m_filter[0].response(freq/m_samplerate);
 }
 
-float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples)
+float NoteClassifier::filterAndComputeMeanEnv(float* input,int nsamples)
 {
-        for (int i = 0; i < FILTERORDER; i++)
+    float* buffer=new float[nsamples];
+    
+    // Increase gain to increase the response in the passband
+    for (int s = 0; s < nsamples; s++)
+        buffer[s] = 1 * input[s];
+    for (int i = 0; i < FILTERORDER; i++)
         m_filter[i].process(nsamples, &buffer);
 
     float meanenv = 0;
     int count = 0;
 
-    //Get average envelope
+    // Get average envelope
     for (int s = 1; s < (nsamples - 1); s++)
     {
-        if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
+        // if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
         {
-            float absval=fabs(buffer[s]);
-            //meanenv += fabs(output[s]);
-            meanenv=(absval>meanenv)?absval:meanenv;
+            float absval = fabs(buffer[s]);
+            // meanenv += fabs(buffer[s]);
+            meanenv = (absval > meanenv) ? absval : meanenv;
             count++;
         }
     }
     // if (count)
     //     meanenv /= count;
+    delete [] buffer;
     return meanenv;
 }
 void NoteClassifier::process(int nsamples)
@@ -127,9 +140,6 @@ void NoteClassifier::process(int nsamples)
 
     m_noteOnOffState = m_oldNoteOnOffState;
 
-    //Increase gain to increase the response in the passband
-    for (int s = 0; s < nsamples; s++)
-        output[s] = 10 * output[s];
 
     float meanenv=filterAndComputeMeanEnv(output,nsamples);
 

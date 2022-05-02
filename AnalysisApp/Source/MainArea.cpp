@@ -79,7 +79,7 @@ MainArea::MainArea()
     for (int n = 0; n < m_fretboard->getNoteClassifiers().size(); n++)
     {
         auto notecl = m_fretboard->getNoteClassifiers()[n];
-        m_noteClSelector->addItem(String(notecl->getCenterFrequency()), n);
+        m_noteClSelector->addItem(String(notecl->getCenterFrequency()), n+1);//IDs in the combobox cannot be zero thats why all IDs are shifted by 1
     }
     //[/UserPreSize]
 
@@ -210,7 +210,7 @@ void MainArea::drawGraphs()
     }
     else
     {
-        auto notecl = m_fretboard->getNoteClassifiers()[m_currentNoteCl];
+        auto notecl = m_fretboard->getNoteClassifiers()[m_currentNoteCl-1];//IDs in the combobox cannot be zero thats why all IDs are shifted by 1
         shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl);
         shared_ptr<FilteredAudioGraph> filteredaudio = make_shared<FilteredAudioGraph>(notecl, m_waveFileView->getCurrentAudioSlice());
         shared_ptr<PhaseGraph> newphase = make_shared<PhaseGraph>(notecl);

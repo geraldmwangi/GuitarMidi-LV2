@@ -42,7 +42,7 @@ WaveFileView::WaveFileView ()
 
     //[Constructor] You can add your own custom stuff here..
     m_formatManager.registerBasicFormats();
-    juce::String file = juce::String("/home/gerald/Downloads/gtr-jaz-2.wav");
+    juce::String file = juce::String("/home/gerald/Music/guitarmidi/A-Chord-lespaul.wav");
     auto *reader = m_formatManager.createReaderFor(file);
     std::cout << "Loading file: " << file << std::endl;
     std::cout << "Samplerate: " << reader->sampleRate << " Hz" << std::endl;
@@ -52,11 +52,12 @@ WaveFileView::WaveFileView ()
     m_readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
 
     m_transportSource.setSource(m_readerSource.get(), 0, nullptr, reader->sampleRate);
-    m_transportSource.prepareToPlay(512,48000);
+    m_transportSource.prepareToPlay(256,48000);
     m_thumbnail.setSource(new juce::FileInputSource(juce::File(file)));
     m_thumbnail.addChangeListener(this);
     m_linePositionX = -1;
-    m_audioSlice.setSize(1,512);
+    m_audioSlice.setSize(1,8000);
+    m_lastPosSample=0;
     //[/Constructor]
 }
 
@@ -81,9 +82,11 @@ void WaveFileView::paint (juce::Graphics& g)
 
     m_thumbnail.drawChannels(g, getLocalBounds(), 0, m_thumbnail.getTotalLength(), 0.5f);
     g.setColour(juce::Colour::fromRGB(255, 255, 255));
+    int width=((float)m_audioSlice.getNumSamples())/m_buffer.getNumSamples()*getBounds().getWidth();
 
     if (m_linePositionX >= 0)
-        g.drawLine(m_linePositionX, 0, m_linePositionX, getBounds().getHeight());
+        //g.drawLine(m_linePositionX, 0, m_linePositionX, getBounds().getHeight());
+        g.drawRect(m_linePositionX,0,width,getBounds().getHeight());
     //[/UserPaint]
 }
 
@@ -130,12 +133,22 @@ void WaveFileView::mouseDown (const juce::MouseEvent& e)
 
     std::cout<<"Line position: "<<pos_secs<<" s"<<", "<<pos_sample<<" samples"<<std::endl;
 
-    m_audioSlice.copyFrom(0,0,m_buffer,0,pos_sample,512);
-    m_transportSource.setPosition(pos_secs);
-    juce::AudioSourceChannelInfo info;
-    m_transportSource.getNextAudioBlock(info);
-    sendSynchronousChangeMessage();
-    repaint();
+    // int dir=(pos_sample-m_lastPosSample)/std::abs(pos_sample-m_lastPosSample);
+    // for(int p=m_lastPosSample;dir*p<dir*pos_sample;p+=dir)
+    // {
+    //     m_audioSlice.copyFrom(0, 0, m_buffer, 0, p, 512);
+    //     sendSynchronousChangeMessage();
+    // }
+    // m_lastPosSample=pos_sample;
+
+    //for(int i=0;i<10;i++)
+    {
+        m_audioSlice.copyFrom(0, 0, m_buffer, 0, pos_sample,  m_audioSlice.getNumSamples());
+        juce::dsp::WindowingFunction<float> window( m_audioSlice.getNumSamples(), juce::dsp::WindowingFunction<float>::hamming);
+        //window.multiplyWithWindowingTable(*m_audioSlice.getArrayOfWritePointers(), m_audioSlice.getNumSamples());
+        sendSynchronousChangeMessage();
+        repaint();
+    }
     //[/UserCode_mouseDown]
 }
 
@@ -154,10 +167,21 @@ void WaveFileView::mouseDrag (const juce::MouseEvent& e)
     std::cout<<"Line position: "<<pos_secs<<" s"<<std::endl;
     std::cout<<"Line position: "<<pos_secs<<" s"<<", "<<pos_sample<<" samples"<<std::endl;
 
-    m_audioSlice.copyFrom(0,0,m_buffer,0,pos_sample,512);
-    sendSynchronousChangeMessage();
- 
-    repaint();
+    // int dir=(pos_sample-m_lastPosSample)/std::abs(pos_sample-m_lastPosSample);
+    // for(int p=m_lastPosSample;dir*p<dir*pos_sample;p+=dir)
+    // {
+    //     m_audioSlice.copyFrom(0, 0, m_buffer, 0, p, 512);
+    //     sendSynchronousChangeMessage();
+    // }
+    // m_lastPosSample=pos_sample;
+    //for(int i=0;i<10;i++)
+    {
+        m_audioSlice.copyFrom(0, 0, m_buffer, 0, pos_sample, m_audioSlice.getNumSamples());
+        juce::dsp::WindowingFunction<float> window( m_audioSlice.getNumSamples(), juce::dsp::WindowingFunction<float>::hamming);
+        //window.multiplyWithWindowingTable(*m_audioSlice.getArrayOfWritePointers(), m_audioSlice.getNumSamples());
+        sendSynchronousChangeMessage();
+        repaint();
+    }
     //[/UserCode_mouseDrag]
 }
 
@@ -183,7 +207,9 @@ void WaveFileView::changeListenerCallback(juce::ChangeBroadcaster *source)
 
 juce::AudioSampleBuffer WaveFileView::getCurrentAudioSlice()
 {
-    return m_audioSlice;
+    juce::AudioSampleBuffer res;
+    res.makeCopyOf(m_audioSlice);
+    return res;
 }
 //[/MiscUserCode]
 

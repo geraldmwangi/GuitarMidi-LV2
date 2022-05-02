@@ -20,6 +20,7 @@ void FilteredAudioGraph::computeGraph()
         float meanenv=m_notecl->filterAndComputeMeanEnv(*m_audioslice.getArrayOfWritePointers(),m_audioslice.getNumSamples());
         m_path.addRectangle(m_notecl->getCenterFrequency(),maxVal-meanenv,10,meanenv);
     }
+    
     addFunctionPoint(minf,maxVal);
     addFunctionPoint(maxf,maxVal);
 
