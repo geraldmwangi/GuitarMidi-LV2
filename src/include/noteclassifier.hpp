@@ -24,8 +24,8 @@
 #include <memory>
 
 #define FILTERORDER 1 // the real order is 2*MAXORDER
-#define MAXORDER 4 // the real order is 2*MAXORDER
-#define USE_ELLIPTIC 1
+#define MAXORDER 1 // the real order is 2*MAXORDER
+//#define USE_ELLIPTIC 1
 using namespace std;
 /**
  * @brief NoteClassifier analyses polyphonic audio and triggers a midi note when it finds 

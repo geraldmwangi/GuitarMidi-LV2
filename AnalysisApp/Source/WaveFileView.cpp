@@ -22,23 +22,20 @@
 
 #include "WaveFileView.h"
 
-
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-WaveFileView::WaveFileView ()
+WaveFileView::WaveFileView()
     : m_thumbnailCache(1), m_thumbnail(512, m_formatManager, m_thumbnailCache)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (600, 400);
-
+    setSize(600, 400);
 
     //[Constructor] You can add your own custom stuff here..
     m_formatManager.registerBasicFormats();
@@ -47,17 +44,17 @@ WaveFileView::WaveFileView ()
     std::cout << "Loading file: " << file << std::endl;
     std::cout << "Samplerate: " << reader->sampleRate << " Hz" << std::endl;
     std::cout << "Length: " << reader->lengthInSamples << " samples" << std::endl;
-    m_buffer.setSize(1,reader->lengthInSamples);
-    reader->read(&m_buffer,0,reader->lengthInSamples,0,true,false);
+    m_buffer.setSize(1, reader->lengthInSamples);
+    reader->read(&m_buffer, 0, reader->lengthInSamples, 0, true, false);
     m_readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
 
     m_transportSource.setSource(m_readerSource.get(), 0, nullptr, reader->sampleRate);
-    m_transportSource.prepareToPlay(256,48000);
+    m_transportSource.prepareToPlay(256, 48000);
     m_thumbnail.setSource(new juce::FileInputSource(juce::File(file)));
     m_thumbnail.addChangeListener(this);
     m_linePositionX = -1;
-    m_audioSlice.setSize(1,8000);
-    m_lastPosSample=0;
+    m_audioSlice.setSize(1, 8192);
+    m_lastPosSample = 0;
     //[/Constructor]
 }
 
@@ -66,14 +63,12 @@ WaveFileView::~WaveFileView()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-
-
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void WaveFileView::paint (juce::Graphics& g)
+void WaveFileView::paint(juce::Graphics &g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
@@ -82,11 +77,13 @@ void WaveFileView::paint (juce::Graphics& g)
 
     m_thumbnail.drawChannels(g, getLocalBounds(), 0, m_thumbnail.getTotalLength(), 0.5f);
     g.setColour(juce::Colour::fromRGB(255, 255, 255));
-    int width=((float)m_audioSlice.getNumSamples())/m_buffer.getNumSamples()*getBounds().getWidth();
+    int width = ((float)m_audioSlice.getNumSamples()) / m_buffer.getNumSamples() * getBounds().getWidth();
 
     if (m_linePositionX >= 0)
-        //g.drawLine(m_linePositionX, 0, m_linePositionX, getBounds().getHeight());
-        g.drawRect(m_linePositionX,0,width,getBounds().getHeight());
+        if (width == 0)
+            g.drawLine(m_linePositionX, 0, m_linePositionX, getBounds().getHeight());
+        else
+            g.drawRect(m_linePositionX, 0, width, getBounds().getHeight());
     //[/UserPaint]
 }
 
@@ -100,25 +97,25 @@ void WaveFileView::resized()
     //[/UserResized]
 }
 
-void WaveFileView::mouseMove (const juce::MouseEvent& e)
+void WaveFileView::mouseMove(const juce::MouseEvent &e)
 {
     //[UserCode_mouseMove] -- Add your code here...
     //[/UserCode_mouseMove]
 }
 
-void WaveFileView::mouseEnter (const juce::MouseEvent& e)
+void WaveFileView::mouseEnter(const juce::MouseEvent &e)
 {
     //[UserCode_mouseEnter] -- Add your code here...
     //[/UserCode_mouseEnter]
 }
 
-void WaveFileView::mouseExit (const juce::MouseEvent& e)
+void WaveFileView::mouseExit(const juce::MouseEvent &e)
 {
     //[UserCode_mouseExit] -- Add your code here...
     //[/UserCode_mouseExit]
 }
 
-void WaveFileView::mouseDown (const juce::MouseEvent& e)
+void WaveFileView::mouseDown(const juce::MouseEvent &e)
 {
     //[UserCode_mouseDown] -- Add your code here...
     std::cout << "WaveFileView::mouseDown" << std::endl;
@@ -126,12 +123,13 @@ void WaveFileView::mouseDown (const juce::MouseEvent& e)
     m_offsetX = e.getMouseDownX();
     m_linePositionX = m_offsetX;
 
-    double pos_secs=((float)m_linePositionX)/(getLocalBounds().getWidth())*m_transportSource.getLengthInSeconds();
-    double pos_sample=((float)m_linePositionX)/(getLocalBounds().getWidth())*m_buffer.getNumSamples()-1;
-    pos_sample=(pos_sample>=m_buffer.getNumSamples())?(m_buffer.getNumSamples()-1):pos_sample;
-    pos_sample=(pos_sample<0)?0:pos_sample;
+    double pos_secs = ((float)m_linePositionX) / (getLocalBounds().getWidth()) * m_transportSource.getLengthInSeconds();
+    double pos_sample = ((float)m_linePositionX) / (getLocalBounds().getWidth()) * m_buffer.getNumSamples() - 1;
+    pos_sample = (pos_sample >= m_buffer.getNumSamples()) ? (m_buffer.getNumSamples() - 1) : pos_sample;
+    pos_sample = (pos_sample < 0) ? 0 : pos_sample;
 
-    std::cout<<"Line position: "<<pos_secs<<" s"<<", "<<pos_sample<<" samples"<<std::endl;
+    std::cout << "Line position: " << pos_secs << " s"
+              << ", " << pos_sample << " samples" << std::endl;
 
     // int dir=(pos_sample-m_lastPosSample)/std::abs(pos_sample-m_lastPosSample);
     // for(int p=m_lastPosSample;dir*p<dir*pos_sample;p+=dir)
@@ -141,31 +139,32 @@ void WaveFileView::mouseDown (const juce::MouseEvent& e)
     // }
     // m_lastPosSample=pos_sample;
 
-    //for(int i=0;i<10;i++)
+    for(int i=0;i<1;i++)
     {
-        m_audioSlice.copyFrom(0, 0, m_buffer, 0, pos_sample,  m_audioSlice.getNumSamples());
-        juce::dsp::WindowingFunction<float> window( m_audioSlice.getNumSamples(), juce::dsp::WindowingFunction<float>::hamming);
-        //window.multiplyWithWindowingTable(*m_audioSlice.getArrayOfWritePointers(), m_audioSlice.getNumSamples());
+        m_audioSlice.copyFrom(0, 0, m_buffer, 0, pos_sample+i*m_audioSlice.getNumSamples(), m_audioSlice.getNumSamples());
+        juce::dsp::WindowingFunction<float> window(m_audioSlice.getNumSamples(), juce::dsp::WindowingFunction<float>::hamming);
+        // window.multiplyWithWindowingTable(*m_audioSlice.getArrayOfWritePointers(), m_audioSlice.getNumSamples());
         sendSynchronousChangeMessage();
         repaint();
     }
     //[/UserCode_mouseDown]
 }
 
-void WaveFileView::mouseDrag (const juce::MouseEvent& e)
+void WaveFileView::mouseDrag(const juce::MouseEvent &e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
     std::cout << "WaveFileView::mouseDrag" << std::endl;
     std::cout << e.getDistanceFromDragStartX() << "x" << e.getDistanceFromDragStartY() << std::endl;
     if (e.mouseWasDraggedSinceMouseDown())
         m_linePositionX = m_offsetX + e.getDistanceFromDragStartX();
-    double pos_secs=((float)m_linePositionX)/(getLocalBounds().getWidth())*m_transportSource.getLengthInSeconds();
-    double pos_sample=((float)m_linePositionX)/(getLocalBounds().getWidth())*m_buffer.getNumSamples()-1;
-    pos_sample=(pos_sample>=m_buffer.getNumSamples())?(m_buffer.getNumSamples()-1):pos_sample;
-    pos_sample=(pos_sample<0)?0:pos_sample;
+    double pos_secs = ((float)m_linePositionX) / (getLocalBounds().getWidth()) * m_transportSource.getLengthInSeconds();
+    double pos_sample = ((float)m_linePositionX) / (getLocalBounds().getWidth()) * m_buffer.getNumSamples() - 1;
+    pos_sample = (pos_sample >= m_buffer.getNumSamples()) ? (m_buffer.getNumSamples() - 1) : pos_sample;
+    pos_sample = (pos_sample < 0) ? 0 : pos_sample;
 
-    std::cout<<"Line position: "<<pos_secs<<" s"<<std::endl;
-    std::cout<<"Line position: "<<pos_secs<<" s"<<", "<<pos_sample<<" samples"<<std::endl;
+    std::cout << "Line position: " << pos_secs << " s" << std::endl;
+    std::cout << "Line position: " << pos_secs << " s"
+              << ", " << pos_sample << " samples" << std::endl;
 
     // int dir=(pos_sample-m_lastPosSample)/std::abs(pos_sample-m_lastPosSample);
     // for(int p=m_lastPosSample;dir*p<dir*pos_sample;p+=dir)
@@ -174,28 +173,26 @@ void WaveFileView::mouseDrag (const juce::MouseEvent& e)
     //     sendSynchronousChangeMessage();
     // }
     // m_lastPosSample=pos_sample;
-    //for(int i=0;i<10;i++)
+     for(int i=0;i<1;i++)
     {
-        m_audioSlice.copyFrom(0, 0, m_buffer, 0, pos_sample, m_audioSlice.getNumSamples());
-        juce::dsp::WindowingFunction<float> window( m_audioSlice.getNumSamples(), juce::dsp::WindowingFunction<float>::hamming);
-        //window.multiplyWithWindowingTable(*m_audioSlice.getArrayOfWritePointers(), m_audioSlice.getNumSamples());
+        m_audioSlice.copyFrom(0, 0, m_buffer, 0, pos_sample+i*m_audioSlice.getNumSamples(), m_audioSlice.getNumSamples());
+        juce::dsp::WindowingFunction<float> window(m_audioSlice.getNumSamples(), juce::dsp::WindowingFunction<float>::hamming);
+        // window.multiplyWithWindowingTable(*m_audioSlice.getArrayOfWritePointers(), m_audioSlice.getNumSamples());
         sendSynchronousChangeMessage();
         repaint();
     }
     //[/UserCode_mouseDrag]
 }
 
-void WaveFileView::mouseUp (const juce::MouseEvent& e)
+void WaveFileView::mouseUp(const juce::MouseEvent &e)
 {
     //[UserCode_mouseUp] -- Add your code here...
 
     std::cout << "WaveFileView::mouseUp" << std::endl;
-    //m_linePositionX = -1;
+    // m_linePositionX = -1;
     repaint();
     //[/UserCode_mouseUp]
 }
-
-
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void WaveFileView::changeListenerCallback(juce::ChangeBroadcaster *source)
@@ -212,7 +209,6 @@ juce::AudioSampleBuffer WaveFileView::getCurrentAudioSlice()
     return res;
 }
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -243,7 +239,5 @@ END_JUCER_METADATA
 */
 #endif
 
-
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-
