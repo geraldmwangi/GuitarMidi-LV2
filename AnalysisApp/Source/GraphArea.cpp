@@ -72,7 +72,7 @@ void GraphArea::paint (juce::Graphics& g)
                     g.setColour(juce::Colour::fromRGB(255,255,255));
         graph->processGraph();
         g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType(1.0f));
-        g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
+       // g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
         }
         else
         {
@@ -84,7 +84,7 @@ void GraphArea::paint (juce::Graphics& g)
                 c++;
                 graph->processGraph();
                 g.strokePath(graph->getPath(getLocalBounds()), PathStrokeType(1.0f));
-                g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
+                //g.strokePath(graph->getFrequencyLine(getLocalBounds()), PathStrokeType(1.0f));
                 // g.drawText("hallo",Rectangle<float>(100,100,100,100),Justification::centred);
             }
         }
@@ -120,6 +120,7 @@ Rectangle<float> GraphArea::getGraphBounds()
     {
         for (auto gr : *m_graphs)
         {
+            gr->processGraph();
             res = res.getUnion(gr->getBounds());
         }
     }

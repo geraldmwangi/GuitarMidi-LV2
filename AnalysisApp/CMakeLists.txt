@@ -48,6 +48,7 @@ ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/PlotArea.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/Graph.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/ResponseGraph.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/PhaseGraph.cpp
+${CMAKE_SOURCE_DIR}/AnalysisApp/Source/FilteredAudioGraph.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/WaveFileView.cpp)
 
 

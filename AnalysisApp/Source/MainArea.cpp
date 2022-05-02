@@ -32,6 +32,7 @@ MainArea::MainArea()
     m_fretboard = make_shared<FretBoard>(nullptr, 48000);
     m_fretboard->initialize();
     m_responseArea.reset(new PlotArea());
+    m_filteredAudioArea.reset(new PlotArea());
     m_phaseArea.reset(new PlotArea());
     m_waveFileView.reset(new WaveFileView());
     //[/Constructor_pre]
@@ -72,6 +73,7 @@ MainArea::MainArea()
     m_waveFileView->addChangeListener(this);
     m_phaseResponseTab->addTab(TRANS("Response"), juce::Colours::lightgrey, m_responseArea.get(), false);
     m_phaseResponseTab->addTab(TRANS("Phase"), juce::Colours::lightgrey, m_phaseArea.get(), false);
+    m_phaseResponseTab->addTab(TRANS("Filtered Audio"), juce::Colours::lightgrey, m_filteredAudioArea.get(), false);
 
     m_noteClSelector->addItem("ALL", ALL_NOTECLS);
     for (int n = 0; n < m_fretboard->getNoteClassifiers().size(); n++)
@@ -139,31 +141,7 @@ void MainArea::comboBoxChanged(juce::ComboBox *comboBoxThatHasChanged)
         //[UserComboBoxCode_m_noteClSelector] -- add your combo box handling code here..
         int id = comboBoxThatHasChanged->getSelectedId();
         m_currentNoteCl = id;
-        shared_ptr<GraphVector> responseGraphs = make_shared<GraphVector>();
-        shared_ptr<GraphVector> phaseGraphs = make_shared<GraphVector>();
-        if (m_currentNoteCl == ALL_NOTECLS)
-        {
-
-            for (auto notecl : m_fretboard->getNoteClassifiers())
-            {
-
-                shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl,m_waveFileView->getCurrentAudioSlice());
-                shared_ptr<PhaseGraph> newphase = make_shared<PhaseGraph>(notecl);
-                responseGraphs->push_back(newspektrum);
-                phaseGraphs->push_back(newphase);
-            }
-        }
-        else
-        {
-            auto notecl = m_fretboard->getNoteClassifiers()[m_currentNoteCl];
-            shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl,m_waveFileView->getCurrentAudioSlice());
-            shared_ptr<PhaseGraph> newphase = make_shared<PhaseGraph>(notecl);
-            responseGraphs->push_back(newspektrum);
-            phaseGraphs->push_back(newphase);
-        }
-
-        m_responseArea->drawGraphs(responseGraphs);
-        m_phaseArea->drawGraphs(phaseGraphs);
+        drawGraphs();
         //[/UserComboBoxCode_m_noteClSelector]
     }
 
@@ -207,7 +185,44 @@ void MainArea::changeListenerCallback(ChangeBroadcaster *source)
     if(source==dynamic_cast<ChangeBroadcaster*>(m_waveFileView.get()))
     {
         cout<<"MainArea waveFileView changed"<<endl;
+        drawGraphs();
     }
+}
+
+void MainArea::drawGraphs()
+{
+    shared_ptr<GraphVector> responseGraphs = make_shared<GraphVector>();
+    shared_ptr<GraphVector> phaseGraphs = make_shared<GraphVector>();
+    shared_ptr<GraphVector> filteredAudioGraphs = make_shared<GraphVector>();
+    if (m_currentNoteCl == ALL_NOTECLS)
+    {
+
+        for (auto notecl : m_fretboard->getNoteClassifiers())
+        {
+
+            shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl);
+            shared_ptr<FilteredAudioGraph> filteredaudio = make_shared<FilteredAudioGraph>(notecl, m_waveFileView->getCurrentAudioSlice());
+            shared_ptr<PhaseGraph> newphase = make_shared<PhaseGraph>(notecl);
+            responseGraphs->push_back(newspektrum);
+            filteredAudioGraphs->push_back(filteredaudio);
+            phaseGraphs->push_back(newphase);
+        }
+    }
+    else
+    {
+        auto notecl = m_fretboard->getNoteClassifiers()[m_currentNoteCl];
+        shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl);
+        shared_ptr<FilteredAudioGraph> filteredaudio = make_shared<FilteredAudioGraph>(notecl, m_waveFileView->getCurrentAudioSlice());
+        shared_ptr<PhaseGraph> newphase = make_shared<PhaseGraph>(notecl);
+        responseGraphs->push_back(newspektrum);
+        filteredAudioGraphs->push_back(filteredaudio);
+        phaseGraphs->push_back(newphase);
+    }
+
+    m_responseArea->drawGraphs(responseGraphs);
+    m_phaseArea->drawGraphs(phaseGraphs);
+    m_filteredAudioArea->drawGraphs(filteredAudioGraphs);
+    repaint();
 }
 //[/MiscUserCode]
 

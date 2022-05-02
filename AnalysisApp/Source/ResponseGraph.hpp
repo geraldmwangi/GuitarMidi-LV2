@@ -6,9 +6,8 @@ class ResponseGraph : public Graph
 {
 protected:
     virtual void computeGraph();
-    juce::AudioSampleBuffer m_audioslice;
 
 public:
-    ResponseGraph(shared_ptr<NoteClassifier> notecl, juce::AudioSampleBuffer audioslice);
+    ResponseGraph(shared_ptr<NoteClassifier> notecl);
     virtual ~ResponseGraph();
 };

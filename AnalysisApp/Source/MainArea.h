@@ -23,6 +23,7 @@
 #include <JuceHeader.h>
 #include <PlotArea.h>
 #include <ResponseGraph.hpp>
+#include <FilteredAudioGraph.hpp>
 #include <PhaseGraph.hpp>
 #include <fretboard.hpp>
 #include <WaveFileView.h>
@@ -51,6 +52,7 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
     virtual void changeListenerCallback (ChangeBroadcaster* source);
+    void drawGraphs();
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -63,6 +65,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     unique_ptr<PlotArea>    m_responseArea;
+    unique_ptr<PlotArea>    m_filteredAudioArea;
     unique_ptr<PlotArea>     m_phaseArea;
     shared_ptr<FretBoard>     m_fretboard;
     int m_currentNoteCl;

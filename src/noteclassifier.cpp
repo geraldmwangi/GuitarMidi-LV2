@@ -108,9 +108,9 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples)
     //Get average envelope
     for (int s = 1; s < (nsamples - 1); s++)
     {
-        if (fabs(output[s]) > fabs(output[s - 1]) && fabs(output[s]) > fabs(output[s + 1]) && fabs(output[s]) > 0)
+        if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
         {
-            float absval=fabs(output[s]);
+            float absval=fabs(buffer[s]);
             //meanenv += fabs(output[s]);
             meanenv=(absval>meanenv)?absval:meanenv;
             count++;
@@ -118,6 +118,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples)
     }
     // if (count)
     //     meanenv /= count;
+    return meanenv;
 }
 void NoteClassifier::process(int nsamples)
 {

@@ -46,6 +46,7 @@ public:
   void drawGraphs(shared_ptr<GraphVector> graph)
   {
     m_graphArea->drawGraphs(graph);
+    repaint();
   }
 
     //[/UserMethods]
