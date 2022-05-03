@@ -32,7 +32,8 @@ MainArea::MainArea()
     m_fretboard = make_shared<FretBoard>(nullptr, 48000);
     m_fretboard->initialize();
     m_responseArea.reset(new PlotArea());
-    m_filteredAudioArea.reset(new PlotArea());
+    m_meanResponseAudioArea.reset(new PlotArea());
+    m_responseAudioArea.reset(new PlotArea());
     m_phaseArea.reset(new PlotArea());
     m_waveFileView.reset(new WaveFileView());
     //[/Constructor_pre]
@@ -73,7 +74,8 @@ MainArea::MainArea()
     m_waveFileView->addChangeListener(this);
     m_phaseResponseTab->addTab(TRANS("Response"), juce::Colours::lightgrey, m_responseArea.get(), false);
     m_phaseResponseTab->addTab(TRANS("Phase"), juce::Colours::lightgrey, m_phaseArea.get(), false);
-    m_phaseResponseTab->addTab(TRANS("Filtered Audio"), juce::Colours::lightgrey, m_filteredAudioArea.get(), false);
+    m_phaseResponseTab->addTab(TRANS("Mean Response Audio"), juce::Colours::lightgrey, m_meanResponseAudioArea.get(), false);
+    m_phaseResponseTab->addTab(TRANS(" Response Audio"), juce::Colours::lightgrey, m_responseAudioArea.get(), false);
 
     m_noteClSelector->addItem("ALL", ALL_NOTECLS);
     for (int n = 0; n < m_fretboard->getNoteClassifiers().size(); n++)
@@ -201,7 +203,7 @@ void MainArea::drawGraphs()
         {
 
             shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl);
-            shared_ptr<FilteredAudioGraph> filteredaudio = make_shared<FilteredAudioGraph>(notecl, m_waveFileView->getCurrentAudioSlice());
+            shared_ptr<MeanResponseGraph> filteredaudio = make_shared<MeanResponseGraph>(notecl, m_waveFileView->getCurrentAudioSlice());
             shared_ptr<PhaseGraph> newphase = make_shared<PhaseGraph>(notecl);
             responseGraphs->push_back(newspektrum);
             filteredAudioGraphs->push_back(filteredaudio);
@@ -212,16 +214,22 @@ void MainArea::drawGraphs()
     {
         auto notecl = m_fretboard->getNoteClassifiers()[m_currentNoteCl-1];//IDs in the combobox cannot be zero thats why all IDs are shifted by 1
         shared_ptr<ResponseGraph> newspektrum = make_shared<ResponseGraph>(notecl);
-        shared_ptr<FilteredAudioGraph> filteredaudio = make_shared<FilteredAudioGraph>(notecl, m_waveFileView->getCurrentAudioSlice());
+        shared_ptr<MeanResponseGraph> filteredaudio = make_shared<MeanResponseGraph>(notecl, m_waveFileView->getCurrentAudioSlice());
         shared_ptr<PhaseGraph> newphase = make_shared<PhaseGraph>(notecl);
         responseGraphs->push_back(newspektrum);
         filteredAudioGraphs->push_back(filteredaudio);
         phaseGraphs->push_back(newphase);
+
+        shared_ptr<GraphVector> responseAudioGraphs = make_shared<GraphVector>();
+
+        responseAudioGraphs->push_back(make_shared<AudioResponseGraph>(notecl,m_waveFileView->getAudioBuffer()));
+        m_responseAudioArea->drawGraphs(responseAudioGraphs);
+        
     }
 
     m_responseArea->drawGraphs(responseGraphs);
     m_phaseArea->drawGraphs(phaseGraphs);
-    m_filteredAudioArea->drawGraphs(filteredAudioGraphs);
+    m_meanResponseAudioArea->drawGraphs(filteredAudioGraphs);
     repaint();
 }
 //[/MiscUserCode]

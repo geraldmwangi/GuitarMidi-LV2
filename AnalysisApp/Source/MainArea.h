@@ -65,7 +65,8 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     unique_ptr<PlotArea>    m_responseArea;
-    unique_ptr<PlotArea>    m_filteredAudioArea;
+    unique_ptr<PlotArea>    m_meanResponseAudioArea;
+    unique_ptr<PlotArea>    m_responseAudioArea;
     unique_ptr<PlotArea>     m_phaseArea;
     shared_ptr<FretBoard>     m_fretboard;
     int m_currentNoteCl;

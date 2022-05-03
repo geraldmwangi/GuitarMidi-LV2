@@ -104,13 +104,13 @@ Dsp::complex_t NoteClassifier::filterResponse(float freq)
     return m_filter[0].response(freq/m_samplerate);
 }
 
-float NoteClassifier::filterAndComputeMeanEnv(float* input,int nsamples)
+float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples)
 {
-    float* buffer=new float[nsamples];
+    //float* buffer=new float[nsamples];
     
     // Increase gain to increase the response in the passband
-    for (int s = 0; s < nsamples; s++)
-        buffer[s] = 1 * input[s];
+    // for (int s = 0; s < nsamples; s++)
+    //     buffer[s] = 10 * buffer[s];
     for (int i = 0; i < FILTERORDER; i++)
         m_filter[i].process(nsamples, &buffer);
 
@@ -130,7 +130,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float* input,int nsamples)
     }
     // if (count)
     //     meanenv /= count;
-    delete [] buffer;
+    //delete [] buffer;
     return meanenv;
 }
 void NoteClassifier::process(int nsamples)
@@ -139,6 +139,8 @@ void NoteClassifier::process(int nsamples)
     memcpy(output, input, nsamples * sizeof(float));
 
     m_noteOnOffState = m_oldNoteOnOffState;
+    for (int s = 0; s < nsamples; s++)
+        output[s] = 10 * output[s];
 
 
     float meanenv=filterAndComputeMeanEnv(output,nsamples);

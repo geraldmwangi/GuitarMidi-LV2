@@ -208,6 +208,13 @@ juce::AudioSampleBuffer WaveFileView::getCurrentAudioSlice()
     res.makeCopyOf(m_audioSlice);
     return res;
 }
+
+juce::AudioSampleBuffer WaveFileView::getAudioBuffer()
+{
+    juce::AudioSampleBuffer res;
+    res.makeCopyOf(m_buffer);
+    return res;
+}
 //[/MiscUserCode]
 
 //==============================================================================

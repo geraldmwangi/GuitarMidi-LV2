@@ -46,6 +46,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
   virtual void changeListenerCallback(juce::ChangeBroadcaster *source);
   juce::AudioSampleBuffer getCurrentAudioSlice();
+  juce::AudioSampleBuffer getAudioBuffer();
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;

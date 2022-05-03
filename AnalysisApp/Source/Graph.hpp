@@ -40,6 +40,11 @@ public:
         return scaledPath;
     }
 
+    virtual void drawGraph(juce::Graphics& g, juce::Rectangle<int> bounds )
+    {
+        g.strokePath(this->getPath(bounds), PathStrokeType(1.0f));
+    }
+
     Path getFrequencyLine(juce::Rectangle<int> bounds);
 
     Path getPath()
