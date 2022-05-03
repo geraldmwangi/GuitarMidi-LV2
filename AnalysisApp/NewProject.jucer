@@ -9,13 +9,8 @@
       <FILE id="wxsJ72" name="WaveFileView.cpp" compile="1" resource="0"
             file="Source/WaveFileView.cpp"/>
       <FILE id="OUzBIo" name="WaveFileView.h" compile="0" resource="0" file="Source/WaveFileView.h"/>
-      <FILE id="NNqaPD" name="PhaseArea.h" compile="0" resource="0" file="Source/PhaseArea.h"/>
-      <FILE id="f88IdF" name="PhaseArea.cpp" compile="1" resource="0" file="Source/PhaseArea.cpp"/>
       <FILE id="LMz5SI" name="GraphArea.cpp" compile="1" resource="0" file="Source/GraphArea.cpp"/>
       <FILE id="KBvseS" name="GraphArea.h" compile="0" resource="0" file="Source/GraphArea.h"/>
-      <FILE id="JuWCBe" name="ResponseArea.cpp" compile="1" resource="0"
-            file="Source/ResponseArea.cpp"/>
-      <FILE id="dImsyz" name="ResponseArea.h" compile="0" resource="0" file="Source/ResponseArea.h"/>
       <FILE id="dvenxa" name="MainArea.cpp" compile="1" resource="0" file="Source/MainArea.cpp"/>
       <FILE id="AYiVNF" name="MainArea.h" compile="0" resource="0" file="Source/MainArea.h"/>
       <FILE id="LNusNU" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
