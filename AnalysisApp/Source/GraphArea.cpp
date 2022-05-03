@@ -116,7 +116,8 @@ void GraphArea::mouseDown(const juce::MouseEvent &e)
 void GraphArea::mouseDrag(const juce::MouseEvent &e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
-    m_linePositionX = m_linePositionXOffset + e.getDistanceFromDragStartX();
+    if(e.getDistanceFromDragStartX()>e.getDistanceFromDragStartY())
+        m_linePositionX = m_linePositionXOffset + e.getDistanceFromDragStartX();
     repaint();
     //[/UserCode_mouseDrag]
 }
