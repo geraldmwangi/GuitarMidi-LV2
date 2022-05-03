@@ -53,12 +53,18 @@ public:
 
     void paint (juce::Graphics& g) override;
     void resized() override;
+    void mouseDown (const juce::MouseEvent& e) override;
+    void mouseDrag (const juce::MouseEvent& e) override;
+    void mouseUp (const juce::MouseEvent& e) override;
+    void mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
   std::unique_ptr<GraphArea> m_graphArea;
+  int m_linePositionX;
+  int m_linePositionXOffset;
     //[/UserVariables]
 
     //==============================================================================

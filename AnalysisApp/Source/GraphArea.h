@@ -52,12 +52,16 @@ public:
 
     void paint (juce::Graphics& g) override;
     void resized() override;
+    void mouseDown (const juce::MouseEvent& e) override;
+    void mouseDrag (const juce::MouseEvent& e) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
   shared_ptr<GraphVector> m_graphs;
+    int m_linePositionX;
+  int m_linePositionXOffset;
     //[/UserVariables]
 
     //==============================================================================

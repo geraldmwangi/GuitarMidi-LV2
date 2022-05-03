@@ -32,6 +32,7 @@ PlotArea::PlotArea ()
     //[Constructor_pre] You can add your own custom stuff here..
     m_graphArea.reset(new GraphArea());
     addAndMakeVisible(m_graphArea.get());
+    m_linePositionX=-1;
     //[/Constructor_pre]
 
 
@@ -93,6 +94,10 @@ void PlotArea::paint (juce::Graphics& g)
         g.drawText(String(valx), x, abscisse.getEndY()+10, 50, 100, Justification::topLeft);
         g.drawLine(x,abscisse.getEndY()+10,x,abscisse.getEndY());
     }
+    if(m_linePositionX>=0)
+    {
+        g.drawLine(m_linePositionX,0,m_linePositionX,getHeight());
+    }
     //[/UserPaint]
 }
 
@@ -104,6 +109,35 @@ void PlotArea::resized()
     //[UserResized] Add your own custom resize handling here..
     m_graphArea->setBounds(proportionOfWidth(0.1), proportionOfHeight(0.0), proportionOfWidth(0.9), proportionOfHeight(0.9));
     //[/UserResized]
+}
+
+void PlotArea::mouseDown (const juce::MouseEvent& e)
+{
+    //[UserCode_mouseDown] -- Add your code here...
+    m_linePositionX=e.getMouseDownX();
+    m_linePositionXOffset=m_linePositionX;
+    repaint();
+    //[/UserCode_mouseDown]
+}
+
+void PlotArea::mouseDrag (const juce::MouseEvent& e)
+{
+    //[UserCode_mouseDrag] -- Add your code here...
+    m_linePositionX=m_linePositionXOffset+e.getDistanceFromDragStartX();
+    repaint();
+    //[/UserCode_mouseDrag]
+}
+
+void PlotArea::mouseUp (const juce::MouseEvent& e)
+{
+    //[UserCode_mouseUp] -- Add your code here...
+    //[/UserCode_mouseUp]
+}
+
+void PlotArea::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel)
+{
+    //[UserCode_mouseWheelMove] -- Add your code here...
+    //[/UserCode_mouseWheelMove]
 }
 
 
@@ -125,6 +159,12 @@ BEGIN_JUCER_METADATA
                  parentClasses="public juce::Component" constructorParams="" variableInitialisers=""
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
+  <METHODS>
+    <METHOD name="mouseDrag (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseDown (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseUp (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseWheelMove (const juce::MouseEvent&amp; e, const juce::MouseWheelDetails&amp; wheel)"/>
+  </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
 </JUCER_COMPONENT>
 
