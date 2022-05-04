@@ -74,6 +74,8 @@ private:
      */
     aubio_pitch_t* mPitchDetector;
 
+    aubio_onset_t* m_onsetDetector;
+
     /**
      * @brief m_pitchfreq: The result of the pitch estimator
      * >
@@ -172,7 +174,7 @@ public:
      * @param nsamples 
      * @return float 
      */
-    float filterAndComputeMeanEnv(float *buffer,int nsamples);
+    float filterAndComputeMeanEnv(float *buffer,int nsamples,bool* onsetdetected=nullptr);
 
     Dsp::complex_t filterResponse(float freq);
 

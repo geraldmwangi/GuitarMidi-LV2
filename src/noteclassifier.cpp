@@ -33,6 +33,7 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     //TODO query host for buffersize. This is only used for the pitch detector
     mBufferSize = 256;
     m_noteOnOffState = false;
+    m_onsetDetector=new_aubio_onset("mkl",mBufferSize,mBufferSize/2,m_samplerate);
 }
 
 void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten,int order)
@@ -86,6 +87,8 @@ void NoteClassifier::finalize()
         delete[] m_pitchbuffer;
     if (m_pitchfreq)
         del_fvec(m_pitchfreq);
+    if(m_onsetDetector)
+        del_aubio_onset(m_onsetDetector);
 }
 
 Dsp::complex_t NoteClassifier::filterResponse(float freq)
@@ -93,7 +96,7 @@ Dsp::complex_t NoteClassifier::filterResponse(float freq)
     return m_filter.response(freq/m_samplerate);
 }
 
-float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples)
+float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* onsetdetected)
 {
     //float* buffer=new float[nsamples];
     
@@ -116,6 +119,19 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples)
             count++;
         }
     }
+    if(m_onsetDetector&&onsetdetected)
+    {
+        fvec_t* ons=new_fvec(1);
+        fvec_t* onsinput;
+        onsinput->data=(smpl_t*)buffer;
+        onsinput->length=nsamples;
+
+        aubio_onset_do(m_onsetDetector,onsinput,ons);
+        *onsetdetected=*(*ons).data>0.0;
+        del_fvec(ons);
+    }
+
+    
     // if (count)
     //     meanenv /= count;
     //delete [] buffer;

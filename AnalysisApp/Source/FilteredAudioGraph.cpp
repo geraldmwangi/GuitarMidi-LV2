@@ -72,7 +72,14 @@ void AudioResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<int> bound
     {
        res.copyFrom(0,pos,*m_audioslice.getArrayOfReadPointers()+pos,chunk);
        //res.copyFrom(1,pos,*m_audioslice.getArrayOfReadPointers()+pos,chunk);
-       m_notecl->filterAndComputeMeanEnv(*res.getArrayOfWritePointers()+pos,chunk);
+       bool onset=0;
+       m_notecl->filterAndComputeMeanEnv(*res.getArrayOfWritePointers()+pos,chunk,&onset);
+
+       if(onset)
+        {
+            int linepos=(float)pos/m_audioslice.getNumSamples()*bounds.getWidth();
+            g.drawLine(linepos,0,linepos,bounds.getHeight());
+        }
        res.copyFrom(1,pos,*m_audioslice.getArrayOfReadPointers()+pos,chunk);
 
     }
