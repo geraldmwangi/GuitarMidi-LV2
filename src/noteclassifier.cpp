@@ -35,19 +35,17 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_noteOnOffState = false;
 }
 
-void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten)
+void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten,int order)
 {
     m_bandwidth=bandwidth;
     m_passbandatten=passbandatten;
-    for (int i = 0; i < FILTERORDER; i++)
-    {
-        m_filter[i].reset();
-        #ifdef USE_ELLIPTIC
-        m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
-        #else
-        m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth);
-        #endif
-    }
+
+    m_filter.reset();
+#ifdef USE_ELLIPTIC
+    m_filter.setup(order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+#else
+    m_filter.setup(order, m_samplerate, m_centerfreq, m_bandwidth);
+#endif
 }
 
 void NoteClassifier::setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output)
@@ -59,15 +57,7 @@ void NoteClassifier::initialize()
 {
     //Setup FILTERORDER 1st order filters. Currently Elliptic::BandPass crashes when running setup() with orders higher than 1
     //When we solve this we can run sharper filters with narrower bandwidth and maybe drop the pitch validation below in process()
-    for (int i = 0; i < FILTERORDER; i++)
-    {
-        m_filter[i].reset();
-        #ifdef USE_ELLIPTIC
-        m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
-        #else
-        m_filter[i].setup(MAXORDER, m_samplerate, m_centerfreq, m_bandwidth);
-        #endif
-    }
+    setFilterParameters(m_bandwidth,m_passbandatten);
 
     //Setup a schmitt trigger as pitchdetector
     if (mPitchDetector)
@@ -89,8 +79,7 @@ void NoteClassifier::initialize()
 void NoteClassifier::finalize()
 {
     //Release ressources
-    for (int i = 0; i < FILTERORDER; i++)
-        m_filter[i].reset();
+    m_filter.reset();
     if (mPitchDetector)
         del_aubio_pitch(mPitchDetector);
     if (m_pitchbuffer)
@@ -101,7 +90,7 @@ void NoteClassifier::finalize()
 
 Dsp::complex_t NoteClassifier::filterResponse(float freq)
 {
-    return m_filter[0].response(freq/m_samplerate);
+    return m_filter.response(freq/m_samplerate);
 }
 
 float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples)
@@ -111,8 +100,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples)
     // Increase gain to increase the response in the passband
     // for (int s = 0; s < nsamples; s++)
     //     buffer[s] = 10 * buffer[s];
-    for (int i = 0; i < FILTERORDER; i++)
-        m_filter[i].process(nsamples, &buffer);
+        m_filter.process(nsamples, &buffer);
 
     float meanenv = 0;
     int count = 0;

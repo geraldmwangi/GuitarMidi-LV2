@@ -79,6 +79,7 @@ private:
     std::unique_ptr<juce::ComboBox> m_noteClSelector;
     std::unique_ptr<juce::Slider> m_bandwidthInput;
     std::unique_ptr<juce::GroupComponent> m_waveFileGroup;
+    std::unique_ptr<juce::Slider> m_orderInput;
 
 
     //==============================================================================

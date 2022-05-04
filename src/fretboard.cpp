@@ -42,6 +42,10 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
      m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 146.83,Dbw));
     m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 155.56,Dbw));
     m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 164.81,Dbw));
+
+   // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 164.81*3,Dbw));
+    //m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 164.81*4,Dbw));
+
     m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 174.61,Dbw));
     m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 185.00,Dbw));
 

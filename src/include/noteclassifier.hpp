@@ -23,8 +23,8 @@
 #include <midioutput.hpp>
 #include <memory>
 
-#define FILTERORDER 1 // the real order is 2*MAXORDER
-#define MAXORDER 1 // the real order is 2*MAXORDER
+#define FILTERORDER 2 // the real order is 2*MAXORDER
+#define MAXORDER 10 // the real order is 2*MAXORDER
 //#define USE_ELLIPTIC 1
 using namespace std;
 /**
@@ -121,9 +121,9 @@ private:
      * 
      */
     #ifndef USE_ELLIPTIC
-    Dsp::SimpleFilter <Dsp::Butterworth::BandPass<MAXORDER>, 1> m_filter[FILTERORDER];
+    Dsp::SimpleFilter <Dsp::Butterworth::BandPass<MAXORDER>, 1> m_filter;
     #else
-    Dsp::SimpleFilter <Dsp::Elliptic::BandPass<MAXORDER>, 1> m_filter[FILTERORDER];
+    Dsp::SimpleFilter <Dsp::Elliptic::BandPass<MAXORDER>, 1> m_filter;
     #endif
 
 
@@ -195,7 +195,7 @@ public:
      */
     void setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output);
 
-    void setFilterParameters(float bandwidth = 20, float passbandatten = 1);
+    void setFilterParameters(float bandwidth = 20, float passbandatten = 1,int order=FILTERORDER);
 
     float getCenterFrequency()
     {

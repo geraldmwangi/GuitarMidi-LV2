@@ -22,19 +22,22 @@
 
 #include "GraphArea.h"
 
+
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-GraphArea::GraphArea()
+GraphArea::GraphArea ()
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
+
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize(600, 400);
+    setSize (600, 400);
+
 
     //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
@@ -45,18 +48,20 @@ GraphArea::~GraphArea()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
+
+
     //[Destructor]. You can add your own custom destruction code here..
     m_linePositionX = -1;
     //[/Destructor]
 }
 
 //==============================================================================
-void GraphArea::paint(juce::Graphics &g)
+void GraphArea::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll(juce::Colour(0xff323e44));
+    g.fillAll (juce::Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
 
@@ -104,7 +109,7 @@ void GraphArea::resized()
     //[/UserResized]
 }
 
-void GraphArea::mouseDown(const juce::MouseEvent &e)
+void GraphArea::mouseDown (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
     m_linePositionX = e.getMouseDownX();
@@ -113,7 +118,7 @@ void GraphArea::mouseDown(const juce::MouseEvent &e)
     //[/UserCode_mouseDown]
 }
 
-void GraphArea::mouseDrag(const juce::MouseEvent &e)
+void GraphArea::mouseDrag (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
     if(e.getDistanceFromDragStartX()>e.getDistanceFromDragStartY())
@@ -121,6 +126,8 @@ void GraphArea::mouseDrag(const juce::MouseEvent &e)
     repaint();
     //[/UserCode_mouseDrag]
 }
+
+
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void GraphArea::drawGraphs(shared_ptr<GraphVector> graphs)
@@ -143,6 +150,7 @@ Rectangle<float> GraphArea::getGraphBounds()
     return res;
 }
 //[/MiscUserCode]
+
 
 //==============================================================================
 #if 0
@@ -168,5 +176,7 @@ END_JUCER_METADATA
 */
 #endif
 
+
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+
