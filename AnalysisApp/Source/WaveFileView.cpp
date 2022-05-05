@@ -39,7 +39,7 @@ WaveFileView::WaveFileView()
 
     //[Constructor] You can add your own custom stuff here..
     m_formatManager.registerBasicFormats();
-    juce::String file = juce::String("/home/gerald/Music/guitarmidi/A-Chord-lespaul.wav");
+    juce::String file = juce::String("/home/gerald/Music/guitarmidi/A-Chord-lespaul-norm.wav");
     auto *reader = m_formatManager.createReaderFor(file);
     std::cout << "Loading file: " << file << std::endl;
     std::cout << "Samplerate: " << reader->sampleRate << " Hz" << std::endl;

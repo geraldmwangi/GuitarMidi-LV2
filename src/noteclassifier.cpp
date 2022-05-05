@@ -36,6 +36,18 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_onsetDetector=new_aubio_onset("mkl",mBufferSize,mBufferSize/2,m_samplerate);
 }
 
+void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,bool adap_whitening)
+{
+    if(m_onsetDetector)
+        del_aubio_onset(m_onsetDetector);
+    m_onsetDetector=new_aubio_onset(method.c_str(),mBufferSize,mBufferSize/2,m_samplerate);
+    aubio_onset_set_threshold(m_onsetDetector,threshold);
+    aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
+    aubio_onset_set_silence(m_onsetDetector,silence);
+    aubio_onset_set_compression(m_onsetDetector,comp);
+    
+}
+
 void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten,int order)
 {
     m_bandwidth=bandwidth;
@@ -98,6 +110,7 @@ Dsp::complex_t NoteClassifier::filterResponse(float freq)
 
 float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* onsetdetected)
 {
+
     //float* buffer=new float[nsamples];
     
     // Increase gain to increase the response in the passband
@@ -119,6 +132,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
             count++;
         }
     }
+
     if(m_onsetDetector&&onsetdetected)
     {
         fvec_t* ons=new_fvec(1);
@@ -130,6 +144,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
         *onsetdetected=*(*ons).data>0.0;
         del_fvec(ons);
     }
+
 
     
     // if (count)

@@ -72,10 +72,51 @@ MainArea::MainArea ()
     m_orderInput.reset (new juce::Slider ("orderInput"));
     addAndMakeVisible (m_orderInput.get());
     m_orderInput->setTooltip (TRANS("Filter order"));
-    m_orderInput->setRange (1, 10, 0);
-    m_orderInput->setSliderStyle (juce::Slider::Rotary);
+    m_orderInput->setRange (1, 10, 1);
+    m_orderInput->setSliderStyle (juce::Slider::IncDecButtons);
     m_orderInput->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
     m_orderInput->addListener (this);
+
+    m_onsetMethod.reset (new juce::ComboBox ("onsetMethod"));
+    addAndMakeVisible (m_onsetMethod.get());
+    m_onsetMethod->setEditableText (false);
+    m_onsetMethod->setJustificationType (juce::Justification::centredLeft);
+    m_onsetMethod->setTextWhenNothingSelected (TRANS("select onset method"));
+    m_onsetMethod->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    m_onsetMethod->addItem (TRANS("energy"), 1);
+    m_onsetMethod->addItem (TRANS("hfc"), 2);
+    m_onsetMethod->addItem (TRANS("complex"), 3);
+    m_onsetMethod->addItem (TRANS("phase"), 4);
+    m_onsetMethod->addItem (TRANS("wphase"), 5);
+    m_onsetMethod->addItem (TRANS("specdiff"), 6);
+    m_onsetMethod->addItem (TRANS("kl"), 7);
+    m_onsetMethod->addItem (TRANS("mkl"), 8);
+    m_onsetMethod->addItem (TRANS("specflux"), 9);
+    m_onsetMethod->addListener (this);
+
+    m_onsetthreshold.reset (new juce::Slider ("onsetthreshold"));
+    addAndMakeVisible (m_onsetthreshold.get());
+    m_onsetthreshold->setTooltip (TRANS("onset threshold"));
+    m_onsetthreshold->setRange (0.1, 0.9, 0);
+    m_onsetthreshold->setSliderStyle (juce::Slider::Rotary);
+    m_onsetthreshold->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
+    m_onsetthreshold->addListener (this);
+
+    m_onsetsilence.reset (new juce::Slider ("onsetsilence"));
+    addAndMakeVisible (m_onsetsilence.get());
+    m_onsetsilence->setTooltip (TRANS("onset threshold"));
+    m_onsetsilence->setRange (-90, -10, 0);
+    m_onsetsilence->setSliderStyle (juce::Slider::Rotary);
+    m_onsetsilence->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
+    m_onsetsilence->addListener (this);
+
+    m_onsetcomp.reset (new juce::Slider ("onsetcomp"));
+    addAndMakeVisible (m_onsetcomp.get());
+    m_onsetcomp->setTooltip (TRANS("onset compression"));
+    m_onsetcomp->setRange (0, 1, 0);
+    m_onsetcomp->setSliderStyle (juce::Slider::Rotary);
+    m_onsetcomp->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
+    m_onsetcomp->addListener (this);
 
 
     //[UserPreSize]
@@ -94,6 +135,8 @@ MainArea::MainArea ()
         auto notecl = m_fretboard->getNoteClassifiers()[n];
         m_noteClSelector->addItem(String(notecl->getCenterFrequency()), n+1);//IDs in the combobox cannot be zero thats why all IDs are shifted by 1
     }
+    m_noteClSelector->setSelectedId(ALL_NOTECLS);
+    m_onsetMethod->setSelectedId(1);
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -114,6 +157,10 @@ MainArea::~MainArea()
     m_bandwidthInput = nullptr;
     m_waveFileGroup = nullptr;
     m_orderInput = nullptr;
+    m_onsetMethod = nullptr;
+    m_onsetthreshold = nullptr;
+    m_onsetsilence = nullptr;
+    m_onsetcomp = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -129,7 +176,7 @@ void MainArea::paint (juce::Graphics& g)
     g.fillAll (juce::Colour (0xff323e44));
 
     {
-        int x = proportionOfWidth (0.2295f), y = proportionOfHeight (0.6345f), width = proportionOfWidth (0.1490f), height = proportionOfHeight (0.0353f);
+        int x = proportionOfWidth (0.4441f), y = proportionOfHeight (0.8320f), width = proportionOfWidth (0.1490f), height = proportionOfHeight (0.0352f);
         juce::String text (TRANS("Bandwidth"));
         juce::Colour fillColour = juce::Colours::white;
         //[UserPaintCustomArguments] Customize the painting arguments here..
@@ -141,8 +188,44 @@ void MainArea::paint (juce::Graphics& g)
     }
 
     {
-        int x = proportionOfWidth (0.2295f), y = proportionOfHeight (0.8226f), width = proportionOfWidth (0.1490f), height = proportionOfHeight (0.0353f);
+        int x = proportionOfWidth (0.5753f), y = proportionOfHeight (0.8320f), width = proportionOfWidth (0.1490f), height = proportionOfHeight (0.0352f);
         juce::String text (TRANS("Filter order"));
+        juce::Colour fillColour = juce::Colours::white;
+        //[UserPaintCustomArguments] Customize the painting arguments here..
+        //[/UserPaintCustomArguments]
+        g.setColour (fillColour);
+        g.setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+        g.drawText (text, x, y, width, height,
+                    juce::Justification::centred, true);
+    }
+
+    {
+        int x = proportionOfWidth (0.0268f), y = proportionOfHeight (0.8320f), width = proportionOfWidth (0.0805f), height = proportionOfHeight (0.0352f);
+        juce::String text (TRANS("Peak Threshold"));
+        juce::Colour fillColour = juce::Colour (0xfffefefe);
+        //[UserPaintCustomArguments] Customize the painting arguments here..
+        //[/UserPaintCustomArguments]
+        g.setColour (fillColour);
+        g.setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+        g.drawText (text, x, y, width, height,
+                    juce::Justification::centred, true);
+    }
+
+    {
+        int x = proportionOfWidth (0.1461f), y = proportionOfHeight (0.8320f), width = proportionOfWidth (0.0745f), height = proportionOfHeight (0.0352f);
+        juce::String text (TRANS("Onset silence"));
+        juce::Colour fillColour = juce::Colours::white;
+        //[UserPaintCustomArguments] Customize the painting arguments here..
+        //[/UserPaintCustomArguments]
+        g.setColour (fillColour);
+        g.setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+        g.drawText (text, x, y, width, height,
+                    juce::Justification::centred, true);
+    }
+
+    {
+        int x = proportionOfWidth (0.2474f), y = proportionOfHeight (0.8320f), width = proportionOfWidth (0.1043f), height = proportionOfHeight (0.0352f);
+        juce::String text (TRANS("Onset compression"));
         juce::Colour fillColour = juce::Colours::white;
         //[UserPaintCustomArguments] Customize the painting arguments here..
         //[/UserPaintCustomArguments]
@@ -161,12 +244,16 @@ void MainArea::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    m_phaseResponseTab->setBounds (proportionOfWidth (0.0175f), proportionOfHeight (0.0188f), proportionOfWidth (0.9725f), proportionOfHeight (0.5511f));
+    m_phaseResponseTab->setBounds (proportionOfWidth (0.0171f), proportionOfHeight (0.0188f), proportionOfWidth (0.9724f), proportionOfHeight (0.5511f));
     m_controlsArea->setBounds (0, proportionOfHeight (0.6005f), proportionOfWidth (1.0000f), proportionOfHeight (0.3995f));
-    m_noteClSelector->setBounds (0 + juce::roundToInt (proportionOfWidth (1.0000f) * 0.0475f), proportionOfHeight (0.6005f) + juce::roundToInt (proportionOfHeight (0.3995f) * 0.1500f), juce::roundToInt (proportionOfWidth (1.0000f) * 0.1300f), juce::roundToInt (proportionOfHeight (0.3995f) * 0.0677f));
-    m_bandwidthInput->setBounds (proportionOfWidth (0.2027f), proportionOfHeight (0.6675f), proportionOfWidth (0.2049f), proportionOfHeight (0.1328f));
-    m_waveFileGroup->setBounds (proportionOfWidth (0.4709f), proportionOfHeight (0.6299f), proportionOfWidth (0.5074f), proportionOfHeight (0.1763f));
-    m_orderInput->setBounds (proportionOfWidth (0.2027f), proportionOfHeight (0.8555f), proportionOfWidth (0.2049f), proportionOfHeight (0.1328f));
+    m_noteClSelector->setBounds (0 + juce::roundToInt (proportionOfWidth (1.0000f) * 0.0477f), proportionOfHeight (0.6005f) + juce::roundToInt (proportionOfHeight (0.3995f) * 0.1500f), juce::roundToInt (proportionOfWidth (1.0000f) * 0.1297f), juce::roundToInt (proportionOfHeight (0.3995f) * 0.0677f));
+    m_bandwidthInput->setBounds (proportionOfWidth (0.4471f), proportionOfHeight (0.8649f), proportionOfWidth (0.1513f), proportionOfHeight (0.1328f));
+    m_waveFileGroup->setBounds (proportionOfWidth (0.2265f), proportionOfHeight (0.6299f), proportionOfWidth (0.7511f), proportionOfHeight (0.1763f));
+    m_orderInput->setBounds (proportionOfWidth (0.5961f), proportionOfHeight (0.8837f), proportionOfWidth (0.1155f), proportionOfHeight (0.0752f));
+    m_onsetMethod->setBounds (proportionOfWidth (0.0477f), proportionOfHeight (0.7239f), proportionOfWidth (0.1252f), proportionOfHeight (0.0282f));
+    m_onsetthreshold->setBounds (proportionOfWidth (0.0179f), proportionOfHeight (0.8649f), proportionOfWidth (0.0954f), proportionOfHeight (0.1222f));
+    m_onsetsilence->setBounds (proportionOfWidth (0.1371f), proportionOfHeight (0.8649f), proportionOfWidth (0.0954f), proportionOfHeight (0.1222f));
+    m_onsetcomp->setBounds (proportionOfWidth (0.2444f), proportionOfHeight (0.8649f), proportionOfWidth (0.0954f), proportionOfHeight (0.1222f));
     //[UserResized] Add your own custom resize handling here..
     m_waveFileView->setBounds(m_waveFileGroup->getLocalBounds());
     //[/UserResized]
@@ -184,6 +271,12 @@ void MainArea::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
         m_currentNoteCl = id;
         drawGraphs();
         //[/UserComboBoxCode_m_noteClSelector]
+    }
+    else if (comboBoxThatHasChanged == m_onsetMethod.get())
+    {
+        //[UserComboBoxCode_m_onsetMethod] -- add your combo box handling code here..
+        setOnsetDetectors();
+        //[/UserComboBoxCode_m_onsetMethod]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -237,6 +330,24 @@ void MainArea::sliderValueChanged (juce::Slider* sliderThatWasMoved)
         drawGraphs();
         //[/UserSliderCode_m_orderInput]
     }
+    else if (sliderThatWasMoved == m_onsetthreshold.get())
+    {
+        //[UserSliderCode_m_onsetthreshold] -- add your slider handling code here..
+        setOnsetDetectors();
+        //[/UserSliderCode_m_onsetthreshold]
+    }
+    else if (sliderThatWasMoved == m_onsetsilence.get())
+    {
+        //[UserSliderCode_m_onsetsilence] -- add your slider handling code here..
+        setOnsetDetectors();
+        //[/UserSliderCode_m_onsetsilence]
+    }
+    else if (sliderThatWasMoved == m_onsetcomp.get())
+    {
+        //[UserSliderCode_m_onsetcomp] -- add your slider handling code here..
+        setOnsetDetectors();
+        //[/UserSliderCode_m_onsetcomp]
+    }
 
     //[UsersliderValueChanged_Post]
     //[/UsersliderValueChanged_Post]
@@ -253,7 +364,19 @@ void MainArea::changeListenerCallback(ChangeBroadcaster *source)
         drawGraphs();
     }
 }
-
+void MainArea::setOnsetDetectors()
+{
+        auto id=m_onsetMethod->getSelectedItemIndex();
+        auto val=m_onsetMethod->getItemText(id);
+        auto threshold=m_onsetthreshold->getValue();
+        auto silence=m_onsetsilence->getValue();
+        auto comp=m_onsetcomp->getValue();
+        for(auto notecl:m_fretboard->getNoteClassifiers())
+        {
+            notecl->setOnsetParameter(val.toStdString(),threshold,silence,comp);
+        }
+        drawGraphs();
+}
 void MainArea::drawGraphs()
 {
     shared_ptr<GraphVector> responseGraphs = make_shared<GraphVector>();
@@ -313,12 +436,21 @@ BEGIN_JUCER_METADATA
                  snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="600"
                  initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44">
-    <TEXT pos="22.951% 63.455% 14.903% 3.525%" fill="solid: ffffffff" hasStroke="0"
+    <TEXT pos="44.411% 83.196% 14.903% 3.525%" fill="solid: ffffffff" hasStroke="0"
           text="Bandwidth" fontname="Default font" fontsize="15.0" kerning="0.0"
           bold="0" italic="0" justification="36"/>
-    <TEXT pos="22.951% 82.256% 14.903% 3.525%" fill="solid: ffffffff" hasStroke="0"
+    <TEXT pos="57.526% 83.196% 14.903% 3.525%" fill="solid: ffffffff" hasStroke="0"
           text="Filter order" fontname="Default font" fontsize="15.0" kerning="0.0"
           bold="0" italic="0" justification="36"/>
+    <TEXT pos="2.683% 83.196% 8.048% 3.525%" fill="solid: fffefefe" hasStroke="0"
+          text="Peak Threshold" fontname="Default font" fontsize="15.0"
+          kerning="0.0" bold="0" italic="0" justification="36"/>
+    <TEXT pos="14.605% 83.196% 7.452% 3.525%" fill="solid: ffffffff" hasStroke="0"
+          text="Onset silence" fontname="Default font" fontsize="15.0"
+          kerning="0.0" bold="0" italic="0" justification="36"/>
+    <TEXT pos="24.739% 83.196% 10.432% 3.525%" fill="solid: ffffffff" hasStroke="0"
+          text="Onset compression" fontname="Default font" fontsize="15.0"
+          kerning="0.0" bold="0" italic="0" justification="36"/>
   </BACKGROUND>
   <TABBEDCOMPONENT name="new tabbed component" id="d26db19854bd82c8" memberName="m_phaseResponseTab"
                    virtualName="" explicitFocusOrder="0" pos="1.714% 1.88% 97.243% 55.112%"
@@ -332,16 +464,35 @@ BEGIN_JUCER_METADATA
             posRelativeW="5dfc032bfdecdadc" posRelativeH="5dfc032bfdecdadc"
             editable="0" layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="bandwidthInput" id="1373a80496253bfb" memberName="m_bandwidthInput"
-          virtualName="" explicitFocusOrder="0" pos="20.268% 66.745% 20.492% 13.278%"
+          virtualName="" explicitFocusOrder="0" pos="44.709% 86.486% 15.127% 13.278%"
           tooltip="Bandwidth" min="10.0" max="50.0" int="0.0" style="Rotary"
           textBoxPos="TextBoxBelow" textBoxEditable="1" textBoxWidth="80"
           textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <GROUPCOMPONENT name="new group" id="3dba363dad72d9cb" memberName="m_waveFileGroup"
-                  virtualName="" explicitFocusOrder="0" pos="47.094% 62.985% 50.745% 17.626%"
+                  virtualName="" explicitFocusOrder="0" pos="22.653% 62.985% 75.112% 17.626%"
                   title="Input Wavefile"/>
   <SLIDER name="orderInput" id="9776d67d8e8f0565" memberName="m_orderInput"
-          virtualName="" explicitFocusOrder="0" pos="20.268% 85.546% 20.492% 13.278%"
-          tooltip="Filter order" min="1.0" max="10.0" int="0.0" style="Rotary"
+          virtualName="" explicitFocusOrder="0" pos="59.613% 88.367% 11.55% 7.521%"
+          tooltip="Filter order" min="1.0" max="10.0" int="1.0" style="IncDecButtons"
+          textBoxPos="TextBoxBelow" textBoxEditable="1" textBoxWidth="80"
+          textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <COMBOBOX name="onsetMethod" id="e193ce76d9fca56d" memberName="m_onsetMethod"
+            virtualName="" explicitFocusOrder="0" pos="4.769% 72.385% 12.519% 2.82%"
+            editable="0" layout="33" items="energy&#10;hfc&#10;complex&#10;phase&#10;wphase&#10;specdiff&#10;kl&#10;mkl&#10;specflux"
+            textWhenNonSelected="select onset method" textWhenNoItems="(no choices)"/>
+  <SLIDER name="onsetthreshold" id="a007d5251242647" memberName="m_onsetthreshold"
+          virtualName="" explicitFocusOrder="0" pos="1.788% 86.486% 9.538% 12.221%"
+          tooltip="onset threshold" min="0.1" max="0.9" int="0.0" style="Rotary"
+          textBoxPos="TextBoxBelow" textBoxEditable="1" textBoxWidth="80"
+          textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <SLIDER name="onsetsilence" id="beff56a9655692c4" memberName="m_onsetsilence"
+          virtualName="" explicitFocusOrder="0" pos="13.711% 86.486% 9.538% 12.221%"
+          tooltip="onset threshold" min="-90.0" max="-10.0" int="0.0" style="Rotary"
+          textBoxPos="TextBoxBelow" textBoxEditable="1" textBoxWidth="80"
+          textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <SLIDER name="onsetcomp" id="a06d44331028ba76" memberName="m_onsetcomp"
+          virtualName="" explicitFocusOrder="0" pos="24.441% 86.486% 9.538% 12.221%"
+          tooltip="onset compression" min="0.0" max="1.0" int="0.0" style="Rotary"
           textBoxPos="TextBoxBelow" textBoxEditable="1" textBoxWidth="80"
           textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
 </JUCER_COMPONENT>

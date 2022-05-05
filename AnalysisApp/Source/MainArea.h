@@ -53,6 +53,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     virtual void changeListenerCallback (ChangeBroadcaster* source);
     void drawGraphs();
+    void setOnsetDetectors();
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -80,6 +81,10 @@ private:
     std::unique_ptr<juce::Slider> m_bandwidthInput;
     std::unique_ptr<juce::GroupComponent> m_waveFileGroup;
     std::unique_ptr<juce::Slider> m_orderInput;
+    std::unique_ptr<juce::ComboBox> m_onsetMethod;
+    std::unique_ptr<juce::Slider> m_onsetthreshold;
+    std::unique_ptr<juce::Slider> m_onsetsilence;
+    std::unique_ptr<juce::Slider> m_onsetcomp;
 
 
     //==============================================================================

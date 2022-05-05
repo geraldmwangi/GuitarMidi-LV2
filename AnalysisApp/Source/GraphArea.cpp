@@ -40,6 +40,10 @@ GraphArea::GraphArea ()
 
 
     //[Constructor] You can add your own custom stuff here..
+    m_linePositionX=-1;
+    m_linePositionXOffset=-1;
+    m_linePositionY=-1;
+    m_linePositionYOffset=-1;
     //[/Constructor]
 }
 
@@ -52,6 +56,7 @@ GraphArea::~GraphArea()
 
     //[Destructor]. You can add your own custom destruction code here..
     m_linePositionX = -1;
+
     //[/Destructor]
 }
 
@@ -106,6 +111,7 @@ void GraphArea::resized()
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
+
     //[/UserResized]
 }
 
@@ -114,6 +120,10 @@ void GraphArea::mouseDown (const juce::MouseEvent& e)
     //[UserCode_mouseDown] -- Add your code here...
     m_linePositionX = e.getMouseDownX();
     m_linePositionXOffset = m_linePositionX;
+    m_linePositionY=e.getMouseDownY();
+    m_linePositionYOffset=m_linePositionY;
+    m_offsetBounds=getBounds();
+
     repaint();
     //[/UserCode_mouseDown]
 }
@@ -123,8 +133,32 @@ void GraphArea::mouseDrag (const juce::MouseEvent& e)
     //[UserCode_mouseDrag] -- Add your code here...
     if(e.getDistanceFromDragStartX()>e.getDistanceFromDragStartY())
         m_linePositionX = m_linePositionXOffset + e.getDistanceFromDragStartX();
+    //if(abs(e.getDistanceFromDragStartY()))
+    {
+        float scale=(((float)e.getDistanceFromDragStartY())/getHeight());
+
+        float x=m_offsetBounds.getX()-scale*m_offsetBounds.getWidth()+e.getDistanceFromDragStartX();
+        float width= m_offsetBounds.getWidth()+ 2*scale*m_offsetBounds.getWidth();
+        Rectangle<int> b(m_offsetBounds);
+        b.setX(x);
+        b.setWidth(width);
+        setBounds(b);
+        cout<<"Zoom factor:"<<scale<<", x: "<<x<<", width: "<<width<<endl;
+
+
+
+    }
     repaint();
     //[/UserCode_mouseDrag]
+}
+
+void GraphArea::mouseDoubleClick (const juce::MouseEvent& e)
+{
+    //[UserCode_mouseDoubleClick] -- Add your code here...
+    cout<<"Douuble click timeout: "<<e.getDoubleClickTimeout()<<endl;
+    setBounds(getParentComponent()->proportionOfWidth(0.1), getParentComponent()->proportionOfHeight(0.0),  
+        getParentComponent()->proportionOfWidth(0.9), getParentComponent()->proportionOfHeight(0.9));
+    //[/UserCode_mouseDoubleClick]
 }
 
 
@@ -168,6 +202,7 @@ BEGIN_JUCER_METADATA
   <METHODS>
     <METHOD name="mouseDown (const juce::MouseEvent&amp; e)"/>
     <METHOD name="mouseDrag (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseDoubleClick (const juce::MouseEvent&amp; e)"/>
   </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
 </JUCER_COMPONENT>

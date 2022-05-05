@@ -85,9 +85,14 @@ void AudioResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<int> bound
     }
     juce::AudioFormatManager manager;
     juce::AudioThumbnailCache cache(1);
-    juce::AudioThumbnail thumbnail(512,manager,cache);
+    float factor=((float)g.getClipBounds().getWidth())/bounds.getWidth();
+    int thumbres=256*factor;
+    thumbres=(thumbres>1)?thumbres:1;
+    juce::AudioThumbnail thumbnail(thumbres,manager,cache);
     thumbnail.reset(2,48000,res.getNumSamples());
     thumbnail.addBlock(0,res,0,res.getNumSamples());
-    thumbnail.drawChannels(g,bounds,0,thumbnail.getTotalLength(),1.0);
+    float start=((float)(g.getClipBounds().getX()-bounds.getX()))/bounds.getWidth()*thumbnail.getTotalLength();
+    float end=((float)(g.getClipBounds().getX()+g.getClipBounds().getWidth()+-bounds.getX()))/bounds.getWidth()*thumbnail.getTotalLength();
+    thumbnail.drawChannels(g,g.getClipBounds(),start,end,1.0);
     
 }

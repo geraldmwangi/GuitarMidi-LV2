@@ -54,6 +54,7 @@ public:
     void resized() override;
     void mouseDown (const juce::MouseEvent& e) override;
     void mouseDrag (const juce::MouseEvent& e) override;
+    void mouseDoubleClick (const juce::MouseEvent& e) override;
 
 
 
@@ -62,6 +63,9 @@ private:
   shared_ptr<GraphVector> m_graphs;
     int m_linePositionX;
   int m_linePositionXOffset;
+    int m_linePositionY;
+  int m_linePositionYOffset;
+  Rectangle<int> m_offsetBounds;
     //[/UserVariables]
 
     //==============================================================================
