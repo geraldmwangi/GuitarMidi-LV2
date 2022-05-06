@@ -31,12 +31,18 @@ PlotArea::PlotArea ()
 {
     //[Constructor_pre] You can add your own custom stuff here..
     m_graphArea.reset(new GraphArea());
-    addAndMakeVisible(m_graphArea.get());
+    // addAndMakeVisible(m_graphArea.get());
     m_linePositionX=-1;
     //[/Constructor_pre]
 
+    m_graphView.reset (new juce::Viewport ("graphView"));
+    addAndMakeVisible (m_graphView.get());
+
+    m_graphView->setBounds (24, 8, 1304, 824);
+
 
     //[UserPreSize]
+    m_graphView->addAndMakeVisible(m_graphArea.get());
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -51,6 +57,7 @@ PlotArea::~PlotArea()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
+    m_graphView = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -69,7 +76,7 @@ void PlotArea::paint (juce::Graphics& g)
     Rectangle<float> valueBounds = m_graphArea->getGraphBounds();
     g.setColour(juce::Colour::fromRGB(255, 255, 255));
     // Line<int> ordinate(getBounds().getTopLeft(), getBounds().getBottomLeft());
-    Line<int> ordinate(m_graphArea->getBounds().getTopLeft(), m_graphArea->getBounds().getBottomLeft());
+    Line<int> ordinate(m_graphView->getBounds().getTopLeft(), m_graphView->getBounds().getBottomLeft());
     g.drawLine(ordinate.getStartX(), ordinate.getStartY(), ordinate.getEndX(), ordinate.getEndY());
 
     int numticks = 10;
@@ -83,7 +90,7 @@ void PlotArea::paint (juce::Graphics& g)
     }
 
 
-    Line<int> abscisse(m_graphArea->getBounds().getBottomLeft(), m_graphArea->getBounds().getBottomRight());
+    Line<int> abscisse(m_graphView->getBounds().getBottomLeft(), m_graphView->getBounds().getBottomRight());
     g.drawLine(abscisse.getStartX(), abscisse.getStartY(), abscisse.getEndX(), abscisse.getEndY());
 
     for (int i = 0; i < numticks; i++)
@@ -107,7 +114,8 @@ void PlotArea::resized()
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
-    m_graphArea->setBounds(proportionOfWidth(0.1), proportionOfHeight(0.0), proportionOfWidth(0.9), proportionOfHeight(0.9));
+    m_graphView->setBounds(proportionOfWidth(0.1), proportionOfHeight(0.0), proportionOfWidth(0.9), proportionOfHeight(0.9));
+    m_graphArea->setBoundsRelative(0,0,1,1);
     //[/UserResized]
 }
 
@@ -166,6 +174,10 @@ BEGIN_JUCER_METADATA
     <METHOD name="mouseWheelMove (const juce::MouseEvent&amp; e, const juce::MouseWheelDetails&amp; wheel)"/>
   </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
+  <VIEWPORT name="graphView" id="afae721d72c0e0a4" memberName="m_graphView"
+            virtualName="" explicitFocusOrder="0" pos="24 8 1304 824" vscroll="1"
+            hscroll="1" scrollbarThickness="8" contentType="0" jucerFile=""
+            contentClass="GraphArea" constructorParams=""/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

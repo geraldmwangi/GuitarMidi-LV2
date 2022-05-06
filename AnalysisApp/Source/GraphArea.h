@@ -65,7 +65,7 @@ private:
   int m_linePositionXOffset;
     int m_linePositionY;
   int m_linePositionYOffset;
-  Rectangle<int> m_offsetBounds;
+  Rectangle<int> m_lastBoundsRelativToParent;
     //[/UserVariables]
 
     //==============================================================================

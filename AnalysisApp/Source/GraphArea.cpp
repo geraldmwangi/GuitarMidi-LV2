@@ -97,10 +97,10 @@ void GraphArea::paint (juce::Graphics& g)
             }
         }
     }
-    if (m_linePositionX >= 0)
-    {
-        g.drawLine(m_linePositionX, 0, m_linePositionX, getHeight());
-    }
+    // if (m_linePositionX >= 0)
+    // {
+    //     g.drawLine(m_linePositionX, 0, m_linePositionX, getHeight());
+    // }
 
     //[/UserPaint]
 }
@@ -122,7 +122,7 @@ void GraphArea::mouseDown (const juce::MouseEvent& e)
     m_linePositionXOffset = m_linePositionX;
     m_linePositionY=e.getMouseDownY();
     m_linePositionYOffset=m_linePositionY;
-    m_offsetBounds=getBounds();
+    m_lastBoundsRelativToParent=getBounds();
 
     repaint();
     //[/UserCode_mouseDown]
@@ -133,17 +133,39 @@ void GraphArea::mouseDrag (const juce::MouseEvent& e)
     //[UserCode_mouseDrag] -- Add your code here...
     if(e.getDistanceFromDragStartX()>e.getDistanceFromDragStartY())
         m_linePositionX = m_linePositionXOffset + e.getDistanceFromDragStartX();
-    //if(abs(e.getDistanceFromDragStartY()))
+    if(abs(e.getDistanceFromDragStartY()))
     {
-        float scale=(((float)e.getDistanceFromDragStartY())/getHeight());
+        float s=(((float)e.getDistanceFromDragStartY())/m_lastBoundsRelativToParent.getHeight());
 
-        float x=m_offsetBounds.getX()-scale*m_offsetBounds.getWidth()+e.getDistanceFromDragStartX();
-        float width= m_offsetBounds.getWidth()+ 2*scale*m_offsetBounds.getWidth();
-        Rectangle<int> b(m_offsetBounds);
-        b.setX(x);
-        b.setWidth(width);
-        setBounds(b);
-        cout<<"Zoom factor:"<<scale<<", x: "<<x<<", width: "<<width<<endl;
+         s=1+s;//pow(2,s);
+
+
+
+        //The origin is the top left of this object in the frame of the parent
+        auto l=m_lastBoundsRelativToParent.getX();
+        auto r=m_lastBoundsRelativToParent.getTopRight().getX();
+
+        //Get the mouse down position in the parent coordinate frame 
+        auto m=e.getMouseDownX()+l;
+
+        //Transform left(right) position with affine transform
+        //The coordinate frame is translated to the frame with the mouse at the origin
+        auto lp=s*(l-m)+m;
+        auto rp=s*(r-m)+m;
+
+
+        
+
+        //new width
+        auto width=rp-lp;
+        Rectangle<int> newbounds(m_lastBoundsRelativToParent);
+        newbounds.setX(lp+e.getDistanceFromDragStartX());
+        newbounds.setWidth(width);
+        setBounds(newbounds);
+
+
+
+        
 
 
 
@@ -156,8 +178,7 @@ void GraphArea::mouseDoubleClick (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDoubleClick] -- Add your code here...
     cout<<"Douuble click timeout: "<<e.getDoubleClickTimeout()<<endl;
-    setBounds(getParentComponent()->proportionOfWidth(0.1), getParentComponent()->proportionOfHeight(0.0),  
-        getParentComponent()->proportionOfWidth(0.9), getParentComponent()->proportionOfHeight(0.9));
+    setBoundsRelative(0,0,1,1);
     //[/UserCode_mouseDoubleClick]
 }
 

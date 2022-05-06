@@ -33,14 +33,15 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     //TODO query host for buffersize. This is only used for the pitch detector
     mBufferSize = 256;
     m_noteOnOffState = false;
-    m_onsetDetector=new_aubio_onset("mkl",mBufferSize,mBufferSize/2,m_samplerate);
+    m_onsetDetector=nullptr;
+    setOnsetParameter("energy");
 }
 
-void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,bool adap_whitening)
+void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,float onsetbuffersize,bool adap_whitening)
 {
     if(m_onsetDetector)
         del_aubio_onset(m_onsetDetector);
-    m_onsetDetector=new_aubio_onset(method.c_str(),mBufferSize,mBufferSize/2,m_samplerate);
+    m_onsetDetector=new_aubio_onset(method.c_str(),onsetbuffersize,onsetbuffersize/2,m_samplerate);
     aubio_onset_set_threshold(m_onsetDetector,threshold);
     aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
     aubio_onset_set_silence(m_onsetDetector,silence);

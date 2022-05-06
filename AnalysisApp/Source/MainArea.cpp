@@ -118,6 +118,18 @@ MainArea::MainArea ()
     m_onsetcomp->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
     m_onsetcomp->addListener (this);
 
+    m_onsetBufferSize.reset (new juce::ComboBox ("onset buffersize"));
+    addAndMakeVisible (m_onsetBufferSize.get());
+    m_onsetBufferSize->setEditableText (false);
+    m_onsetBufferSize->setJustificationType (juce::Justification::centredLeft);
+    m_onsetBufferSize->setTextWhenNothingSelected (juce::String());
+    m_onsetBufferSize->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    m_onsetBufferSize->addItem (TRANS("256"), 1);
+    m_onsetBufferSize->addItem (TRANS("512"), 2);
+    m_onsetBufferSize->addItem (TRANS("1024"), 3);
+    m_onsetBufferSize->addItem (TRANS("2048"), 4);
+    m_onsetBufferSize->addListener (this);
+
 
     //[UserPreSize]
 
@@ -137,6 +149,7 @@ MainArea::MainArea ()
     }
     m_noteClSelector->setSelectedId(ALL_NOTECLS);
     m_onsetMethod->setSelectedId(1);
+    m_onsetBufferSize->setSelectedId(1);
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -161,6 +174,7 @@ MainArea::~MainArea()
     m_onsetthreshold = nullptr;
     m_onsetsilence = nullptr;
     m_onsetcomp = nullptr;
+    m_onsetBufferSize = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -254,6 +268,7 @@ void MainArea::resized()
     m_onsetthreshold->setBounds (proportionOfWidth (0.0179f), proportionOfHeight (0.8649f), proportionOfWidth (0.0954f), proportionOfHeight (0.1222f));
     m_onsetsilence->setBounds (proportionOfWidth (0.1371f), proportionOfHeight (0.8649f), proportionOfWidth (0.0954f), proportionOfHeight (0.1222f));
     m_onsetcomp->setBounds (proportionOfWidth (0.2444f), proportionOfHeight (0.8649f), proportionOfWidth (0.0954f), proportionOfHeight (0.1222f));
+    m_onsetBufferSize->setBounds (proportionOfWidth (0.3517f), proportionOfHeight (0.8367f), proportionOfWidth (0.1118f), proportionOfHeight (0.0282f));
     //[UserResized] Add your own custom resize handling here..
     m_waveFileView->setBounds(m_waveFileGroup->getLocalBounds());
     //[/UserResized]
@@ -277,6 +292,12 @@ void MainArea::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
         //[UserComboBoxCode_m_onsetMethod] -- add your combo box handling code here..
         setOnsetDetectors();
         //[/UserComboBoxCode_m_onsetMethod]
+    }
+    else if (comboBoxThatHasChanged == m_onsetBufferSize.get())
+    {
+        //[UserComboBoxCode_m_onsetBufferSize] -- add your combo box handling code here..
+        setOnsetDetectors();
+        //[/UserComboBoxCode_m_onsetBufferSize]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -371,9 +392,12 @@ void MainArea::setOnsetDetectors()
         auto threshold=m_onsetthreshold->getValue();
         auto silence=m_onsetsilence->getValue();
         auto comp=m_onsetcomp->getValue();
+        auto idbuf=m_onsetBufferSize->getSelectedItemIndex();
+        auto valbuf=m_onsetBufferSize->getItemText(idbuf);
+        int bufsize=atoi(valbuf.toStdString().c_str());
         for(auto notecl:m_fretboard->getNoteClassifiers())
         {
-            notecl->setOnsetParameter(val.toStdString(),threshold,silence,comp);
+            notecl->setOnsetParameter(val.toStdString(),threshold,silence,comp,bufsize);
         }
         drawGraphs();
 }
@@ -495,6 +519,10 @@ BEGIN_JUCER_METADATA
           tooltip="onset compression" min="0.0" max="1.0" int="0.0" style="Rotary"
           textBoxPos="TextBoxBelow" textBoxEditable="1" textBoxWidth="80"
           textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <COMBOBOX name="onset buffersize" id="30e2a283a5236310" memberName="m_onsetBufferSize"
+            virtualName="" explicitFocusOrder="0" pos="35.171% 83.666% 11.177% 2.82%"
+            editable="0" layout="33" items="256&#10;512&#10;1024&#10;2048"
+            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

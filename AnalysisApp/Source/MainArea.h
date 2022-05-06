@@ -85,6 +85,7 @@ private:
     std::unique_ptr<juce::Slider> m_onsetthreshold;
     std::unique_ptr<juce::Slider> m_onsetsilence;
     std::unique_ptr<juce::Slider> m_onsetcomp;
+    std::unique_ptr<juce::ComboBox> m_onsetBufferSize;
 
 
     //==============================================================================
