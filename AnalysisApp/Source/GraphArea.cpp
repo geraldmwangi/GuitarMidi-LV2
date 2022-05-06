@@ -159,7 +159,7 @@ void GraphArea::mouseDrag (const juce::MouseEvent& e)
         //new width
         auto width=rp_trans-lp_trans;
         Rectangle<int> newbounds(m_lastBoundsRelativToParent);
-        newbounds.setX(lp_trans);
+        newbounds.setX(lp_trans+e.getDistanceFromDragStartX());
         newbounds.setWidth(width);
         setBounds(newbounds);
 
