@@ -47,8 +47,15 @@ void NoteClassifier::setOnsetParameter(string method, float threshold,float sile
     aubio_onset_set_silence(m_onsetDetector,silence);
     aubio_onset_set_compression(m_onsetDetector,comp);
     
+    
 }
 
+void NoteClassifier::resetFilterAndOnsetDetector()
+{
+    if(m_onsetDetector)
+        aubio_onset_reset(m_onsetDetector);
+    m_filter.reset();
+}
 void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten,int order)
 {
     m_bandwidth=bandwidth;

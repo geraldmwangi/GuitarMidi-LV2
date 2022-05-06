@@ -68,6 +68,8 @@ void AudioResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<int> bound
     AudioSampleBuffer res;
     res.setSize(2,m_audioslice.getNumSamples());
     int chunk=256;
+    int onscount=0;
+    m_notecl->resetFilterAndOnsetDetector();
     for(int pos=0;pos<(m_audioslice.getNumSamples()-chunk);pos+=chunk)
     {
        res.copyFrom(0,pos,*m_audioslice.getArrayOfReadPointers()+pos,chunk);
@@ -79,6 +81,7 @@ void AudioResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<int> bound
         {
             int linepos=(float)pos/m_audioslice.getNumSamples()*bounds.getWidth();
             g.drawLine(linepos,0,linepos,bounds.getHeight());
+            onscount++;
         }
        res.copyFrom(1,pos,*m_audioslice.getArrayOfReadPointers()+pos,chunk);
 
@@ -94,5 +97,6 @@ void AudioResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<int> bound
     float start=((float)(g.getClipBounds().getX()-bounds.getX()))/bounds.getWidth()*thumbnail.getTotalLength();
     float end=((float)(g.getClipBounds().getX()+g.getClipBounds().getWidth()+-bounds.getX()))/bounds.getWidth()*thumbnail.getTotalLength();
     thumbnail.drawChannels(g,g.getClipBounds(),start,end,1.0);
+    cout<<"Found "<<onscount<<" onsets"<<endl;
     
 }

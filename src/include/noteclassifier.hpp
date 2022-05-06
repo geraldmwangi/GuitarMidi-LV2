@@ -201,6 +201,8 @@ public:
 
     void setFilterParameters(float bandwidth = 20, float passbandatten = 1,int order=FILTERORDER);
 
+    void resetFilterAndOnsetDetector();
+
     float getCenterFrequency()
     {
         return m_centerfreq;

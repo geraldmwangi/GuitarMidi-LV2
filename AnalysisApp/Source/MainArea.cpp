@@ -149,7 +149,9 @@ MainArea::MainArea ()
     }
     m_noteClSelector->setSelectedId(ALL_NOTECLS);
     m_onsetMethod->setSelectedId(1);
-    m_onsetBufferSize->setSelectedId(1);
+    m_onsetBufferSize->setSelectedId(3);
+    m_onsetthreshold->setValue(0.3);
+    m_onsetsilence->setValue(-50);
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -440,7 +442,7 @@ void MainArea::drawGraphs()
     m_responseArea->drawGraphs(responseGraphs);
     m_phaseArea->drawGraphs(phaseGraphs);
     m_meanResponseAudioArea->drawGraphs(filteredAudioGraphs);
-    repaint();
+    //repaint();
 }
 //[/MiscUserCode]
 
