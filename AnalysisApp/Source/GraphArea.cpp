@@ -41,7 +41,7 @@ GraphArea::GraphArea ()
 
     //[Constructor] You can add your own custom stuff here..
     m_linePositionX=-1;
-    m_linePositionXOffset=-1;
+    m_lastMouseDownX=-1;
     m_linePositionY=-1;
     m_linePositionYOffset=-1;
     //[/Constructor]
@@ -119,7 +119,7 @@ void GraphArea::mouseDown (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
     m_linePositionX = e.getMouseDownX();
-    m_linePositionXOffset = m_linePositionX;
+    m_lastMouseDownX = m_linePositionX;
     m_linePositionY=e.getMouseDownY();
     m_linePositionYOffset=m_linePositionY;
     m_lastBoundsRelativToParent=getBounds();
@@ -132,7 +132,7 @@ void GraphArea::mouseDrag (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
     if(e.getDistanceFromDragStartX()>e.getDistanceFromDragStartY())
-        m_linePositionX = m_linePositionXOffset + e.getDistanceFromDragStartX();
+        m_linePositionX = m_lastMouseDownX + e.getDistanceFromDragStartX();
     if(abs(e.getDistanceFromDragStartY()))
     {
         float s=(((float)e.getDistanceFromDragStartY())/m_lastBoundsRelativToParent.getHeight());
@@ -142,24 +142,24 @@ void GraphArea::mouseDrag (const juce::MouseEvent& e)
 
 
         //The origin is the top left of this object in the frame of the parent
-        auto l=m_lastBoundsRelativToParent.getX();
-        auto r=m_lastBoundsRelativToParent.getTopRight().getX();
+        auto lp=m_lastBoundsRelativToParent.getX();
+        auto rp=m_lastBoundsRelativToParent.getTopRight().getX();
 
         //Get the mouse down position in the parent coordinate frame 
-        auto m=e.getMouseDownX()+l;
+        auto mp=m_lastMouseDownX+lp;
 
         //Transform left(right) position with affine transform
         //The coordinate frame is translated to the frame with the mouse at the origin
-        auto lp=s*(l-m)+m;
-        auto rp=s*(r-m)+m;
+        auto lp_trans=s*(lp-mp)+mp;
+        auto rp_trans=s*(rp-mp)+mp;
 
 
         
 
         //new width
-        auto width=rp-lp;
+        auto width=rp_trans-lp_trans;
         Rectangle<int> newbounds(m_lastBoundsRelativToParent);
-        newbounds.setX(lp+e.getDistanceFromDragStartX());
+        newbounds.setX(lp_trans);
         newbounds.setWidth(width);
         setBounds(newbounds);
 

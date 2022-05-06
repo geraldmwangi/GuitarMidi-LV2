@@ -62,7 +62,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
   shared_ptr<GraphVector> m_graphs;
     int m_linePositionX;
-  int m_linePositionXOffset;
+  int m_lastMouseDownX;
     int m_linePositionY;
   int m_linePositionYOffset;
   Rectangle<int> m_lastBoundsRelativToParent;
