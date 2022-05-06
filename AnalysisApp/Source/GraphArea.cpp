@@ -142,26 +142,24 @@ void GraphArea::mouseDrag (const juce::MouseEvent& e)
 
 
         //The origin is the top left of this object in the frame of the parent
-        auto lp=m_lastBoundsRelativToParent.getX();
-
-        //The right edge in the parent coord frame
-        auto rp=m_lastBoundsRelativToParent.getTopRight().getX();
+        auto l=m_lastBoundsRelativToParent.getX();
+        auto r=m_lastBoundsRelativToParent.getTopRight().getX();
 
         //Get the mouse down position in the parent coordinate frame 
-        auto mp=e.getMouseDownX()+lp;
+        auto m=e.getMouseDownX()+l;
 
         //Transform left(right) position with affine transform
         //The coordinate frame is translated to the frame with the mouse at the origin
-        auto lp_trans=s*(lp-mp)+mp;
-        auto rp_trans=s*(rp-mp)+mp;
+        auto lp=s*(l-m)+m;
+        auto rp=s*(r-m)+m;
 
 
         
 
         //new width
-        auto width=rp_trans-lp_trans;
+        auto width=rp-lp;
         Rectangle<int> newbounds(m_lastBoundsRelativToParent);
-        newbounds.setX(lp_trans+e.getDistanceFromDragStartX());
+        newbounds.setX(lp+e.getDistanceFromDragStartX());
         newbounds.setWidth(width);
         setBounds(newbounds);
 
