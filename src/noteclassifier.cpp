@@ -34,7 +34,7 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     mBufferSize = 256;
     m_noteOnOffState = false;
     m_onsetDetector=nullptr;
-    setOnsetParameter("energy");
+    setOnsetParameter("specdiff");
 }
 
 void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,float onsetbuffersize,bool adap_whitening)
@@ -95,6 +95,9 @@ void NoteClassifier::initialize()
     if (m_pitchfreq)
         del_fvec(m_pitchfreq);
     m_pitchfreq = new_fvec(1);
+
+    m_meanEnv=0;
+    m_meanEnvCounter=0;
 }
 
 void NoteClassifier::finalize()
@@ -129,17 +132,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     float meanenv = 0;
     int count = 0;
 
-    // Get average envelope
-    for (int s = 1; s < (nsamples - 1); s++)
-    {
-        // if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
-        {
-            float absval = fabs(buffer[s]);
-            // meanenv += fabs(buffer[s]);
-            meanenv = (absval > meanenv) ? absval : meanenv;
-            count++;
-        }
-    }
+
 
     if(m_onsetDetector&&onsetdetected)
     {
@@ -151,6 +144,25 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
         aubio_onset_do(m_onsetDetector,onsinput,ons);
         *onsetdetected=*(*ons).data>0.0;
         del_fvec(ons);
+        m_meanEnv=1.0;
+        m_meanEnvCounter=0;
+    }
+
+    if(m_meanEnvCounter>1024)
+    {
+        m_meanEnv=0;
+        m_meanEnvCounter=0;
+    }
+    // Get average envelope
+    for (int s = 0; s < (nsamples); s++)
+    {
+        // if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
+        {
+            float absval = fabs(buffer[s]);
+            m_meanEnv += fabs(buffer[s]);
+            // meanenv = (absval > meanenv) ? absval : meanenv;
+            m_meanEnvCounter++;
+        }
     }
 
 
@@ -158,7 +170,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     // if (count)
     //     meanenv /= count;
     //delete [] buffer;
-    return meanenv;
+    return m_meanEnv/m_meanEnvCounter;
 }
 void NoteClassifier::process(int nsamples)
 {

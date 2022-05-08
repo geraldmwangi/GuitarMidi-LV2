@@ -76,6 +76,9 @@ private:
 
     aubio_onset_t* m_onsetDetector;
 
+    float m_meanEnv;
+    int m_meanEnvCounter;
+
     /**
      * @brief m_pitchfreq: The result of the pitch estimator
      * >
@@ -197,7 +200,7 @@ public:
      */
     void setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output);
 
-    void setOnsetParameter(string method,float threshold=0.5,float silence=-20,float comp=0.0,float onsetbuffersize=256,bool adap_whitening=false);
+    void setOnsetParameter(string method,float threshold=0.3,float silence=-50,float comp=0.0,float onsetbuffersize=256,bool adap_whitening=false);
 
     void setFilterParameters(float bandwidth = 20, float passbandatten = 1,int order=FILTERORDER);
 
