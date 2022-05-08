@@ -200,7 +200,7 @@ public:
      */
     void setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output);
 
-    void setOnsetParameter(string method,float threshold=0.3,float silence=-50,float comp=0.0,float onsetbuffersize=256,bool adap_whitening=false);
+    void setOnsetParameter(string method,float threshold=0.3,float silence=-50,float comp=0.0,float onsetbuffersize=1024,bool adap_whitening=false);
 
     void setFilterParameters(float bandwidth = 20, float passbandatten = 1,int order=FILTERORDER);
 
