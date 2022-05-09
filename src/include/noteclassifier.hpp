@@ -55,6 +55,8 @@ private:
      */
     float m_bandwidth;
 
+    int m_order;
+
     /**
      * @brief m_passbandatten: The attenuation in db of amplitude of the ripple in the pass and stopband of the elliptic filters
      * 
@@ -76,8 +78,15 @@ private:
 
     aubio_onset_t* m_onsetDetector;
 
+
     float m_meanEnv;
     int m_meanEnvCounter;
+
+    float m_onsetThresh;
+    float m_onsetSilence;
+    float m_onsetCompression;
+    int m_onsetBuffersize;
+    string m_onsetMethod;
 
     /**
      * @brief m_pitchfreq: The result of the pitch estimator
@@ -200,7 +209,7 @@ public:
      */
     void setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output);
 
-    void setOnsetParameter(string method,float threshold=0.3,float silence=-50,float comp=0.0,float onsetbuffersize=1024,bool adap_whitening=false);
+    void setOnsetParameter(string method,float threshold=0.3,float silence=-50,float comp=0.0,int onsetbuffersize=1024,bool adap_whitening=false);
 
     void setFilterParameters(float bandwidth = 20, float passbandatten = 1,int order=FILTERORDER);
 

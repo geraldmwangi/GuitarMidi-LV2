@@ -37,15 +37,20 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     setOnsetParameter("specdiff");
 }
 
-void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,float onsetbuffersize,bool adap_whitening)
+void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,int onsetbuffersize,bool adap_whitening)
 {
+    m_onsetMethod=method;
+    m_onsetThresh=threshold;
+    m_onsetSilence=silence;
+    m_onsetCompression=comp;
+    m_onsetBuffersize=onsetbuffersize;
     if(m_onsetDetector)
         del_aubio_onset(m_onsetDetector);
-    m_onsetDetector=new_aubio_onset(method.c_str(),onsetbuffersize,onsetbuffersize/2,m_samplerate);
-    aubio_onset_set_threshold(m_onsetDetector,threshold);
-    aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
-    aubio_onset_set_silence(m_onsetDetector,silence);
-    aubio_onset_set_compression(m_onsetDetector,comp);
+    m_onsetDetector=new_aubio_onset(m_onsetMethod.c_str(),m_onsetBuffersize,m_onsetBuffersize/2,m_samplerate);
+    aubio_onset_set_threshold(m_onsetDetector,m_onsetThresh);
+    // aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
+    aubio_onset_set_silence(m_onsetDetector,m_onsetSilence);
+    aubio_onset_set_compression(m_onsetDetector,m_onsetCompression);
     
     
 }
@@ -53,19 +58,29 @@ void NoteClassifier::setOnsetParameter(string method, float threshold,float sile
 void NoteClassifier::resetFilterAndOnsetDetector()
 {
     if(m_onsetDetector)
-        aubio_onset_reset(m_onsetDetector);
-    m_filter.reset();
+        del_aubio_onset(m_onsetDetector);
+    m_onsetDetector=new_aubio_onset(m_onsetMethod.c_str(),m_onsetBuffersize,m_onsetBuffersize/2,m_samplerate);
+    aubio_onset_set_threshold(m_onsetDetector,m_onsetThresh);
+    // aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
+    aubio_onset_set_silence(m_onsetDetector,m_onsetSilence);
+    aubio_onset_set_compression(m_onsetDetector,m_onsetCompression);
+#ifdef USE_ELLIPTIC
+    m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+#else
+    m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth);
+#endif
 }
 void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten,int order)
 {
     m_bandwidth=bandwidth;
     m_passbandatten=passbandatten;
+    m_order=order;
 
     m_filter.reset();
 #ifdef USE_ELLIPTIC
-    m_filter.setup(order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+    m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
 #else
-    m_filter.setup(order, m_samplerate, m_centerfreq, m_bandwidth);
+    m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth);
 #endif
 }
 

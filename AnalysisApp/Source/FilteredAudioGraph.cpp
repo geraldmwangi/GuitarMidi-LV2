@@ -70,7 +70,9 @@ void AudioResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<int> bound
     int chunk=256;
     int onscount=0;
     m_notecl->resetFilterAndOnsetDetector();
-    for(int pos=0;pos<(m_audioslice.getNumSamples()-chunk);pos+=chunk)
+    int startpos=0;//round(((float)(g.getClipBounds().getX()-bounds.getX()))/bounds.getWidth()*m_audioslice.getNumSamples());
+    int endpos=round(((float)(g.getClipBounds().getX()+g.getClipBounds().getWidth()+-bounds.getX()))/bounds.getWidth()*m_audioslice.getNumSamples());
+    for(int pos=startpos;pos<min(endpos-chunk,m_audioslice.getNumSamples()-chunk);pos+=chunk)
     {
        res.copyFrom(0,pos,*m_audioslice.getArrayOfReadPointers()+pos,chunk);
        //res.copyFrom(1,pos,*m_audioslice.getArrayOfReadPointers()+pos,chunk);
@@ -79,7 +81,7 @@ void AudioResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<int> bound
 
        if(onset)
         {
-            int linepos=(float)pos/m_audioslice.getNumSamples()*bounds.getWidth();
+            float linepos=(((float)pos)/m_audioslice.getNumSamples()*bounds.getWidth());
             g.drawLine(linepos,0,linepos,bounds.getHeight());
             onscount++;
         }
