@@ -67,17 +67,17 @@ void AudioResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<int> bound
 {
     AudioSampleBuffer res;
     res.setSize(2,m_audioslice.getNumSamples());
+    res.copyFrom(0,0,*m_audioslice.getArrayOfReadPointers(),m_audioslice.getNumSamples());
+    res.copyFrom(1,0,*m_audioslice.getArrayOfReadPointers(),m_audioslice.getNumSamples());
     int chunk=256;
     int onscount=0;
     m_notecl->resetFilterAndOnsetDetector();
-    int startpos=0;//round(((float)(g.getClipBounds().getX()-bounds.getX()))/bounds.getWidth()*m_audioslice.getNumSamples());
+    int startpos=round(((float)(g.getClipBounds().getX()-bounds.getX()))/bounds.getWidth()*m_audioslice.getNumSamples());
     int endpos=round(((float)(g.getClipBounds().getX()+g.getClipBounds().getWidth()+-bounds.getX()))/bounds.getWidth()*m_audioslice.getNumSamples());
-    for(int pos=startpos;pos<min(endpos-chunk,m_audioslice.getNumSamples()-chunk);pos+=chunk)
+    for(int pos=startpos;pos<min(endpos,m_audioslice.getNumSamples()-chunk);pos+=chunk)
     {
-       res.copyFrom(0,pos,*m_audioslice.getArrayOfReadPointers()+pos,chunk);
-       //res.copyFrom(1,pos,*m_audioslice.getArrayOfReadPointers()+pos,chunk);
        bool onset=0;
-       m_notecl->filterAndComputeMeanEnv(*res.getArrayOfWritePointers()+pos,chunk,&onset);
+       m_notecl->filterAndComputeMeanEnv(res.getArrayOfWritePointers()[0]+pos,chunk,&onset);
 
        if(onset)
         {
@@ -85,7 +85,6 @@ void AudioResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<int> bound
             g.drawLine(linepos,0,linepos,bounds.getHeight());
             onscount++;
         }
-       res.copyFrom(1,pos,*m_audioslice.getArrayOfReadPointers()+pos,chunk);
 
     }
     juce::AudioFormatManager manager;
@@ -96,8 +95,8 @@ void AudioResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<int> bound
     juce::AudioThumbnail thumbnail(thumbres,manager,cache);
     thumbnail.reset(2,48000,res.getNumSamples());
     thumbnail.addBlock(0,res,0,res.getNumSamples());
-    float start=((float)(g.getClipBounds().getX()-bounds.getX()))/bounds.getWidth()*thumbnail.getTotalLength();
-    float end=((float)(g.getClipBounds().getX()+g.getClipBounds().getWidth()+-bounds.getX()))/bounds.getWidth()*thumbnail.getTotalLength();
+    float start=((float)startpos)/m_audioslice.getNumSamples()*thumbnail.getTotalLength();//((float)(g.getClipBounds().getX()-bounds.getX()))/bounds.getWidth()*thumbnail.getTotalLength();
+    float end=((float)endpos)/m_audioslice.getNumSamples()*thumbnail.getTotalLength();//((float)(g.getClipBounds().getX()+g.getClipBounds().getWidth()+-bounds.getX()))/bounds.getWidth()*thumbnail.getTotalLength();
     thumbnail.drawChannels(g,g.getClipBounds(),start,end,1.0);
     cout<<"Found "<<onscount<<" onsets"<<endl;
     
