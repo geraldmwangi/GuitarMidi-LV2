@@ -120,5 +120,8 @@ void FretBoard::process(int nsamples)
 {
     m_midioutput->initializeSequence();
     for (auto notecl : m_noteClassifiers)
+    {
         notecl->process(nsamples);
+        notecl->sendMidiNote(nsamples);    
+    }
 }

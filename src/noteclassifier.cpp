@@ -35,6 +35,7 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_noteOnOffState = false;
     m_onsetDetector=nullptr;
     setOnsetParameter("specdiff");
+    m_numSamplesSinceLastOnset=-1;
 }
 
 void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,int onsetbuffersize,bool adap_whitening)
@@ -149,7 +150,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
 
 
 
-    if(m_onsetDetector&&onsetdetected)
+    if(m_onsetDetector)
     {
         fvec_t* ons=new_fvec(1);
         fvec_t* onsinput;
@@ -157,7 +158,13 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
         onsinput->length=nsamples;
 
         aubio_onset_do(m_onsetDetector,onsinput,ons);
-        *onsetdetected=*(*ons).data>0.0;
+        bool onsdetected=*(*ons).data>0.0;
+        if(onsetdetected)
+            *onsetdetected=onsdetected;
+        if(onsdetected)
+        {
+            m_numSamplesSinceLastOnset=0;
+        }
         del_fvec(ons);
         m_meanEnv=1.0;
         m_meanEnvCounter=0;
@@ -224,9 +231,23 @@ void NoteClassifier::process(int nsamples)
                 m_noteOnOffState = false; //Candidtate is incorrect
         }
         //  m_noteOnOffState = true;
+
+
+        m_numSamplesSinceLastOnset+=nsamples;
+
+        
     }
     else
+    {
         m_noteOnOffState = false; //No candidate or previous note has stopped
+        m_numSamplesSinceLastOnset=-1;//No note playing
+    }
+
+
+}
+
+void NoteClassifier::sendMidiNote(int nsamples)
+{
     if (m_noteOnOffState != m_oldNoteOnOffState)
         if (m_noteOnOffState)
         {
@@ -244,4 +265,5 @@ void NoteClassifier::process(int nsamples)
         }
 
     m_oldNoteOnOffState = m_noteOnOffState;
+
 }

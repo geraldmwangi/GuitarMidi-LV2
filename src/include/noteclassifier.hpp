@@ -78,6 +78,14 @@ private:
 
     aubio_onset_t* m_onsetDetector;
 
+    /**
+     * @brief The number of samples since the last onset was detected
+     * It is -1 if no note is playing
+     * 
+     */
+    int m_numSamplesSinceLastOnset;
+
+
 
     float m_meanEnv;
     int m_meanEnvCounter;
@@ -178,6 +186,8 @@ public:
      * @param nsamples 
      */
     void process(int nsamples);
+
+    void sendMidiNote(int nsamples);
 
     /**
      * @brief Filter incomming audio and compute the average response
