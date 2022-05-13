@@ -156,7 +156,7 @@ private:
     std::shared_ptr<GuitarMidi::MidiOutput> m_midiOutput;
 
 public:
-
+    typedef shared_ptr<NoteClassifier> Ptr;
     /**
      * @brief Construct a new Note Classifier object
      * 
@@ -186,6 +186,11 @@ public:
      * @param nsamples 
      */
     void process(int nsamples);
+
+    bool getNoteOnOffState()
+    {
+        return m_noteOnOffState;
+    }
 
     void sendMidiNote(int nsamples);
 

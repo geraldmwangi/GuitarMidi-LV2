@@ -18,8 +18,10 @@
  */
 #pragma once
 #include <noteclassifier.hpp>
+#include <harmonicgroup.hpp>
 #include <memory>
 #include <vector>
+#include <map>
 typedef enum
 {
     FRETBOARD_INPUT = 0,
@@ -43,7 +45,13 @@ private:
      */
     vector<shared_ptr<NoteClassifier>> m_noteClassifiers;
 
+    map<float,shared_ptr<NoteClassifier>> m_noteClassifiersMap;
+
+    map<float,shared_ptr<HarmonicGroup> > m_harmonicGroups;
+
     shared_ptr<GuitarMidi::MidiOutput> m_midioutput;
+
+    void addNoteClassifier(float freq,LV2_URID_Map *map, float samplerate);
 
 public:
     /**

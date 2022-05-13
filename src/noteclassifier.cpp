@@ -153,11 +153,11 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     if(m_onsetDetector)
     {
         fvec_t* ons=new_fvec(1);
-        fvec_t* onsinput;
-        onsinput->data=(smpl_t*)buffer;
-        onsinput->length=nsamples;
+        fvec_t onsinput;
+        onsinput.data=(smpl_t*)buffer;
+        onsinput.length=nsamples;
 
-        aubio_onset_do(m_onsetDetector,onsinput,ons);
+        aubio_onset_do(m_onsetDetector,&onsinput,ons);
         bool onsdetected=*(*ons).data>0.0;
         if(onsetdetected)
             *onsetdetected=onsdetected;
