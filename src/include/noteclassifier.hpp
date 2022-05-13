@@ -192,6 +192,11 @@ public:
         return m_noteOnOffState;
     }
 
+    void setNoteOnOffState(bool state)
+    {
+        m_noteOnOffState=state;
+    }
+
     void sendMidiNote(int nsamples);
 
     /**

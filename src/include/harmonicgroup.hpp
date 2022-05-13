@@ -6,11 +6,10 @@ using namespace std;
 class HarmonicGroup
 {
     private:
-    float m_fundamentalFreq;
     vector<shared_ptr<NoteClassifier> > m_noteClassifiers;
 
     public:
-    HarmonicGroup(float fundamentalFreq);
+    HarmonicGroup();
 
     void addNoteClassifier(shared_ptr<NoteClassifier> notecl);
 

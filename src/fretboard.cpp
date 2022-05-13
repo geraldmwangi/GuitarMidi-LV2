@@ -87,10 +87,22 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
         addNoteClassifier(146.83*n, map, samplerate); // D
         addNoteClassifier(155.56*n, map, samplerate); // D#
     }
+
+    for(auto group:m_harmonicGroups)
+    {
+        for (auto notecl : m_noteClassifiersMap)
+        {
+            group.second->addNoteClassifier(notecl.second);
+        }
+
+    }
 }
 void FretBoard::addNoteClassifier(float freq,LV2_URID_Map *map, float samplerate)
 {
     m_noteClassifiersMap[freq]=make_shared<NoteClassifier>(map,samplerate,freq,10);
+    m_harmonicGroups[freq]=make_shared<HarmonicGroup>();
+    m_harmonicGroups[freq]->addNoteClassifier(m_noteClassifiersMap[freq]);
+
 }
 void FretBoard::setAudioInput(const float *input)
 {
@@ -146,7 +158,7 @@ void FretBoard::process(int nsamples)
     for (auto notecl : m_noteClassifiersMap)
     {
         notecl.second->process(nsamples);    
-        notecl.second->sendMidiNote(nsamples); 
+        //  notecl.second->sendMidiNote(nsamples); 
     }
     for(auto group:m_harmonicGroups)
     {

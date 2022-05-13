@@ -207,7 +207,7 @@ void NoteClassifier::process(int nsamples)
     float meanenv=filterAndComputeMeanEnv(output,nsamples);
 
     //If envelope greater then threshold consider these nsamples a candidate 
-    if (meanenv > 0.1)
+    if (meanenv > 0.04)
     {
         memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
         m_pitchBufferCounter += nsamples;
