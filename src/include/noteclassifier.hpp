@@ -199,6 +199,12 @@ public:
 
     void sendMidiNote(int nsamples);
 
+    bool is_ringing;
+
+    void setIsRinging();
+
+    void sendMidiNote(int nsamples, bool noteon);
+
     /**
      * @brief Filter incomming audio and compute the average response
      * 

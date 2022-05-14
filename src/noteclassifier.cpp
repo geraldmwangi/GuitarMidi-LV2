@@ -249,21 +249,34 @@ void NoteClassifier::process(int nsamples)
 void NoteClassifier::sendMidiNote(int nsamples)
 {
     if (m_noteOnOffState != m_oldNoteOnOffState)
-        if (m_noteOnOffState)
-        {
-            //Send note on
-            uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
-            uint8_t noteon[3] = {0x90, midinote, 0x7f};
-            m_midiOutput->sendMidiMessage(noteon,nsamples);
-        }
-        else
-        {
-            //Send note off
-            uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
-            uint8_t noteoff[3] = {0x90, midinote, 0x00};
-            m_midiOutput->sendMidiMessage(noteoff,nsamples);
-        }
+        sendMidiNote(nsamples,m_noteOnOffState);
 
     m_oldNoteOnOffState = m_noteOnOffState;
 
+}
+
+void NoteClassifier::setIsRinging()
+{
+    if (m_noteOnOffState != m_oldNoteOnOffState)
+        is_ringing=m_noteOnOffState;
+
+    m_oldNoteOnOffState = m_noteOnOffState;
+}
+
+void NoteClassifier::sendMidiNote(int nsamples, bool noteon)
+{
+    if (noteon)
+    {
+        // Send note on
+        uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
+        uint8_t noteon[3] = {0x90, midinote, 0x7f};
+        m_midiOutput->sendMidiMessage(noteon, nsamples);
+    }
+    else
+    {
+        // Send note off
+        uint8_t midinote = round((log2(m_centerfreq) - log2(440)) * 12 + 69);
+        uint8_t noteoff[3] = {0x90, midinote, 0x00};
+        m_midiOutput->sendMidiMessage(noteoff, nsamples);
+    }
 }

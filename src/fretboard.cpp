@@ -72,7 +72,7 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
     // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 415.30,ebw));
     // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 440,ebw));
 
-    for (int n = 1; n <= 4; n++)
+    for (int n = 1; n <= 6; n++)
     {
         addNoteClassifier(82.41*n, map, samplerate);  // E
         addNoteClassifier(87.31*n, map, samplerate);  // F
@@ -86,6 +86,18 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
         addNoteClassifier(138.59*n, map, samplerate); // C#
         addNoteClassifier(146.83*n, map, samplerate); // D
         addNoteClassifier(155.56*n, map, samplerate); // D#
+        addNoteClassifier(164.81*n, map, samplerate);
+        addNoteClassifier(174.61*n, map, samplerate);
+        addNoteClassifier(185*n, map, samplerate);
+        addNoteClassifier(196*n, map, samplerate);
+        addNoteClassifier(207.65*n, map, samplerate);
+        addNoteClassifier(220*n, map, samplerate);
+        addNoteClassifier(233.08*n, map, samplerate);
+        addNoteClassifier(246.94*n, map, samplerate);
+        addNoteClassifier(261.63*n, map, samplerate);
+        addNoteClassifier(277.18*n, map, samplerate);
+        addNoteClassifier(293.66*n, map, samplerate);
+        addNoteClassifier(329.63*n, map, samplerate);
     }
 
     for(auto group:m_harmonicGroups)
@@ -158,7 +170,7 @@ void FretBoard::process(int nsamples)
     for (auto notecl : m_noteClassifiersMap)
     {
         notecl.second->process(nsamples);    
-        //  notecl.second->sendMidiNote(nsamples); 
+        notecl.second->setIsRinging();
     }
     for(auto group:m_harmonicGroups)
     {

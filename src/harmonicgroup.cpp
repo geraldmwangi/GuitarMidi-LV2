@@ -2,6 +2,7 @@
 
 HarmonicGroup::HarmonicGroup()
 {
+    m_oldState=false;
 }
 
 void HarmonicGroup::addNoteClassifier(shared_ptr<NoteClassifier> notecl)
@@ -10,7 +11,7 @@ void HarmonicGroup::addNoteClassifier(shared_ptr<NoteClassifier> notecl)
         m_noteClassifiers.push_back(notecl); //Add fundamental
     else
     {
-        for(int n=2;n<=4;n++)
+        for(int n=2;n<=12;n++)
         {
             float min=m_noteClassifiers[0]->getCenterFrequency()*n-1;
             float max=m_noteClassifiers[0]->getCenterFrequency()*n+1;
@@ -26,19 +27,28 @@ void HarmonicGroup::process(int nsamples)
     int numringing=0;
     for(auto notecl:m_noteClassifiers)
     {
-        numringing+=(notecl->getNoteOnOffState()==true);
+        numringing+=(notecl->is_ringing==true);
 
     }
 
-    if(numringing>1)
+    if(numringing>2)
     {
-        // m_noteClassifiers[0]->setNoteOnOffState(true);
-        m_noteClassifiers[0]->sendMidiNote(nsamples);
+        if(!m_oldState&&m_noteClassifiers[0]->is_ringing)
+        {
+            m_noteClassifiers[0]->sendMidiNote(nsamples, true);
+            m_oldState = true;
+            cout<<"Note on: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
+        }
     }
-    // else
-    // {
-    //     m_noteClassifiers[0]->setNoteOnOffState(false);
-    //     m_noteClassifiers[0]->sendMidiNote(nsamples);        
-    // }
+    else
+    {
+        if(m_oldState)
+        {
+            m_noteClassifiers[0]->sendMidiNote(nsamples,false);
+            m_oldState=false;
+            cout<<"Note off: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
+        }
+
+    }
     
 }
