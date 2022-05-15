@@ -132,6 +132,8 @@ private:
      */
     bool m_noteOnOffState;
 
+    int m_samplesSinceLastChangeOfState;
+
     /**
      * @brief m_oldNoteOnOffState: The state of NoteClassifier at the previous call of process()
      * 
@@ -201,7 +203,7 @@ public:
 
     bool is_ringing;
 
-    void setIsRinging();
+    void setIsRinging(int nsamples);
 
     int getNumSamplesSinceLastOnset()
     {

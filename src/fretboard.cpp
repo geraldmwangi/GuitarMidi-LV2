@@ -194,7 +194,7 @@ void FretBoard::process(int nsamples)
     for (auto notecl : m_noteClassifiersMap)
     {
         notecl.second->process(nsamples);    
-        notecl.second->setIsRinging();
+        notecl.second->setIsRinging(nsamples);
     }
     for(auto group:m_harmonicGroups)
     {

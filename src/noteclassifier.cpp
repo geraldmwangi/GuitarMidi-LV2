@@ -36,6 +36,7 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_onsetDetector=nullptr;
     setOnsetParameter("specdiff");
     m_numSamplesSinceLastOnset=-1;
+    m_samplesSinceLastChangeOfState=0;
 }
 
 void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,int onsetbuffersize,bool adap_whitening)
@@ -252,25 +253,33 @@ void NoteClassifier::process(int nsamples)
                 m_meanEnv=0.0;
         m_meanEnvCounter=0;
     }
+    m_samplesSinceLastChangeOfState+=nsamples;
 
 
 }
 
 void NoteClassifier::sendMidiNote(int nsamples)
 {
-    if (m_noteOnOffState != m_oldNoteOnOffState)
-        sendMidiNote(nsamples,m_noteOnOffState);
+    if(m_samplesSinceLastChangeOfState>2*nsamples)
+    {
+        if (m_noteOnOffState != m_oldNoteOnOffState)
+            sendMidiNote(nsamples, m_noteOnOffState);
 
-    m_oldNoteOnOffState = m_noteOnOffState;
-
+        m_oldNoteOnOffState = m_noteOnOffState;
+        m_samplesSinceLastChangeOfState=0;
+    }
 }
 
-void NoteClassifier::setIsRinging()
+void NoteClassifier::setIsRinging(int nsamples)
 {
-    if (m_noteOnOffState != m_oldNoteOnOffState)
-        is_ringing=m_noteOnOffState;
+    if(m_samplesSinceLastChangeOfState>4*nsamples)
+    {
+        if (m_noteOnOffState != m_oldNoteOnOffState)
+            is_ringing = m_noteOnOffState;
 
-    m_oldNoteOnOffState = m_noteOnOffState;
+        m_oldNoteOnOffState = m_noteOnOffState;
+        m_samplesSinceLastChangeOfState=0;
+    }
 }
 
 void NoteClassifier::sendMidiNote(int nsamples, bool noteon)

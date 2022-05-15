@@ -13,8 +13,8 @@ void HarmonicGroup::addNoteClassifier(shared_ptr<NoteClassifier> notecl)
     {
         for (int n = 2; n <= 12; n++)
         {
-            float min = m_noteClassifiers[0]->getCenterFrequency() * n - 1;
-            float max = m_noteClassifiers[0]->getCenterFrequency() * n + 1;
+            float min = m_noteClassifiers[0]->getCenterFrequency() * n - 0.5;
+            float max = m_noteClassifiers[0]->getCenterFrequency() * n + 0.5;
             float f = notecl->getCenterFrequency();
             if (f >= min && f <= max)
                 m_noteClassifiers.push_back(notecl);
