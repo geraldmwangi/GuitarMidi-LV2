@@ -146,8 +146,11 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
 
     for (int s = 1; s < (nsamples-1); s++)
         if(fabs(buffer[s])>fabs(buffer[s-1])&&fabs(buffer[s])>fabs(buffer[s+1]))
-            buffer[s]*=2;
-
+        {
+            buffer[s] *= 1.5;
+            // buffer[s-1] *= 2;
+            // buffer[s+2] *= 2;
+        }
         m_filter.process(nsamples, &buffer);
 
     float meanenv = 0;
