@@ -51,7 +51,7 @@ private:
 
     shared_ptr<GuitarMidi::MidiOutput> m_midioutput;
 
-    void addNoteClassifier(float freq,LV2_URID_Map *map, float samplerate);
+    void addNoteClassifier(float freq,int mult,LV2_URID_Map *map, float samplerate);
 
 public:
     /**

@@ -203,6 +203,11 @@ public:
 
     void setIsRinging();
 
+    int getNumSamplesSinceLastOnset()
+    {
+        return m_numSamplesSinceLastOnset;
+    }
+
     void sendMidiNote(int nsamples, bool noteon);
 
     /**

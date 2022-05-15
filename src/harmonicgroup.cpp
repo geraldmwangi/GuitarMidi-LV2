@@ -25,30 +25,35 @@ void HarmonicGroup::addNoteClassifier(shared_ptr<NoteClassifier> notecl)
 void HarmonicGroup::process(int nsamples)
 {
     int numringing=0;
-    for(auto notecl:m_noteClassifiers)
+    int numSamplesSinceLastOnset=m_noteClassifiers[0]->getNumSamplesSinceLastOnset();
+    //if(numSamplesSinceLastOnset>=0)
     {
-        numringing+=(notecl->is_ringing==true);
-
-    }
-
-    if(numringing>2)
-    {
-        if(!m_oldState&&m_noteClassifiers[0]->is_ringing)
+        for (auto notecl : m_noteClassifiers)
         {
-            m_noteClassifiers[0]->sendMidiNote(nsamples, true);
-            m_oldState = true;
-            cout<<"Note on: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
+            // if(notecl!=m_noteClassifiers[0])
+            numringing += (notecl->is_ringing == true);
+            // numringing+=(notecl->getNumSamplesSinceLastOnset()>=0);
+            // if(abs(notecl->getNumSamplesSinceLastOnset()-numSamplesSinceLastOnset)<=3*nsamples&&notecl->is_ringing)
+            //     numringing++;
+        }
+        numringing*=m_noteClassifiers[0]->is_ringing;
+        if (numringing > 1)
+        {
+            if (!m_oldState)
+            {
+                m_noteClassifiers[0]->sendMidiNote(nsamples, true);
+                m_oldState = true;
+                // cout<<"Note on: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
+            }
+        }
+        else
+        {
+            if (m_oldState)
+            {
+                m_noteClassifiers[0]->sendMidiNote(nsamples, false);
+                m_oldState = false;
+                // cout<<"Note off: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
+            }
         }
     }
-    else
-    {
-        if(m_oldState)
-        {
-            m_noteClassifiers[0]->sendMidiNote(nsamples,false);
-            m_oldState=false;
-            cout<<"Note off: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
-        }
-
-    }
-    
 }

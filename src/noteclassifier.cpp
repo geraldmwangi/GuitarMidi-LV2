@@ -143,6 +143,11 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     // Increase gain to increase the response in the passband
     // for (int s = 0; s < nsamples; s++)
     //     buffer[s] = 10 * buffer[s];
+
+    for (int s = 1; s < (nsamples-1); s++)
+        if(fabs(buffer[s])>fabs(buffer[s-1])&&fabs(buffer[s])>fabs(buffer[s+1]))
+            buffer[s]*=2;
+
         m_filter.process(nsamples, &buffer);
 
     float meanenv = 0;
@@ -207,7 +212,7 @@ void NoteClassifier::process(int nsamples)
     float meanenv=filterAndComputeMeanEnv(output,nsamples);
 
     //If envelope greater then threshold consider these nsamples a candidate 
-    if (meanenv > 0.04)
+    if (meanenv > 0.1)
     {
         memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
         m_pitchBufferCounter += nsamples;
@@ -230,7 +235,7 @@ void NoteClassifier::process(int nsamples)
             else
                 m_noteOnOffState = false; //Candidtate is incorrect
         }
-        //  m_noteOnOffState = true;
+        // m_noteOnOffState = true;
 
 
         m_numSamplesSinceLastOnset+=nsamples;
