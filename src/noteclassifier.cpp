@@ -210,7 +210,7 @@ void NoteClassifier::process(int nsamples)
 
     m_noteOnOffState = m_oldNoteOnOffState;
     for (int s = 0; s < nsamples; s++)
-        output[s] = 10 * output[s];
+        output[s] = 20 * output[s];
 
 
     float meanenv=filterAndComputeMeanEnv(output,nsamples);
