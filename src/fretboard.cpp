@@ -97,6 +97,7 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
         addNoteClassifier(261.63,n, map, samplerate);
         addNoteClassifier(277.18,n, map, samplerate);
         addNoteClassifier(293.66,n, map, samplerate);
+        addNoteClassifier(311.13,n, map, samplerate);
         addNoteClassifier(329.63,n, map, samplerate);
 
         addNoteClassifier(349.23,n, map, samplerate);
