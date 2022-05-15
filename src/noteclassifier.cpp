@@ -144,13 +144,13 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     // for (int s = 0; s < nsamples; s++)
     //     buffer[s] = 10 * buffer[s];
 
-    for (int s = 1; s < (nsamples-1); s++)
-        if(fabs(buffer[s])>fabs(buffer[s-1])&&fabs(buffer[s])>fabs(buffer[s+1]))
-        {
-            buffer[s] *= 1.5;
-            // buffer[s-1] *= 2;
-            // buffer[s+2] *= 2;
-        }
+    // for (int s = 1; s < (nsamples-1); s++)
+    //     if(fabs(buffer[s])>fabs(buffer[s-1])&&fabs(buffer[s])>fabs(buffer[s+1]))
+    //     {
+    //         buffer[s] *= 1.5;
+    //         // buffer[s-1] *= 2;
+    //         // buffer[s+2] *= 2;
+    //     }
         m_filter.process(nsamples, &buffer);
 
     float meanenv = 0;
@@ -174,11 +174,11 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
             m_numSamplesSinceLastOnset=0;
         }
         del_fvec(ons);
-        m_meanEnv=1.0;
+        m_meanEnv=0.0;
         m_meanEnvCounter=0;
     }
 
-    if(m_meanEnvCounter>1024)
+    if(m_meanEnvCounter>48000)
     {
         m_meanEnv=0;
         m_meanEnvCounter=0;
@@ -249,6 +249,8 @@ void NoteClassifier::process(int nsamples)
     {
         m_noteOnOffState = false; //No candidate or previous note has stopped
         m_numSamplesSinceLastOnset=-1;//No note playing
+                m_meanEnv=0.0;
+        m_meanEnvCounter=0;
     }
 
 
