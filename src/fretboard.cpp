@@ -72,8 +72,9 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
     // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 415.30,ebw));
     // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 440,ebw));
 
-    for (int n = 1; n <=4; n++)
+    for (int ni = 1; ni <=2; ni++)
     {
+        float n=((float)ni);
         addNoteClassifier(82.41,n, map, samplerate);  // E
         addNoteClassifier(87.31,n, map, samplerate);  // F
         addNoteClassifier(92.50,n, map, samplerate);  // F#
@@ -131,7 +132,7 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
 
     }
 }
-void FretBoard::addNoteClassifier(float freq,int mult,LV2_URID_Map *map, float samplerate)
+void FretBoard::addNoteClassifier(float freq,float mult,LV2_URID_Map *map, float samplerate)
 {
     freq*=mult;
     if(mult==1||freq>987.77)
