@@ -38,10 +38,11 @@ void HarmonicGroup::process(int nsamples)
                 // if(abs(notecl->getNumSamplesSinceLastOnset()-numSamplesSinceLastOnset)<=3*nsamples&&notecl->is_ringing)
                 //     numringing++;
             }
+            
             numringing *= m_noteClassifiers[0]->is_ringing;
-            if (numringing > 1)
+            if (numringing > 2)
             {
-                if (!m_oldState)
+                if (!m_oldState&&m_noteClassifiers[0]->is_ringing)
                 {
                     m_noteClassifiers[0]->sendMidiNote(nsamples, true);
                     m_oldState = true;
@@ -58,5 +59,11 @@ void HarmonicGroup::process(int nsamples)
                 }
             }
         }
+    }
+    else if (m_oldState)
+    {
+        m_noteClassifiers[0]->sendMidiNote(nsamples, false);
+        m_oldState = false;
+        // cout<<"Note off: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
     }
 }

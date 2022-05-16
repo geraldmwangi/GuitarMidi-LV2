@@ -45,7 +45,7 @@ private:
      */
     vector<shared_ptr<NoteClassifier>> m_noteClassifiers;
 
-    map<float,shared_ptr<NoteClassifier>> m_noteClassifiersMap;
+    vector<shared_ptr<NoteClassifier>> m_noteClassifiersMap;
 
     map<float,shared_ptr<HarmonicGroup> > m_harmonicGroups;
 

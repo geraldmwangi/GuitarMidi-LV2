@@ -72,7 +72,7 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
     // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 415.30,ebw));
     // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 440,ebw));
 
-    for (int ni = 1; ni <=2; ni++)
+    for (int ni = 1; ni <=4; ni++)
     {
         float n=((float)ni);
         addNoteClassifier(82.41,n, map, samplerate);  // E
@@ -127,7 +127,7 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
     {
         for (auto notecl : m_noteClassifiersMap)
         {
-            group.second->addNoteClassifier(notecl.second);
+            group.second->addNoteClassifier(notecl);
         }
 
     }
@@ -137,16 +137,17 @@ void FretBoard::addNoteClassifier(float freq,float mult,LV2_URID_Map *map, float
     freq*=mult;
     if(mult==1||freq>987.77)
     {
-        m_noteClassifiersMap[freq] = make_shared<NoteClassifier>(map, samplerate, freq, 10);
+        auto notecl=make_shared<NoteClassifier>(map, samplerate, freq, 10);
+        m_noteClassifiersMap.push_back(notecl );
         m_harmonicGroups[freq] = make_shared<HarmonicGroup>();
-        m_harmonicGroups[freq]->addNoteClassifier(m_noteClassifiersMap[freq]);
+        m_harmonicGroups[freq]->addNoteClassifier(notecl);
     }
 }
 void FretBoard::setAudioInput(const float *input)
 {
     for (auto notecl : m_noteClassifiersMap)
     {
-        notecl.second->input = input;
+        notecl->input = input;
     }
 }
 
@@ -154,7 +155,7 @@ void FretBoard::setAudioOutput(float *output)
 {
     for (auto notecl : m_noteClassifiersMap)
     {
-        notecl.second->output = output;
+        notecl->output = output;
     }
 
 }
@@ -167,7 +168,7 @@ void FretBoard::setMidiOutput(LV2_Atom_Sequence *output)
 
         for (auto notecl : m_noteClassifiersMap)
         {
-            notecl.second->setMidiOutput(m_midioutput);
+            notecl->setMidiOutput(m_midioutput);
         }
     }
 }
@@ -178,7 +179,7 @@ void FretBoard::initialize()
         m_midioutput->initializeSequence();
     for (auto notecl : m_noteClassifiersMap)
     {
-        notecl.second->initialize();    
+        notecl->initialize();    
     }
 }
 
@@ -186,7 +187,7 @@ void FretBoard::finalize()
 {
     for (auto notecl : m_noteClassifiersMap)
     {
-        notecl.second->finalize();    
+        notecl->finalize();    
     }
 }
 
@@ -195,8 +196,23 @@ void FretBoard::process(int nsamples)
     m_midioutput->initializeSequence();
     for (auto notecl : m_noteClassifiersMap)
     {
-        notecl.second->process(nsamples);    
-        notecl.second->setIsRinging(nsamples);
+        notecl->process(nsamples);    
+        notecl->setIsRinging(nsamples);
+    }
+    for (int i=1;i<(m_noteClassifiersMap.size()-1);i++)
+    {
+        auto prev=m_noteClassifiersMap[i-1];
+        auto notecl=m_noteClassifiersMap[i];
+        auto following=m_noteClassifiersMap[i+1];
+        
+        if(notecl->is_ringing&&prev->is_ringing&&following->is_ringing)
+        {
+            prev->setNoteOnOffState(false);
+            prev->setIsRinging(nsamples);
+
+            following->setNoteOnOffState(false);
+            following->setIsRinging(nsamples);
+        }
     }
     for(auto group:m_harmonicGroups)
     {

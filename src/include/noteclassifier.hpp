@@ -25,7 +25,7 @@
 
 #define FILTERORDER 2 // the real order is 2*MAXORDER
 #define MAXORDER 10 // the real order is 2*MAXORDER
-#define USE_ELLIPTIC 1
+//#define USE_ELLIPTIC 1
 using namespace std;
 /**
  * @brief NoteClassifier analyses polyphonic audio and triggers a midi note when it finds 
@@ -192,6 +192,13 @@ public:
     bool getNoteOnOffState()
     {
         return m_noteOnOffState;
+    }
+    float getMeanEnv()
+    {
+        if(m_meanEnvCounter)
+            return m_meanEnv/m_meanEnvCounter;
+        else
+            return 0.0;
     }
 
     void setNoteOnOffState(bool state)
