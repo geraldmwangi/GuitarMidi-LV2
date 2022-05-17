@@ -137,7 +137,15 @@ void FretBoard::addNoteClassifier(float freq,float mult,LV2_URID_Map *map, float
     freq*=mult;
     if(mult==1||freq>987.77)
     {
-        auto notecl=make_shared<NoteClassifier>(map, samplerate, freq, 10);
+        float minf=82;
+        float maxf=164;
+        float minbw=5;
+        float maxbw=15;
+        float bw=(freq<minf)?minbw:((freq>maxf)?maxbw:((freq-minf)*(maxbw-minbw)/(maxf-minf)+minbw));
+        
+
+
+        auto notecl=make_shared<NoteClassifier>(map, samplerate, freq, bw);
         m_noteClassifiersMap.push_back(notecl );
         m_harmonicGroups[freq] = make_shared<HarmonicGroup>();
         m_harmonicGroups[freq]->addNoteClassifier(notecl);
