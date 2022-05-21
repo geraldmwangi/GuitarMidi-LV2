@@ -12,7 +12,7 @@ PhaseGraph::~PhaseGraph()
 void PhaseGraph::computeGraph()
 {
     float minf = 0.0;
-    float maxf = 500.0;
+    float maxf = 4000.0;
 
     for (float f = minf; f < maxf; f += 1.0)
     {

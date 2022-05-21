@@ -171,6 +171,7 @@ void GraphArea::mouseDrag (const juce::MouseEvent& e)
 
     }
     repaint();
+    getParentComponent()->repaint();
     //[/UserCode_mouseDrag]
 }
 

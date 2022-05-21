@@ -125,7 +125,7 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
 
     for(auto group:m_harmonicGroups)
     {
-        for (auto notecl : m_noteClassifiersMap)
+        for (auto notecl : m_noteClassifiers)
         {
             group.second->addNoteClassifier(notecl);
         }
@@ -146,14 +146,14 @@ void FretBoard::addNoteClassifier(float freq,float mult,LV2_URID_Map *map, float
 
 
         auto notecl=make_shared<NoteClassifier>(map, samplerate, freq, bw);
-        m_noteClassifiersMap.push_back(notecl );
+        m_noteClassifiers.push_back(notecl );
         m_harmonicGroups[freq] = make_shared<HarmonicGroup>();
         m_harmonicGroups[freq]->addNoteClassifier(notecl);
     }
 }
 void FretBoard::setAudioInput(const float *input)
 {
-    for (auto notecl : m_noteClassifiersMap)
+    for (auto notecl : m_noteClassifiers)
     {
         notecl->input = input;
     }
@@ -161,7 +161,7 @@ void FretBoard::setAudioInput(const float *input)
 
 void FretBoard::setAudioOutput(float *output)
 {
-    for (auto notecl : m_noteClassifiersMap)
+    for (auto notecl : m_noteClassifiers)
     {
         notecl->output = output;
     }
@@ -174,7 +174,7 @@ void FretBoard::setMidiOutput(LV2_Atom_Sequence *output)
     {
         m_midioutput->setMidiOutput(output);
 
-        for (auto notecl : m_noteClassifiersMap)
+        for (auto notecl : m_noteClassifiers)
         {
             notecl->setMidiOutput(m_midioutput);
         }
@@ -185,7 +185,7 @@ void FretBoard::initialize()
 {
     if(m_midioutput)
         m_midioutput->initializeSequence();
-    for (auto notecl : m_noteClassifiersMap)
+    for (auto notecl : m_noteClassifiers)
     {
         notecl->initialize();    
     }
@@ -193,7 +193,7 @@ void FretBoard::initialize()
 
 void FretBoard::finalize()
 {
-    for (auto notecl : m_noteClassifiersMap)
+    for (auto notecl : m_noteClassifiers)
     {
         notecl->finalize();    
     }
@@ -202,16 +202,16 @@ void FretBoard::finalize()
 void FretBoard::process(int nsamples)
 {
     m_midioutput->initializeSequence();
-    for (auto notecl : m_noteClassifiersMap)
+    for (auto notecl : m_noteClassifiers)
     {
         notecl->process(nsamples);    
         notecl->setIsRinging(nsamples);
     }
-    for (int i=1;i<(m_noteClassifiersMap.size()-1);i++)
+    for (int i=1;i<(m_noteClassifiers.size()-1);i++)
     {
-        auto prev=m_noteClassifiersMap[i-1];
-        auto notecl=m_noteClassifiersMap[i];
-        auto following=m_noteClassifiersMap[i+1];
+        auto prev=m_noteClassifiers[i-1];
+        auto notecl=m_noteClassifiers[i];
+        auto following=m_noteClassifiers[i+1];
         
         if(notecl->is_ringing&&prev->is_ringing&&following->is_ringing)
         {

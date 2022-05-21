@@ -12,7 +12,7 @@ MeanResponseGraph::~MeanResponseGraph()
 void MeanResponseGraph::computeGraph()
 {
     float minf = 0.0;
-    float maxf = 500.0;
+    float maxf = 4000.0;
     float maxVal=0.1;
     m_initialized = false;
     if(m_audioslice.getNumSamples())

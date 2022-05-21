@@ -43,9 +43,9 @@ private:
      * @brief m_noteClassifiers: The filterbank
      * 
      */
-    vector<shared_ptr<NoteClassifier>> m_noteClassifiers;
 
-    vector<shared_ptr<NoteClassifier>> m_noteClassifiersMap;
+
+    vector<shared_ptr<NoteClassifier>> m_noteClassifiers;
 
     map<float,shared_ptr<HarmonicGroup> > m_harmonicGroups;
 
