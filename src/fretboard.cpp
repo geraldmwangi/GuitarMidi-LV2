@@ -205,7 +205,7 @@ void FretBoard::process(int nsamples)
     for (auto notecl : m_noteClassifiers)
     {
         notecl->process(nsamples);    
-        notecl->setIsRinging(nsamples);
+        //notecl->setIsRinging(nsamples);
     }
     for (int i=1;i<(m_noteClassifiers.size()-1);i++)
     {
@@ -213,14 +213,14 @@ void FretBoard::process(int nsamples)
         auto notecl=m_noteClassifiers[i];
         auto following=m_noteClassifiers[i+1];
         
-        if(notecl->is_ringing&&prev->is_ringing&&following->is_ringing)
-        {
-            prev->setNoteOnOffState(false);
-            prev->setIsRinging(nsamples);
+        // if(notecl->is_ringing&&prev->is_ringing&&following->is_ringing)
+        // {
+        //     prev->setNoteOnOffState(false);
+        //     prev->setIsRinging(nsamples);
 
-            following->setNoteOnOffState(false);
-            following->setIsRinging(nsamples);
-        }
+        //     following->setNoteOnOffState(false);
+        //     following->setIsRinging(nsamples);
+        // }
     }
     for(auto group:m_harmonicGroups)
     {

@@ -24,7 +24,7 @@ void HarmonicGroup::addNoteClassifier(shared_ptr<NoteClassifier> notecl)
 
 void HarmonicGroup::process(int nsamples)
 {
-    if (m_noteClassifiers[0]->getCenterFrequency() < 987.77)
+    if (m_noteClassifiers[0]->getCenterFrequency() < 987.77&&m_noteClassifiers[0]->is_ringing)
     {
         int numringing = 0;
         int numSamplesSinceLastOnset = m_noteClassifiers[0]->getNumSamplesSinceLastOnset();
@@ -33,7 +33,13 @@ void HarmonicGroup::process(int nsamples)
             for (auto notecl : m_noteClassifiers)
             {
                 // if(notecl!=m_noteClassifiers[0])
-                numringing += (notecl->is_ringing == true);
+                //if(abs(notecl->getNumSamplesSinceLastOnset()-numSamplesSinceLastOnset)<=3*nsamples)
+                {
+                    numringing += (notecl->is_ringing == true);
+                    if(notecl!=m_noteClassifiers[0])
+                        notecl->is_ringing=false;
+                }
+                
                 // numringing+=(notecl->getNumSamplesSinceLastOnset()>=0);
                 // if(abs(notecl->getNumSamplesSinceLastOnset()-numSamplesSinceLastOnset)<=3*nsamples&&notecl->is_ringing)
                 //     numringing++;
@@ -46,7 +52,8 @@ void HarmonicGroup::process(int nsamples)
                 {
                     m_noteClassifiers[0]->sendMidiNote(nsamples, true);
                     m_oldState = true;
-                    // cout<<"Note on: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
+                    cout<<"Freq: "<<m_noteClassifiers[0]->getCenterFrequency()<<"Numsamples: "<<m_noteClassifiers[0]->getNumSamplesSinceLastOnset()<<endl;
+                    cout<<"partials: "<<numringing<<endl;
                 }
             }
             else

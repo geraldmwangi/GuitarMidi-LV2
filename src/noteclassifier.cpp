@@ -240,6 +240,7 @@ void NoteClassifier::process(int nsamples)
         //         m_noteOnOffState = false; //Candidtate is incorrect
         // }
         m_noteOnOffState = true;
+        is_ringing=true;
 
 
         m_numSamplesSinceLastOnset+=nsamples;
@@ -252,6 +253,7 @@ void NoteClassifier::process(int nsamples)
         m_numSamplesSinceLastOnset=-1;//No note playing
                 m_meanEnv=0.0;
         m_meanEnvCounter=0;
+        is_ringing=false;
     }
     m_samplesSinceLastChangeOfState+=nsamples;
 
@@ -272,13 +274,13 @@ void NoteClassifier::sendMidiNote(int nsamples)
 
 void NoteClassifier::setIsRinging(int nsamples)
 {
-    if(m_samplesSinceLastChangeOfState>4*nsamples)
+    //if(m_samplesSinceLastChangeOfState>4*nsamples)
     {
         if (m_noteOnOffState != m_oldNoteOnOffState)
             is_ringing = m_noteOnOffState;
 
         m_oldNoteOnOffState = m_noteOnOffState;
-        m_samplesSinceLastChangeOfState=0;
+        //m_samplesSinceLastChangeOfState=0;
     }
 }
 
