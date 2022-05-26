@@ -33,11 +33,11 @@ void HarmonicGroup::process(int nsamples)
             for (auto notecl : m_noteClassifiers)
             {
                 // if(notecl!=m_noteClassifiers[0])
-                //if(abs(notecl->getNumSamplesSinceLastOnset()-numSamplesSinceLastOnset)<=3*nsamples)
+                //if(abs(notecl->getNumSamplesSinceLastOnset()-numSamplesSinceLastOnset)<=2*nsamples)
                 {
                     numringing += (notecl->is_ringing == true);
                     if(notecl!=m_noteClassifiers[0])
-                        notecl->is_ringing=false;
+                        notecl->block_midinote=true;
                 }
                 
                 // numringing+=(notecl->getNumSamplesSinceLastOnset()>=0);
@@ -48,7 +48,7 @@ void HarmonicGroup::process(int nsamples)
             numringing *= m_noteClassifiers[0]->is_ringing;
             if (numringing > 2)
             {
-                if (!m_oldState&&m_noteClassifiers[0]->is_ringing)
+                if (!m_oldState&&m_noteClassifiers[0]->is_ringing&&!m_noteClassifiers[0]->block_midinote)
                 {
                     m_noteClassifiers[0]->sendMidiNote(nsamples, true);
                     m_oldState = true;

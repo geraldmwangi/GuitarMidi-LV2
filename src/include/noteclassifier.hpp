@@ -210,6 +210,8 @@ public:
 
     bool is_ringing;
 
+    bool block_midinote;
+
     void setIsRinging(int nsamples);
 
     int getNumSamplesSinceLastOnset()

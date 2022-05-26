@@ -226,4 +226,6 @@ void FretBoard::process(int nsamples)
     {
         group.second->process(nsamples);
     }
+    for (auto notecl : m_noteClassifiers)
+        notecl->block_midinote=false;
 }
