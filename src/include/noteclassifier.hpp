@@ -189,6 +189,8 @@ public:
      */
     void process(int nsamples);
 
+    bool isNoteValid(int samples);
+
     bool getNoteOnOffState()
     {
         return m_noteOnOffState;
@@ -217,6 +219,11 @@ public:
     int getNumSamplesSinceLastOnset()
     {
         return m_numSamplesSinceLastOnset;
+    }
+
+    int getNumSamplesSinceLastChangeOfState()
+    {
+        return m_samplesSinceLastChangeOfState;
     }
 
     void sendMidiNote(int nsamples, bool noteon);
