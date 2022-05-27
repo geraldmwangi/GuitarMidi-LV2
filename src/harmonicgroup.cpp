@@ -46,7 +46,7 @@ void HarmonicGroup::process(int nsamples)
             }
             
             numringing *= m_noteClassifiers[0]->is_ringing;
-            if (numringing > 2)
+            if (numringing > 1)
             {
                 if (!m_oldState&&m_noteClassifiers[0]->is_ringing&&!m_noteClassifiers[0]->block_midinote)
                 {

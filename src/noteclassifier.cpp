@@ -37,6 +37,9 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     setOnsetParameter("specdiff");
     m_numSamplesSinceLastOnset=-1;
     m_samplesSinceLastChangeOfState=0;
+    m_numOvertones=1;
+
+
 }
 
 void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,int onsetbuffersize,bool adap_whitening)
@@ -69,7 +72,8 @@ void NoteClassifier::resetFilterAndOnsetDetector()
 #ifdef USE_ELLIPTIC
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
 #else
-    m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth);
+    for(int n=0;n<m_filter.size();n++)
+        m_filter[n].setup(m_order, m_samplerate, (n+1)*m_centerfreq, m_bandwidth);
 #endif
 }
 void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten,int order)
@@ -78,11 +82,13 @@ void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten,in
     m_passbandatten=passbandatten;
     m_order=order;
 
-    m_filter.reset();
+    for(auto &f:m_filter)
+        f.reset();
 #ifdef USE_ELLIPTIC
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
 #else
-    m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth);
+    for(int n=0;n<m_filter.size();n++)
+        m_filter[n].setup(m_order, m_samplerate, (n+1)*m_centerfreq, m_bandwidth);
 #endif
 }
 
@@ -93,6 +99,12 @@ void NoteClassifier::setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output)
 }
 void NoteClassifier::initialize()
 {
+    m_filter.resize(m_numOvertones);
+    for(int i=0;i<m_internalFilterBuffers.size();i++)
+        delete [] m_internalFilterBuffers[i];
+    m_internalFilterBuffers.resize(m_numOvertones);
+    for(int i=0;i<m_internalFilterBuffers.size();i++)
+        m_internalFilterBuffers[i]=new float[mBufferSize];
     //Setup FILTERORDER 1st order filters. Currently Elliptic::BandPass crashes when running setup() with orders higher than 1
     //When we solve this we can run sharper filters with narrower bandwidth and maybe drop the pitch validation below in process()
     setFilterParameters(m_bandwidth,m_passbandatten);
@@ -120,7 +132,10 @@ void NoteClassifier::initialize()
 void NoteClassifier::finalize()
 {
     //Release ressources
-    m_filter.reset();
+    for (int i = 0; i < m_internalFilterBuffers.size(); i++)
+        delete[] m_internalFilterBuffers[i];
+    for(auto &f:m_filter)
+        f.reset();
     if (mPitchDetector)
         del_aubio_pitch(mPitchDetector);
     if (m_pitchbuffer)
@@ -133,7 +148,7 @@ void NoteClassifier::finalize()
 
 Dsp::complex_t NoteClassifier::filterResponse(float freq)
 {
-    return m_filter.response(freq/m_samplerate);
+    return m_filter[0].response(freq/m_samplerate);
 }
 
 float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* onsetdetected)
@@ -152,12 +167,23 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     //         // buffer[s-1] *= 2;
     //         // buffer[s+2] *= 2;
     //     }
-        m_filter.process(nsamples, &buffer);
 
+    for (int i = 0; i < m_filter.size(); i++)
+    {
+        memcpy(m_internalFilterBuffers[i], buffer, nsamples * sizeof(float));
+        m_filter[i].process(nsamples, &m_internalFilterBuffers[i]);
+    }
+
+    for (int s = 0; s < nsamples; s++)
+    {
+        buffer[s] = 0;
+        for (int i = 0; i < m_internalFilterBuffers.size(); i++)
+        {
+            buffer[s] +=4* m_internalFilterBuffers[i][s];
+        }
+    }
     float meanenv = 0;
     int count = 0;
-
-
 
     if(m_onsetDetector)
     {
@@ -236,19 +262,19 @@ void NoteClassifier::process(int nsamples)
     float meanenv=filterAndComputeMeanEnv(output,nsamples);
 
     //If envelope greater then threshold consider these nsamples a candidate 
-    if (meanenv > 0.1)
+    if (meanenv > 0.7)
     {
-        memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
-        m_pitchBufferCounter += nsamples;
+        // memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
+        // m_pitchBufferCounter += nsamples;
 
-        // Check that the pitch is correct. This step is probably unneccessary if we can increase the order of the filters see comment above in initialize()
-        if (m_pitchBufferCounter >= mInBufSize)
-        {
-            m_pitchBufferCounter = 0;
+        // // Check that the pitch is correct. This step is probably unneccessary if we can increase the order of the filters see comment above in initialize()
+        // if (m_pitchBufferCounter >= mInBufSize)
+        // {
+        //     m_pitchBufferCounter = 0;
 
-            m_noteOnOffState=isNoteValid(nsamples);
-        }
-        m_noteOnOffState = true;
+        //     m_noteOnOffState=isNoteValid(nsamples);
+        // }
+         m_noteOnOffState = true;
         //is_ringing=true;
 
 
@@ -271,7 +297,7 @@ void NoteClassifier::process(int nsamples)
 
 void NoteClassifier::sendMidiNote(int nsamples)
 {
-    if(m_samplesSinceLastChangeOfState>2*nsamples)
+//    if(m_samplesSinceLastChangeOfState>2*nsamples)
     {
         if (m_noteOnOffState != m_oldNoteOnOffState)
             sendMidiNote(nsamples, m_noteOnOffState);

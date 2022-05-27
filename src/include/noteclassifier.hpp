@@ -57,6 +57,8 @@ private:
 
     int m_order;
 
+    int m_numOvertones;
+
     /**
      * @brief m_passbandatten: The attenuation in db of amplitude of the ripple in the pass and stopband of the elliptic filters
      * 
@@ -145,7 +147,8 @@ private:
      * 
      */
     #ifndef USE_ELLIPTIC
-    Dsp::SimpleFilter <Dsp::Butterworth::BandPass<MAXORDER>, 1> m_filter;
+    vector<Dsp::SimpleFilter <Dsp::Butterworth::BandPass<MAXORDER>, 1> >m_filter;
+    vector<float*> m_internalFilterBuffers;
     #else
     Dsp::SimpleFilter <Dsp::Elliptic::BandPass<MAXORDER>, 1> m_filter;
     #endif

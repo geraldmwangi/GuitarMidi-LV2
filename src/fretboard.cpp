@@ -72,7 +72,7 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
     // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 415.30,ebw));
     // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 440,ebw));
 
-    for (int ni = 1; ni <=4; ni++)
+    for (int ni = 1; ni <=1; ni++)
     {
         float n=((float)ni);
         addNoteClassifier(82.41,n, map, samplerate);  // E
@@ -205,14 +205,14 @@ void FretBoard::process(int nsamples)
     for (auto notecl : m_noteClassifiers)
     {
         notecl->process(nsamples);    
-        notecl->setIsRinging(nsamples);
-        //notecl->sendMidiNote(nsamples);
+        // notecl->setIsRinging(nsamples);
+        notecl->sendMidiNote(nsamples);
     }
  
-    for(auto group:m_harmonicGroups)
-    {
-        group.second->process(nsamples);
-    }
-    for (auto notecl : m_noteClassifiers)
-        notecl->block_midinote=false;
+    // for(auto group:m_harmonicGroups)
+    // {
+    //     group.second->process(nsamples);
+    // }
+    // for (auto notecl : m_noteClassifiers)
+    //     notecl->block_midinote=false;
 }
