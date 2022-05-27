@@ -18,7 +18,6 @@
  */
 #include <noteclassifier.hpp>
 #include <cmath>
-#include <iostream>
 
 NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center, float bandwidth, float passbandatten) 
 {
@@ -35,7 +34,7 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     mBufferSize = 256;
     m_noteOnOffState = false;
     m_onsetDetector=nullptr;
-    setOnsetParameter("energy");
+    setOnsetParameter("specdiff");
     m_numSamplesSinceLastOnset=-1;
     m_samplesSinceLastChangeOfState=0;
 }
@@ -174,7 +173,6 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
         if(onsdetected)
         {
             m_numSamplesSinceLastOnset=0;
-            std::cout<<"Onset: "<<m_centerfreq<<std::endl;
         }
         del_fvec(ons);
         m_meanEnv=0.0;
@@ -218,7 +216,7 @@ void NoteClassifier::process(int nsamples)
     float meanenv=filterAndComputeMeanEnv(output,nsamples);
 
     //If envelope greater then threshold consider these nsamples a candidate 
-    if(m_numSamplesSinceLastOnset==0)//if (meanenv > 0.1)
+    if (meanenv > 0.1)
     {
         // memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
         // m_pitchBufferCounter += nsamples;
@@ -243,24 +241,19 @@ void NoteClassifier::process(int nsamples)
         // }
         m_noteOnOffState = true;
         is_ringing=true;
-        
 
 
-        
+        m_numSamplesSinceLastOnset+=nsamples;
 
         
     }
     else
     {
-        if(meanenv<0.1)
-        {
-            m_noteOnOffState = false;        // No candidate or previous note has stopped
-            
-            m_meanEnv = 0.0;
-            m_meanEnvCounter = 0;
-            is_ringing = false;
-        }
-        m_numSamplesSinceLastOnset+=nsamples;
+        m_noteOnOffState = false; //No candidate or previous note has stopped
+        m_numSamplesSinceLastOnset=-1;//No note playing
+                m_meanEnv=0.0;
+        m_meanEnvCounter=0;
+        is_ringing=false;
     }
     m_samplesSinceLastChangeOfState+=nsamples;
 
