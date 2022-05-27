@@ -203,6 +203,26 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     //delete [] buffer;
     return m_meanEnv/m_meanEnvCounter;
 }
+
+bool NoteClassifier::isNoteValid(int nsamples)
+{
+    //if(m_pitchBufferCounter==0)
+    {
+                    fvec_t Buf;
+            Buf.data = m_pitchbuffer;
+            Buf.length = mInBufSize;
+
+            aubio_pitch_do(mPitchDetector, &Buf, m_pitchfreq);
+            if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 4.0)
+            {
+                //Candidtate is valid
+                return true;
+            }
+            else
+                return false; //Candidtate is incorrect
+    }
+
+}
 void NoteClassifier::process(int nsamples)
 {
     //The filters work inplace so we have to initialize the output with the input data
@@ -218,29 +238,18 @@ void NoteClassifier::process(int nsamples)
     //If envelope greater then threshold consider these nsamples a candidate 
     if (meanenv > 0.1)
     {
-        // memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
-        // m_pitchBufferCounter += nsamples;
+        memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
+        m_pitchBufferCounter += nsamples;
 
-        // // Check that the pitch is correct. This step is probably unneccessary if we can increase the order of the filters see comment above in initialize()
-        // if (m_pitchBufferCounter >= mInBufSize)
-        // {
-        //     m_pitchBufferCounter = 0;
+        // Check that the pitch is correct. This step is probably unneccessary if we can increase the order of the filters see comment above in initialize()
+        if (m_pitchBufferCounter >= mInBufSize)
+        {
+            m_pitchBufferCounter = 0;
 
-        //     fvec_t Buf;
-        //     Buf.data = m_pitchbuffer;
-        //     Buf.length = mInBufSize;
-
-        //     aubio_pitch_do(mPitchDetector, &Buf, m_pitchfreq);
-        //     if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 4.0)
-        //     {
-        //         //Candidtate is valid
-        //         m_noteOnOffState = true;
-        //     }
-        //     else
-        //         m_noteOnOffState = false; //Candidtate is incorrect
-        // }
+            m_noteOnOffState=isNoteValid(nsamples);
+        }
         m_noteOnOffState = true;
-        is_ringing=true;
+        //is_ringing=true;
 
 
         m_numSamplesSinceLastOnset+=nsamples;
@@ -253,9 +262,9 @@ void NoteClassifier::process(int nsamples)
         m_numSamplesSinceLastOnset=-1;//No note playing
                 m_meanEnv=0.0;
         m_meanEnvCounter=0;
-        is_ringing=false;
+        //is_ringing=false;
+        //m_samplesSinceLastChangeOfState=0;
     }
-    m_samplesSinceLastChangeOfState+=nsamples;
 
 
 }
