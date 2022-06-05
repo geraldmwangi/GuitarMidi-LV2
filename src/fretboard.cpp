@@ -201,18 +201,29 @@ void FretBoard::finalize()
 
 void FretBoard::process(int nsamples)
 {
+    for (auto notecl : m_noteClassifiers)
+        notecl->block_midinote = false;
     m_midioutput->initializeSequence();
+    uint numringing=0;
     for (auto notecl : m_noteClassifiers)
     {
-        notecl->process(nsamples);    
+        notecl->process(nsamples);  
+         
         notecl->setIsRinging(nsamples);
+        if(notecl->getNumSamplesSinceLastOnset()<2*nsamples)
+            numringing++;
         //notecl->sendMidiNote(nsamples);
     }
- 
-    for(auto group:m_harmonicGroups)
-    {
-        group.second->process(nsamples);
-    }
+    float fraction_ringing=((float)numringing)/m_noteClassifiers.size();
+
+    //  if (fraction_ringing < 0.15)
+        for (auto group : m_harmonicGroups)
+        {
+            group.second->process(nsamples);
+        }
+    //  else
+    // if(fraction_ringing)
+    //     cout << "Attack: "<<fraction_ringing << endl;
     for (auto notecl : m_noteClassifiers)
-        notecl->block_midinote=false;
+        notecl->block_midinote = false;
 }

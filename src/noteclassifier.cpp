@@ -34,9 +34,10 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     mBufferSize = 256;
     m_noteOnOffState = false;
     m_onsetDetector=nullptr;
-    setOnsetParameter("specdiff");
+    setOnsetParameter("energy");
     m_numSamplesSinceLastOnset=-1;
     m_samplesSinceLastChangeOfState=0;
+    is_ringing=false;
 }
 
 void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,int onsetbuffersize,bool adap_whitening)
@@ -174,6 +175,8 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
         {
             m_numSamplesSinceLastOnset=0;
         }
+        else
+            m_numSamplesSinceLastOnset+=nsamples;
         del_fvec(ons);
         m_meanEnv=0.0;
         m_meanEnvCounter=0;
@@ -230,7 +233,7 @@ void NoteClassifier::process(int nsamples)
 
     m_noteOnOffState = m_oldNoteOnOffState;
     for (int s = 0; s < nsamples; s++)
-        output[s] = 20 * output[s];
+        output[s] = 40 * output[s];
 
 
     float meanenv=filterAndComputeMeanEnv(output,nsamples);
@@ -252,21 +255,22 @@ void NoteClassifier::process(int nsamples)
         //is_ringing=true;
 
 
-        m_numSamplesSinceLastOnset+=nsamples;
+        
 
         
     }
     else
     {
-        m_noteOnOffState = false; //No candidate or previous note has stopped
-        m_numSamplesSinceLastOnset=-1;//No note playing
-                m_meanEnv=0.0;
-        m_meanEnvCounter=0;
-        //is_ringing=false;
-        //m_samplesSinceLastChangeOfState=0;
+        //if (meanenv < 0.05)
+        {
+            m_noteOnOffState = false;        // No candidate or previous note has stopped
+            //m_numSamplesSinceLastOnset = -1; // No note playing
+            m_meanEnv = 0.0;
+            m_meanEnvCounter = 0;
+            // is_ringing=false;
+            // m_samplesSinceLastChangeOfState=0;
+        }
     }
-
-
 }
 
 void NoteClassifier::sendMidiNote(int nsamples)
@@ -283,13 +287,16 @@ void NoteClassifier::sendMidiNote(int nsamples)
 
 void NoteClassifier::setIsRinging(int nsamples)
 {
-    //if(m_samplesSinceLastChangeOfState>4*nsamples)
+    // if(m_samplesSinceLastChangeOfState>4*nsamples)
     {
         if (m_noteOnOffState != m_oldNoteOnOffState)
+        {
             is_ringing = m_noteOnOffState;
-
+            m_samplesSinceLastChangeOfState = 0;
+        }
+        else
+            m_samplesSinceLastChangeOfState += nsamples;
         m_oldNoteOnOffState = m_noteOnOffState;
-        //m_samplesSinceLastChangeOfState=0;
     }
 }
 
