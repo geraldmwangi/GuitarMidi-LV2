@@ -153,8 +153,8 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     //         // buffer[s-1] *= 2;
     //         // buffer[s+2] *= 2;
     //     }
-        m_filter.process(nsamples, &buffer);
-
+        
+    m_filter.process(nsamples, &buffer);
     float meanenv = 0;
     int count = 0;
 
@@ -173,24 +173,34 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
             *onsetdetected=onsdetected;
         if(onsdetected)
         {
-            m_numSamplesSinceLastOnset=0;
+            m_numSamplesSinceLastOnset = 0;
+            m_meanEnv = -1.0;
+            m_meanEnvCounter = 0;
         }
         else
             m_numSamplesSinceLastOnset+=nsamples;
         del_fvec(ons);
-        m_meanEnv=0.0;
-        m_meanEnvCounter=0;
+
     }
 
-    if(m_meanEnvCounter>48000)
+
+    // if(m_meanEnvCounter>48000)
+    // {
+    //     m_meanEnv=0;
+    //     m_meanEnvCounter=0;
+    // }
+    // Get average envelope
+
+    float period=1/m_centerfreq;
+    int period_samples=period*m_samplerate;
+    if(m_meanEnvCounter>period_samples)
     {
         m_meanEnv=0;
         m_meanEnvCounter=0;
     }
-    // Get average envelope
     for (int s = 0; s < (nsamples); s++)
     {
-        // if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
+         //if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
         {
             float absval = fabs(buffer[s]);
             m_meanEnv += fabs(buffer[s]);
