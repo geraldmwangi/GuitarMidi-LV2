@@ -27,6 +27,7 @@ void HarmonicGroup::process(int nsamples)
     if (m_noteClassifiers[0]->getCenterFrequency() < 987.77&&m_noteClassifiers[0]->is_ringing)
     {
         int numringing = 0;
+        vector<NoteClassifier::Ptr> ringingnotes;
         int getNumSamplesSinceLastOnset = m_noteClassifiers[0]->getNumSamplesSinceLastOnset();
         // if(numSamplesSinceLastOnset>=0)
         {
@@ -37,9 +38,12 @@ void HarmonicGroup::process(int nsamples)
                 {
                     //We assume the harmonic groups are processed from lower to higher frequency 
                     //Then the higher partials must be blocked from sending midi notes themselves
-                    numringing += (notecl->is_ringing == true);
-                    if(notecl!=m_noteClassifiers[0])
-                        notecl->block_midinote=true;
+                    if(notecl->is_ringing == true)
+                    {
+                        ringingnotes.push_back(notecl);
+                        if (notecl != m_noteClassifiers[0])
+                            notecl->block_midinote = false;
+                    }
                 }
                 // else
                 //     notecl->block_midinote=false;
@@ -49,6 +53,7 @@ void HarmonicGroup::process(int nsamples)
                 // if(abs(notecl->getNumSamplesSinceLastOnset()-numSamplesSinceLastOnset)<=3*nsamples&&notecl->is_ringing)
                 //     numringing++;
             }
+            numringing=ringingnotes.size();
             
             // numringing *= m_noteClassifiers[0]->is_ringing;
             if (numringing > 2)
@@ -57,7 +62,8 @@ void HarmonicGroup::process(int nsamples)
                 {
                     m_noteClassifiers[0]->sendMidiNote(nsamples, true);
                     m_oldState = true;
-                    cout<<"Freq: "<<m_noteClassifiers[0]->getCenterFrequency()<<"Numsamples: "<<m_noteClassifiers[0]->getNumSamplesSinceLastOnset()<<endl;
+                    for(auto ncl:ringingnotes)
+                        cout<<"Freq: "<<ncl->getCenterFrequency()<<"Numsamples: "<<ncl->getNumSamplesSinceLastChangeOfState()<<endl;
                     cout<<"partials: "<<numringing<<endl;
                 }
             }
