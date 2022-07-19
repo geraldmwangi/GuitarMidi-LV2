@@ -4,6 +4,7 @@ project("GuitarMidi-LV2")
 
 
 # specify the C++ standard
+option(BUILD_ANALYSIS_APP "Build analysis app, usefull for development" OFF)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 set(DSPFiltersDir DSPFilters/shared/DSPFilters)
@@ -17,6 +18,9 @@ set(DSPFiltersSRCs ${DSPFiltersDir}/source/Cascade.cpp
 add_library(dsp STATIC ${DSPFiltersSRCs})
 
 add_subdirectory(src)
+
+if(${BUILD_ANALYSIS_APP})
 add_subdirectory(AnalysisApp)
+endif()
 
 
