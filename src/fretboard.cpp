@@ -139,8 +139,8 @@ void FretBoard::addNoteClassifier(float freq,float mult,LV2_URID_Map *map, float
     {
         float minf=82;
         float maxf=164;
-        float minbw=5;
-        float maxbw=15;
+        float minbw=1;
+        float maxbw=25;
         float bw=(freq<minf)?minbw:((freq>maxf)?maxbw:((freq-minf)*(maxbw-minbw)/(maxf-minf)+minbw));
         
 
