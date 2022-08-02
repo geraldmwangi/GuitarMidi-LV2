@@ -121,10 +121,16 @@ private:
     int mInBufSize;
 
     /**
-     * @brief mBufferSize: audio buffersize set by the host
+     * @brief mPitchBufferSize: audio buffersize set by the host
      * 
      */
-    int mBufferSize;
+    int mPitchBufferSize;
+
+    /**
+     * @brief m_bufferSize: audio buffersize set by the host
+     * 
+     */
+    int m_bufferSize;
 
     /**
      * @brief m_noteOnOffState: The current state of the NoteClassifier. True if a note is being played, false otherwise
@@ -249,7 +255,7 @@ public:
      * @brief pointer to output audio buffer
      * 
      */
-    float *output;
+    float *m_buffer;
 
     /**
      * @brief Set the Midi Output object

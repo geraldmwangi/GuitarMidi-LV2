@@ -31,7 +31,10 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_pitchfreq = 0;
 
     //TODO query host for buffersize. This is only used for the pitch detector
-    mBufferSize = 256;
+    mPitchBufferSize = 256;
+
+    m_bufferSize=256;
+    m_buffer=nullptr;
     m_noteOnOffState = false;
     m_onsetDetector=nullptr;
     setOnsetParameter("energy");
@@ -102,9 +105,9 @@ void NoteClassifier::initialize()
     if (mPitchDetector)
         del_aubio_pitch(mPitchDetector);
 
-    mInBufSize = mBufferSize * 4;
+    mInBufSize = mPitchBufferSize * 4;
 
-    mPitchDetector = new_aubio_pitch("schmitt", mInBufSize, mBufferSize, m_samplerate);
+    mPitchDetector = new_aubio_pitch("schmitt", mInBufSize, mPitchBufferSize, m_samplerate);
     if (m_pitchbuffer)
         delete[] m_pitchbuffer;
     m_pitchbuffer = new float[mInBufSize];
@@ -113,6 +116,9 @@ void NoteClassifier::initialize()
     if (m_pitchfreq)
         del_fvec(m_pitchfreq);
     m_pitchfreq = new_fvec(1);
+
+    if (m_bufferSize)
+        m_buffer = new float[m_bufferSize];
 
     m_meanEnv=0;
     m_meanEnvCounter=0;
@@ -130,6 +136,8 @@ void NoteClassifier::finalize()
         del_fvec(m_pitchfreq);
     if(m_onsetDetector)
         del_aubio_onset(m_onsetDetector);
+    if(m_buffer)
+        delete [] m_buffer;
 }
 
 Dsp::complex_t NoteClassifier::filterResponse(float freq)
@@ -239,19 +247,19 @@ bool NoteClassifier::isNoteValid(int nsamples)
 void NoteClassifier::process(int nsamples)
 {
     //The filters work inplace so we have to initialize the output with the input data
-    memcpy(output, input, nsamples * sizeof(float));
+    memcpy(m_buffer, input, nsamples * sizeof(float));
 
     m_noteOnOffState = m_oldNoteOnOffState;
-    for (int s = 0; s < nsamples; s++)
-        output[s] = 40 * output[s];
+    // for (int s = 0; s < nsamples; s++)
+    //     m_buffer[s] = 40 * m_buffer[s];
 
 
-    float meanenv=filterAndComputeMeanEnv(output,nsamples);
+    float meanenv=filterAndComputeMeanEnv(m_buffer,nsamples);
 
     //If envelope greater then threshold consider these nsamples a candidate 
-    if (meanenv > 0.1)
+    if (meanenv > 0.1/40)
     {
-        memcpy(m_pitchbuffer + m_pitchBufferCounter, output, sizeof(float) * nsamples);
+        memcpy(m_pitchbuffer + m_pitchBufferCounter, m_buffer, sizeof(float) * nsamples);
         m_pitchBufferCounter += nsamples;
 
         // Check that the pitch is correct. This step is probably unneccessary if we can increase the order of the filters see comment above in initialize()

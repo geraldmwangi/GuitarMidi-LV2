@@ -141,7 +141,7 @@ void FretBoard::addNoteClassifier(float freq,float mult,LV2_URID_Map *map, float
         float maxf=164;
         float minbw=5;
         float maxbw=25;
-        float bw=(freq<minf)?minbw:((freq>maxf)?maxbw:((freq-minf)*(maxbw-minbw)/(maxf-minf)+minbw));
+        float bw=10;//(freq<minf)?minbw:((freq>maxf)?maxbw:((freq-minf)*(maxbw-minbw)/(maxf-minf)+minbw));
         
 
 
@@ -161,10 +161,11 @@ void FretBoard::setAudioInput(const float *input)
 
 void FretBoard::setAudioOutput(float *output)
 {
-    for (auto notecl : m_noteClassifiers)
-    {
-        notecl->output = output;
-    }
+    m_harmonicGroups[196]->audioBuffer=output;
+    // for (auto notecl : m_noteClassifiers)
+    // {
+    //     notecl->m_buffer = output;
+    // }
 
 }
 

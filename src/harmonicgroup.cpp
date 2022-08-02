@@ -3,6 +3,15 @@
 HarmonicGroup::HarmonicGroup()
 {
     m_oldState = false;
+    m_bufferSize=256;
+    m_buffer=new float[m_bufferSize];
+    audioBuffer=nullptr;
+}
+
+HarmonicGroup::~HarmonicGroup()
+{
+    if(m_buffer)
+        delete [] m_buffer;
 }
 
 void HarmonicGroup::addNoteClassifier(shared_ptr<NoteClassifier> notecl)
@@ -24,7 +33,10 @@ void HarmonicGroup::addNoteClassifier(shared_ptr<NoteClassifier> notecl)
 
 void HarmonicGroup::process(int nsamples)
 {
-    if (m_noteClassifiers[0]->getCenterFrequency() < 987.77&&m_noteClassifiers[0]->is_ringing)
+    memset(m_buffer, 0, nsamples * sizeof(float));
+    if (audioBuffer != nullptr)
+        memset(audioBuffer, 0, nsamples * sizeof(float));
+    if (m_noteClassifiers[0]->getCenterFrequency() < 987.77)//&&m_noteClassifiers[0]->is_ringing)
     {
         int numringing = 0;
         vector<NoteClassifier::Ptr> ringingnotes;
@@ -44,6 +56,9 @@ void HarmonicGroup::process(int nsamples)
                         if (notecl != m_noteClassifiers[0])
                             notecl->block_midinote = false;
                     }
+
+                    for(int s=0;s<nsamples;s++)
+                        m_buffer[s]+=notecl->m_buffer[s];
                 }
                 // else
                 //     notecl->block_midinote=false;
@@ -53,18 +68,31 @@ void HarmonicGroup::process(int nsamples)
                 // if(abs(notecl->getNumSamplesSinceLastOnset()-numSamplesSinceLastOnset)<=3*nsamples&&notecl->is_ringing)
                 //     numringing++;
             }
+
+            float max=0;
+            for (int s = 0; s < nsamples; s++)
+                {
+                    float bufabs=fabs(m_buffer[s]);
+                    if(bufabs>max)
+                        max=bufabs;
+                }
+
             numringing=ringingnotes.size();
             
             // numringing *= m_noteClassifiers[0]->is_ringing;
-            if (numringing > 2)
+            if(max>0.1&&m_noteClassifiers[0]->is_ringing)//if (numringing > 2&&max>0.1)
             {
+                if (audioBuffer != nullptr)
+                    for (int s = 0; s < nsamples; s++)
+                        audioBuffer[s] = m_buffer[s];
                 if (!m_oldState&&!m_noteClassifiers[0]->block_midinote)
                 {
                     m_noteClassifiers[0]->sendMidiNote(nsamples, true);
                     m_oldState = true;
-                    for(auto ncl:ringingnotes)
-                        cout<<"Freq: "<<ncl->getCenterFrequency()<<"Numsamples: "<<ncl->getNumSamplesSinceLastChangeOfState()<<endl;
-                    cout<<"partials: "<<numringing<<endl;
+                    // for(auto ncl:ringingnotes)
+                    //     cout<<"Freq: "<<ncl->getCenterFrequency()<<"Numsamples: "<<ncl->getNumSamplesSinceLastChangeOfState()<<endl;
+                    // cout<<"partials: "<<numringing<<endl;
+                    // cout<<"max: "<<max<<endl;
                 }
             }
             else
@@ -73,8 +101,8 @@ void HarmonicGroup::process(int nsamples)
                 {
                     m_noteClassifiers[0]->sendMidiNote(nsamples, false);
                     m_oldState = false;
-                     cout<<"Note off: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
-                     cout<<"note off partials: "<<numringing<<endl;
+                    //  cout<<"Note off: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
+                    //  cout<<"note off partials: "<<numringing<<endl;
                 }
             }
         }
