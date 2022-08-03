@@ -80,7 +80,7 @@ void HarmonicGroup::process(int nsamples)
             numringing=ringingnotes.size();
             
             // numringing *= m_noteClassifiers[0]->is_ringing;
-            if(max>0.1&&m_noteClassifiers[0]->is_ringing)//if (numringing > 2&&max>0.1)
+            if(max>0.01&&m_noteClassifiers[0]->is_ringing&&numringing >= 2)//if (numringing > 2&&max>0.1)
             {
                 if (audioBuffer != nullptr)
                     for (int s = 0; s < nsamples; s++)
