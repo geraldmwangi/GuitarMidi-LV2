@@ -25,7 +25,7 @@
 
 #define FILTERORDER 2 // the real order is 2*MAXORDER
 #define MAXORDER 10 // the real order is 2*MAXORDER
-//#define USE_ELLIPTIC 1
+// #define USE_ELLIPTIC 1
 using namespace std;
 /**
  * @brief NoteClassifier analyses polyphonic audio and triggers a midi note when it finds 
@@ -174,7 +174,7 @@ public:
      * @param bandwidth bandwidth of the bandpass filters
      * @param passbandatten The attenuation in db of amplitude of the ripple in the pass and stopband of the elliptic filters
      */
-    NoteClassifier(LV2_URID_Map *map,float samplerate, float center = 110.0, float bandwidth = 20, float passbandatten = 5);
+    NoteClassifier(LV2_URID_Map *map,float samplerate, float center = 110.0, float bandwidth = 20, float passbandatten = 2);
 
     /**
      * @brief initialize the filters and the pitchdetector
@@ -266,7 +266,7 @@ public:
 
     void setOnsetParameter(string method,float threshold=0.4,float silence=-40,float comp=0.0,int onsetbuffersize=512,bool adap_whitening=false);
 
-    void setFilterParameters(float bandwidth = 20, float passbandatten = 1,int order=FILTERORDER);
+    void setFilterParameters(float bandwidth = 20, float passbandatten = 2,int order=FILTERORDER);
 
     void resetFilterAndOnsetDetector();
 
