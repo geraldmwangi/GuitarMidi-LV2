@@ -4,6 +4,9 @@ HarmonicGroup::HarmonicGroup()
 {
     m_oldState = false;
     m_bufferSize=256;
+    m_samplerate = 48000;
+    m_onsetDetector = nullptr;
+    setOnsetParameter("energy");
     m_buffer=new float[m_bufferSize];
     audioBuffer=nullptr;
 }
@@ -12,6 +15,8 @@ HarmonicGroup::~HarmonicGroup()
 {
     if(m_buffer)
         delete [] m_buffer;
+    if (m_onsetDetector)
+        del_aubio_onset(m_onsetDetector);
 }
 
 void HarmonicGroup::addNoteClassifier(shared_ptr<NoteClassifier> notecl)
@@ -35,8 +40,15 @@ void HarmonicGroup::resetFilters()
     for (auto notecl : m_noteClassifiers)
         notecl->resetFilterAndOnsetDetector();
 
+    if (m_onsetDetector)
+        del_aubio_onset(m_onsetDetector);
+    m_onsetDetector = new_aubio_onset(m_onsetMethod.c_str(), m_onsetBuffersize, m_onsetBuffersize / 2, m_samplerate);
+    aubio_onset_set_threshold(m_onsetDetector, m_onsetThresh);
+    // aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
+    aubio_onset_set_silence(m_onsetDetector, m_onsetSilence);
+    aubio_onset_set_compression(m_onsetDetector, m_onsetCompression);
 }
-void HarmonicGroup::filterAndSumBuffers(const float *input,int nsamples)
+void HarmonicGroup::filterAndSumBuffers(const float *input,int nsamples,bool* onsetdetected)
 {
     memset(m_buffer, 0, nsamples * sizeof(float));
     for (auto notecl : m_noteClassifiers)
@@ -46,7 +58,39 @@ void HarmonicGroup::filterAndSumBuffers(const float *input,int nsamples)
         for (int s = 0; s < nsamples; s++)
             m_buffer[s] += notecl->m_buffer[s];
     }
+    if (m_onsetDetector)
+    {
+        fvec_t *ons = new_fvec(1);
+        fvec_t onsinput;
+        onsinput.data = (smpl_t *)m_buffer;
+        onsinput.length = nsamples;
+
+        aubio_onset_do(m_onsetDetector, &onsinput, ons);
+        bool onsdetected = *(*ons).data > 0.0;
+        if (onsetdetected)
+            *onsetdetected = onsdetected;
+        del_fvec(ons);
+    }
 }
+
+void HarmonicGroup::setOnsetParameter(string method, float threshold,float silence,float comp,int onsetbuffersize,bool adap_whitening)
+{
+    m_onsetMethod=method;
+    m_onsetThresh=threshold;
+    m_onsetSilence=silence;
+    m_onsetCompression=comp;
+    m_onsetBuffersize=onsetbuffersize;
+    if(m_onsetDetector)
+        del_aubio_onset(m_onsetDetector);
+    m_onsetDetector=new_aubio_onset(m_onsetMethod.c_str(),m_onsetBuffersize,m_onsetBuffersize/2,m_samplerate);
+    aubio_onset_set_threshold(m_onsetDetector,m_onsetThresh);
+    // aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
+    aubio_onset_set_silence(m_onsetDetector,m_onsetSilence);
+    aubio_onset_set_compression(m_onsetDetector,m_onsetCompression);
+    
+    
+}
+
 
 void HarmonicGroup::process(int nsamples)
 {

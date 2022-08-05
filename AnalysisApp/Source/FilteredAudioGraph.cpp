@@ -169,7 +169,9 @@ void HarmonicGroupResponseGraph::drawGraph(juce::Graphics& g, juce::Rectangle<in
     for(int pos=startpos;pos<min(endpos,m_audioslice.getNumSamples()-chunk);pos+=chunk)
     {
        bool onset=0;
-       m_group->filterAndSumBuffers(res.getArrayOfWritePointers()[0]+pos,chunk);
+       m_group->filterAndSumBuffers(res.getArrayOfWritePointers()[0]+pos,chunk,&onset);
+       memcpy(res.getArrayOfWritePointers()[0]+pos,m_group->m_buffer,chunk*sizeof(float));
+ 
 
        if(onset)
         {

@@ -131,6 +131,7 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
         }
 
     }
+    sort(m_noteClassifiers.begin(),m_noteClassifiers.end(),sort_notecl);
 }
 void FretBoard::addNoteClassifier(float freq,float mult,LV2_URID_Map *map, float samplerate)
 {

@@ -75,6 +75,11 @@ public:
         return m_noteClassifiers;
     }
 
+    static bool sort_notecl(shared_ptr<NoteClassifier> first,shared_ptr<NoteClassifier> second)
+    {
+        return first->getCenterFrequency()<second->getCenterFrequency();
+    }
+
     vector<shared_ptr<HarmonicGroup>> &getHarmonicGroups()
     {
         return m_harmonicGroups;

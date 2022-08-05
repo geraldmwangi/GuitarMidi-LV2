@@ -35,6 +35,7 @@ MainArea::MainArea ()
     m_responseArea.reset(new PlotArea());
     m_meanResponseAudioArea.reset(new PlotArea());
     m_responseAudioArea.reset(new PlotArea());
+    m_harmonicGroupsResponseArea.reset(new PlotArea());
     m_phaseArea.reset(new PlotArea());
     m_waveFileView.reset(new WaveFileView());
     //[/Constructor_pre]
@@ -140,6 +141,7 @@ MainArea::MainArea ()
     m_phaseResponseTab->addTab(TRANS("Phase"), juce::Colours::lightgrey, m_phaseArea.get(), false);
     m_phaseResponseTab->addTab(TRANS("Mean Response Audio"), juce::Colours::lightgrey, m_meanResponseAudioArea.get(), false);
     m_phaseResponseTab->addTab(TRANS(" Response Audio"), juce::Colours::lightgrey, m_responseAudioArea.get(), false);
+    m_phaseResponseTab->addTab(TRANS(" Response Harmonic Group"), juce::Colours::lightgrey, m_harmonicGroupsResponseArea.get(), false);
 
     m_noteClSelector->addItem("ALL", ALL_NOTECLS);
     for (int n = 0; n < m_fretboard->getNoteClassifiers().size(); n++)
@@ -401,6 +403,11 @@ void MainArea::setOnsetDetectors()
         {
             notecl->setOnsetParameter(val.toStdString(),threshold,silence,comp,bufsize);
         }
+
+        for(auto group:m_fretboard->getHarmonicGroups())
+        {
+            group->setOnsetParameter(val.toStdString(),threshold,silence,comp,bufsize);
+        }
         drawGraphs();
 }
 void MainArea::drawGraphs()
@@ -408,6 +415,7 @@ void MainArea::drawGraphs()
     shared_ptr<GraphVector> responseGraphs = make_shared<GraphVector>();
     shared_ptr<GraphVector> phaseGraphs = make_shared<GraphVector>();
     shared_ptr<GraphVector> filteredAudioGraphs = make_shared<GraphVector>();
+    
     if (m_currentNoteCl == ALL_NOTECLS)
     {
 
@@ -436,6 +444,13 @@ void MainArea::drawGraphs()
 
         responseAudioGraphs->push_back(make_shared<AudioResponseGraph>(notecl,m_waveFileView->getAudioBuffer()));
         m_responseAudioArea->drawGraphs(responseAudioGraphs);
+
+
+        auto harmonicgroup=m_fretboard->getHarmonicGroups()[m_currentNoteCl-1];
+        shared_ptr<GraphVector> harmonicGroupAudioGraphs=make_shared<GraphVector>();
+        harmonicGroupAudioGraphs->push_back(make_shared<HarmonicGroupResponseGraph>(harmonicgroup,m_waveFileView->getAudioBuffer()));
+        m_harmonicGroupsResponseArea->drawGraphs(harmonicGroupAudioGraphs);
+
 
     }
 
