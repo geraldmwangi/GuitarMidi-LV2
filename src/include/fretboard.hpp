@@ -47,7 +47,7 @@ private:
 
     vector<shared_ptr<NoteClassifier>> m_noteClassifiers;
 
-    map<float,shared_ptr<HarmonicGroup> > m_harmonicGroups;
+    vector<shared_ptr<HarmonicGroup> > m_harmonicGroups;
 
     shared_ptr<GuitarMidi::MidiOutput> m_midioutput;
 
@@ -73,6 +73,11 @@ public:
     vector<shared_ptr<NoteClassifier>>& getNoteClassifiers()
     {
         return m_noteClassifiers;
+    }
+
+    vector<shared_ptr<HarmonicGroup>> &getHarmonicGroups()
+    {
+        return m_harmonicGroups;
     }
 
     /**

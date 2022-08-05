@@ -127,7 +127,7 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
     {
         for (auto notecl : m_noteClassifiers)
         {
-            group.second->addNoteClassifier(notecl);
+            group->addNoteClassifier(notecl);
         }
 
     }
@@ -147,8 +147,12 @@ void FretBoard::addNoteClassifier(float freq,float mult,LV2_URID_Map *map, float
 
         auto notecl=make_shared<NoteClassifier>(map, samplerate, freq, bw);
         m_noteClassifiers.push_back(notecl );
-        m_harmonicGroups[freq] = make_shared<HarmonicGroup>();
-        m_harmonicGroups[freq]->addNoteClassifier(notecl);
+        if(mult==1)
+        {
+            auto group = make_shared<HarmonicGroup>();
+            group->addNoteClassifier(notecl);
+            m_harmonicGroups.push_back(group);
+        }
     }
 }
 void FretBoard::setAudioInput(const float *input)
@@ -220,7 +224,7 @@ void FretBoard::process(int nsamples)
     //  if (fraction_ringing < 0.15)
         for (auto group : m_harmonicGroups)
         {
-            group.second->process(nsamples);
+            group->process(nsamples);
         }
     //  else
     // if(fraction_ringing)
