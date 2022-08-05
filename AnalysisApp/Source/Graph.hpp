@@ -27,6 +27,8 @@ private:
     virtual void computeGraph()=0;
 
 public:
+    Graph()
+    {}
     Graph(shared_ptr<NoteClassifier> notecl);
     virtual ~Graph();
 

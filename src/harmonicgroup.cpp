@@ -30,6 +30,23 @@ void HarmonicGroup::addNoteClassifier(shared_ptr<NoteClassifier> notecl)
         }
     }
 }
+void HarmonicGroup::resetFilters()
+{
+    for (auto notecl : m_noteClassifiers)
+        notecl->resetFilterAndOnsetDetector();
+
+}
+void HarmonicGroup::filterAndSumBuffers(const float *input,int nsamples)
+{
+    memset(m_buffer, 0, nsamples * sizeof(float));
+    for (auto notecl : m_noteClassifiers)
+    {
+        notecl->filterAndComputeMeanEnv(input, nsamples);
+
+        for (int s = 0; s < nsamples; s++)
+            m_buffer[s] += notecl->m_buffer[s];
+    }
+}
 
 void HarmonicGroup::process(int nsamples)
 {

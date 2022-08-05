@@ -145,9 +145,10 @@ Dsp::complex_t NoteClassifier::filterResponse(float freq)
     return m_filter.response(freq/m_samplerate);
 }
 
-float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* onsetdetected)
+float NoteClassifier::filterAndComputeMeanEnv(const float* input,int nsamples,bool* onsetdetected)
 {
-
+//The filters work inplace so we have to initialize the output with the input data
+    memcpy(m_buffer, input, nsamples * sizeof(float));
     //float* buffer=new float[nsamples];
     
     // Increase gain to increase the response in the passband
@@ -162,7 +163,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     //         // buffer[s+2] *= 2;
     //     }
         
-    m_filter.process(nsamples, &buffer);
+    m_filter.process(nsamples, &m_buffer);
     float meanenv = 0;
     int count = 0;
 
@@ -172,7 +173,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     {
         fvec_t* ons=new_fvec(1);
         fvec_t onsinput;
-        onsinput.data=(smpl_t*)buffer;
+        onsinput.data=(smpl_t*)m_buffer;
         onsinput.length=nsamples;
 
         aubio_onset_do(m_onsetDetector,&onsinput,ons);
@@ -210,8 +211,8 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     {
          //if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
         {
-            float absval = fabs(buffer[s]);
-            m_meanEnv += fabs(buffer[s]);
+            float absval = fabs(m_buffer[s]);
+            m_meanEnv += fabs(m_buffer[s]);
             // meanenv = (absval > meanenv) ? absval : meanenv;
             m_meanEnvCounter++;
         }
@@ -246,15 +247,14 @@ bool NoteClassifier::isNoteValid(int nsamples)
 }
 void NoteClassifier::process(int nsamples)
 {
-    //The filters work inplace so we have to initialize the output with the input data
-    memcpy(m_buffer, input, nsamples * sizeof(float));
+    
 
     m_noteOnOffState = m_oldNoteOnOffState;
     // for (int s = 0; s < nsamples; s++)
     //     m_buffer[s] = 40 * m_buffer[s];
 
 
-    float meanenv=filterAndComputeMeanEnv(m_buffer,nsamples);
+    float meanenv=filterAndComputeMeanEnv(input,nsamples);
 
     //If envelope greater then threshold consider these nsamples a candidate 
     if (meanenv > 0.002)

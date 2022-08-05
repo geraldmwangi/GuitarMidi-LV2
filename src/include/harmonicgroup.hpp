@@ -18,6 +18,10 @@ class HarmonicGroup
 
     void addNoteClassifier(shared_ptr<NoteClassifier> notecl);
 
+    void resetFilters();
+
+    void filterAndSumBuffers(const float *input,int nsamples);
+
     void process(int nsamples);
 
 

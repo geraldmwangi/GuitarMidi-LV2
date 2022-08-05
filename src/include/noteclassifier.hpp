@@ -241,7 +241,7 @@ public:
      * @param nsamples 
      * @return float 
      */
-    float filterAndComputeMeanEnv(float *buffer,int nsamples,bool* onsetdetected=nullptr);
+    float filterAndComputeMeanEnv(const float *input,int nsamples,bool* onsetdetected=nullptr);
 
     Dsp::complex_t filterResponse(float freq);
 

@@ -27,7 +27,7 @@
             "program": "${workspaceFolder}/build/AnalysisApp/GuitarMidiAnalysisApp",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}/build/AnalysisApp",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
