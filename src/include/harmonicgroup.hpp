@@ -17,6 +17,10 @@ class HarmonicGroup
     aubio_onset_t* m_onsetDetector;
     int m_samplerate;
 
+    float getMeanEnv(int nsamples,bool *period_over);
+    float m_meanEnv;
+    int m_meanEnvCounter;
+
     public:
     float* m_buffer;
     int m_bufferSize;
