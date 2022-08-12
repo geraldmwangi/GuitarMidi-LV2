@@ -166,7 +166,7 @@ void FretBoard::setAudioInput(const float *input)
 
 void FretBoard::setAudioOutput(float *output)
 {
-    m_harmonicGroups[196]->audioBuffer=output;
+    m_harmonicGroups[0]->audioBuffer=output;
     // for (auto notecl : m_noteClassifiers)
     // {
     //     notecl->m_buffer = output;
