@@ -91,44 +91,12 @@ void HarmonicGroup::setOnsetParameter(string method, float threshold,float silen
     
 }
 
-float HarmonicGroup::getMeanEnv(int nsamples,bool* period_over)
-{
-    float period = 1 / m_noteClassifiers[0]->getCenterFrequency();
-    int period_samples = period * m_samplerate;
-    if (m_meanEnvCounter > period_samples*4)
-    {
-        m_meanEnv = 0;
-        m_meanEnvCounter = 0;
-        *period_over=true;
-    }
-    else
-        *period_over=false;
-    for (int s = 0; s < (nsamples); s++)
-    {
-        // if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
-        {
-            float absval = fabs(m_buffer[s]);
-            m_meanEnv += fabs(m_buffer[s]);
-            // m_meanEnv=max(m_meanEnv,m_buffer[s]);
-            // meanenv = (absval > meanenv) ? absval : meanenv;
-            m_meanEnvCounter++;
-        }
-    }
-    return m_meanEnv/m_meanEnvCounter;
-}
-
 
 void HarmonicGroup::process(int nsamples)
 {
     memset(m_buffer, 0, nsamples * sizeof(float));
     if (audioBuffer != nullptr)
         memset(audioBuffer, 0, nsamples * sizeof(float));
-    for (auto notecl : m_noteClassifiers)
-        for (int s = 0; s < nsamples; s++)
-            m_buffer[s] += notecl->m_buffer[s];
-    bool period_over=false;
-    float max=getMeanEnv(nsamples,&period_over);
-
     if (m_noteClassifiers[0]->getCenterFrequency() < 987.77)//&&m_noteClassifiers[0]->is_ringing)
     {
         int numringing = 0;
@@ -150,7 +118,8 @@ void HarmonicGroup::process(int nsamples)
                             notecl->block_midinote = false;
                     }
 
-
+                    for(int s=0;s<nsamples;s++)
+                        m_buffer[s]+=notecl->m_buffer[s];
                 }
                 // else
                 //     notecl->block_midinote=false;
@@ -161,44 +130,40 @@ void HarmonicGroup::process(int nsamples)
                 //     numringing++;
             }
 
-            
+            float max=0;
+            for (int s = 0; s < nsamples; s++)
+                {
+                    float bufabs=fabs(m_buffer[s]);
+                    if(bufabs>max)
+                        max=bufabs;
+                }
 
             numringing=ringingnotes.size();
-            float max = 0;
-            for (int s = 0; s < nsamples; s++)
-            {
-                float bufabs = fabs(m_buffer[s]);
-                if (bufabs > max)
-                    max = bufabs;
-            }
-
+            
             // numringing *= m_noteClassifiers[0]->is_ringing;
-            if(period_over)
+            if(max>0.01&&m_noteClassifiers[0]->is_ringing&&numringing >= 2)//if (numringing > 2&&max>0.1)
             {
-                if (max > 0.01 && m_noteClassifiers[0]->is_ringing && numringing >= 2) // if (numringing > 2&&max>0.1)
+                if (audioBuffer != nullptr)
+                    for (int s = 0; s < nsamples; s++)
+                        audioBuffer[s] = m_buffer[s];
+                if (!m_oldState&&!m_noteClassifiers[0]->block_midinote)
                 {
-                    if (audioBuffer != nullptr)
-                        for (int s = 0; s < nsamples; s++)
-                            audioBuffer[s] = m_buffer[s];
-                    if (!m_oldState && !m_noteClassifiers[0]->block_midinote)
-                    {
-                        m_noteClassifiers[0]->sendMidiNote(nsamples, true);
-                        m_oldState = true;
-                        // for(auto ncl:ringingnotes)
-                        //     cout<<"Freq: "<<ncl->getCenterFrequency()<<"Numsamples: "<<ncl->getNumSamplesSinceLastChangeOfState()<<endl;
-                        // cout<<"partials: "<<numringing<<endl;
-                        // cout<<"max: "<<max<<endl;
-                    }
+                    m_noteClassifiers[0]->sendMidiNote(nsamples, true);
+                    m_oldState = true;
+                    // for(auto ncl:ringingnotes)
+                    //     cout<<"Freq: "<<ncl->getCenterFrequency()<<"Numsamples: "<<ncl->getNumSamplesSinceLastChangeOfState()<<endl;
+                    // cout<<"partials: "<<numringing<<endl;
+                    // cout<<"max: "<<max<<endl;
                 }
-                else
+            }
+            else
+            {
+                if (m_oldState)
                 {
-                    if (m_oldState)
-                    {
-                        m_noteClassifiers[0]->sendMidiNote(nsamples, false);
-                        m_oldState = false;
-                        //  cout<<"Note off: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
-                        //  cout<<"note off partials: "<<numringing<<endl;
-                    }
+                    m_noteClassifiers[0]->sendMidiNote(nsamples, false);
+                    m_oldState = false;
+                    //  cout<<"Note off: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
+                    //  cout<<"note off partials: "<<numringing<<endl;
                 }
             }
         }

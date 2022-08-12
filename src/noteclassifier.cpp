@@ -183,7 +183,7 @@ float NoteClassifier::filterAndComputeMeanEnv(const float* input,int nsamples,bo
         if(onsdetected)
         {
             m_numSamplesSinceLastOnset = 0;
-            m_meanEnv = 0.0;
+            m_meanEnv = -1.0;
             m_meanEnvCounter = 0;
         }
         else
@@ -202,7 +202,7 @@ float NoteClassifier::filterAndComputeMeanEnv(const float* input,int nsamples,bo
 
     float period=1/m_centerfreq;
     int period_samples=period*m_samplerate;
-    if(m_meanEnvCounter>period_samples*4)
+    if(m_meanEnvCounter>period_samples)
     {
         m_meanEnv=0;
         m_meanEnvCounter=0;
@@ -226,6 +226,25 @@ float NoteClassifier::filterAndComputeMeanEnv(const float* input,int nsamples,bo
     return m_meanEnv/m_meanEnvCounter;
 }
 
+bool NoteClassifier::isNoteValid(int nsamples)
+{
+    //if(m_pitchBufferCounter==0)
+    {
+                    fvec_t Buf;
+            Buf.data = m_pitchbuffer;
+            Buf.length = mInBufSize;
+
+            aubio_pitch_do(mPitchDetector, &Buf, m_pitchfreq);
+            if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 4.0)
+            {
+                //Candidtate is valid
+                return true;
+            }
+            else
+                return false; //Candidtate is incorrect
+    }
+
+}
 void NoteClassifier::process(int nsamples)
 {
     
@@ -240,7 +259,16 @@ void NoteClassifier::process(int nsamples)
     //If envelope greater then threshold consider these nsamples a candidate 
     if (meanenv > 0.002)
     {
+        memcpy(m_pitchbuffer + m_pitchBufferCounter, m_buffer, sizeof(float) * nsamples);
+        m_pitchBufferCounter += nsamples;
 
+        // Check that the pitch is correct. This step is probably unneccessary if we can increase the order of the filters see comment above in initialize()
+        if (m_pitchBufferCounter >= mInBufSize)
+        {
+            m_pitchBufferCounter = 0;
+
+            m_noteOnOffState=isNoteValid(nsamples);
+        }
         m_noteOnOffState = true;
         //is_ringing=true;
 
@@ -261,9 +289,19 @@ void NoteClassifier::process(int nsamples)
             // m_samplesSinceLastChangeOfState=0;
         }
     }
-    setIsRinging(nsamples);
 }
 
+void NoteClassifier::sendMidiNote(int nsamples)
+{
+    if(m_samplesSinceLastChangeOfState>2*nsamples)
+    {
+        if (m_noteOnOffState != m_oldNoteOnOffState)
+            sendMidiNote(nsamples, m_noteOnOffState);
+
+        m_oldNoteOnOffState = m_noteOnOffState;
+        m_samplesSinceLastChangeOfState=0;
+    }
+}
 
 void NoteClassifier::setIsRinging(int nsamples)
 {

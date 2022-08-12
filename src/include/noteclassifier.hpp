@@ -195,6 +195,7 @@ public:
      */
     void process(int nsamples);
 
+    bool isNoteValid(int samples);
 
     bool getNoteOnOffState()
     {
@@ -213,6 +214,7 @@ public:
         m_noteOnOffState=state;
     }
 
+    void sendMidiNote(int nsamples);
 
     bool is_ringing;
 
