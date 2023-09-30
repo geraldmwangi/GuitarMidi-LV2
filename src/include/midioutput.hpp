@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lv2/lv2plug.in/ns/lv2core/lv2.h"
+#include <lv2/core/lv2.h>
 
 /* GuitarMidi-LV2 Library
  * Copyright (C) 2022 Gerald Mwangi
@@ -20,16 +20,16 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include "lv2/atom/atom.h"
-#include "lv2/atom/util.h"
-#include "lv2/core/lv2.h"
-#include "lv2/core/lv2_util.h"
-#include "lv2/log/log.h"
-#include "lv2/log/logger.h"
-#include "lv2/midi/midi.h"
-#include "lv2/urid/urid.h"
-#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
-#include <lv2/lv2plug.in/ns/ext/atom/forge.h>
+
+#include <lv2/atom/util.h>
+#include <lv2/core/lv2.h>
+#include <lv2/core/lv2_util.h>
+#include <lv2/log/log.h>
+#include <lv2/log/logger.h>
+#include <lv2/midi/midi.h>
+#include <lv2/urid/urid.h>
+#include <lv2/atom/atom.h>
+#include <lv2/atom/forge.h>
 
 /**
  * @brief MidiOutput abstracts lv2's midi messaging. It needs some debugging

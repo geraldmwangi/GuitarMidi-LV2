@@ -21,8 +21,7 @@
 #include <cassert>
 #include <math.h>
 #include <stdlib.h>
-
-#include "lv2/lv2plug.in/ns/lv2core/lv2.h"
+#include <lv2/core/lv2.h>
 #include <fretboard.hpp>
 
 #define AMP_URI "http://github.com/geraldmwangi/GuitarMidi-LV2"
