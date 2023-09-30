@@ -1,6 +1,7 @@
 #pragma once
 #include <lv2/log/logger.h>
 #include <time.h>
+#include <config.hpp>
 extern LV2_Log_Logger g_logger;
 
 // call this function to start a nanosecond-resolution timer
