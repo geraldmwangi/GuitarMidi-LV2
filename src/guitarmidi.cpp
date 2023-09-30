@@ -44,7 +44,12 @@ instantiate(const LV2_Descriptor *descriptor,
 		lv2_log_error(&g_logger, "Missing feature <%s>\n", missing);
 		return 0;
 	}
-	FretBoard *fretboard = new FretBoard(map, rate);
+#ifdef USE_ELLIPTIC_FILTERS
+	lv2_log_note(&g_logger, "Using elliptic filters");
+#else
+	lv2_log_note(&g_logger, "Using butterworth filters");
+#endif
+		FretBoard *fretboard = new FretBoard(map, rate);
 	return (LV2_Handle)fretboard;
 }
 

@@ -1,1 +1,2 @@
 #cmakedefine WITH_TRACING_INFO
+#cmakedefine USE_ELLIPTIC_FILTERS

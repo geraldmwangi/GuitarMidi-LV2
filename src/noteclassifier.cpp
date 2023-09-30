@@ -30,7 +30,7 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_buffer = nullptr;
     m_noteOnOffState = false;
     m_onsetDetector = nullptr;
-    setOnsetParameter("energy");
+    //setOnsetParameter("energy");
     m_numSamplesSinceLastOnset = -1;
     m_samplesSinceLastChangeOfState = 0;
     is_ringing = false;
@@ -61,7 +61,7 @@ void NoteClassifier::resetFilterAndOnsetDetector()
     // aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
     aubio_onset_set_silence(m_onsetDetector, m_onsetSilence);
     aubio_onset_set_compression(m_onsetDetector, m_onsetCompression);
-#ifdef USE_ELLIPTIC
+#ifdef USE_ELLIPTIC_FILTERS
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
 #else
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth);
@@ -74,7 +74,7 @@ void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten, i
     m_order = order;
 
     m_filter.reset();
-#ifdef USE_ELLIPTIC
+#ifdef USE_ELLIPTIC_FILTERS
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
 #else
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth);

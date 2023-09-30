@@ -133,11 +133,8 @@ void FretBoard::addNoteClassifier(float freq, float mult, LV2_URID_Map *map, flo
     freq *= mult;
     if (mult == 1 || freq > 987.77)
     {
-        float minf = 82;
-        float maxf = 164;
-        float minbw = 5;
-        float maxbw = 25;
-        float bw = 10; //(freq<minf)?minbw:((freq>maxf)?maxbw:((freq-minf)*(maxbw-minbw)/(maxf-minf)+minbw));
+        //Frequencies <100 Hz need higher resolution, so filters with lower bandwidth are applied
+        float bw = (freq<100)?5:10;
 
         auto notecl = make_shared<NoteClassifier>(map, samplerate, freq, bw);
         m_noteClassifiers.push_back(notecl);

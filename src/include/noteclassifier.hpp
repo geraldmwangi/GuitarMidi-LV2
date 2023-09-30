@@ -25,7 +25,7 @@
 
 #define FILTERORDER 2 // the real order is 2*MAXORDER
 #define MAXORDER 10 // the real order is 2*MAXORDER
-// #define USE_ELLIPTIC 1
+// #define USE_ELLIPTIC_FILTERS 1
 using namespace std;
 /**
  * @brief NoteClassifier analyses polyphonic audio and triggers a midi note when it finds 
@@ -117,7 +117,7 @@ private:
      * @brief m_filter: array of elliptic filters
      * 
      */
-    #ifndef USE_ELLIPTIC
+    #ifndef USE_ELLIPTIC_FILTERS
     Dsp::SimpleFilter <Dsp::Butterworth::BandPass<MAXORDER>, 1> m_filter;
     #else
     Dsp::SimpleFilter <Dsp::Elliptic::BandPass<MAXORDER>, 1> m_filter;
