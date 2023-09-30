@@ -5,6 +5,8 @@ project("GuitarMidi-LV2")
 
 # specify the C++ standard
 option(BUILD_ANALYSIS_APP "Build analysis app, usefull for development" OFF)
+
+option(WITH_TRACING_INFO "Build with tracing logs" OFF)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 set(DSPFiltersDir DSPFilters/shared/DSPFilters)

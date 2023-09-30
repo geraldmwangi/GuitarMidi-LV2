@@ -19,68 +19,59 @@
 #include <noteclassifier.hpp>
 #include <cmath>
 
-NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center, float bandwidth, float passbandatten) 
+NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center, float bandwidth, float passbandatten)
 {
     m_centerfreq = center;
     m_passbandatten = passbandatten;
     m_bandwidth = bandwidth;
     m_samplerate = samplerate;
-    mPitchDetector = 0;
-    m_pitchbuffer = 0;
-    m_pitchBufferCounter = 0;
-    m_pitchfreq = 0;
 
-    //TODO query host for buffersize. This is only used for the pitch detector
-    mPitchBufferSize = 256;
-
-    m_bufferSize=256;
-    m_buffer=nullptr;
+    m_bufferSize = 256;
+    m_buffer = nullptr;
     m_noteOnOffState = false;
-    m_onsetDetector=nullptr;
+    m_onsetDetector = nullptr;
     setOnsetParameter("energy");
-    m_numSamplesSinceLastOnset=-1;
-    m_samplesSinceLastChangeOfState=0;
-    is_ringing=false;
+    m_numSamplesSinceLastOnset = -1;
+    m_samplesSinceLastChangeOfState = 0;
+    is_ringing = false;
 }
 
-void NoteClassifier::setOnsetParameter(string method, float threshold,float silence,float comp,int onsetbuffersize,bool adap_whitening)
+void NoteClassifier::setOnsetParameter(string method, float threshold, float silence, float comp, int onsetbuffersize, bool adap_whitening)
 {
-    m_onsetMethod=method;
-    m_onsetThresh=threshold;
-    m_onsetSilence=silence;
-    m_onsetCompression=comp;
-    m_onsetBuffersize=onsetbuffersize;
-    if(m_onsetDetector)
+    m_onsetMethod = method;
+    m_onsetThresh = threshold;
+    m_onsetSilence = silence;
+    m_onsetCompression = comp;
+    m_onsetBuffersize = onsetbuffersize;
+    if (m_onsetDetector)
         del_aubio_onset(m_onsetDetector);
-    m_onsetDetector=new_aubio_onset(m_onsetMethod.c_str(),m_onsetBuffersize,m_onsetBuffersize/2,m_samplerate);
-    aubio_onset_set_threshold(m_onsetDetector,m_onsetThresh);
+    m_onsetDetector = new_aubio_onset(m_onsetMethod.c_str(), m_onsetBuffersize, m_onsetBuffersize / 2, m_samplerate);
+    aubio_onset_set_threshold(m_onsetDetector, m_onsetThresh);
     // aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
-    aubio_onset_set_silence(m_onsetDetector,m_onsetSilence);
-    aubio_onset_set_compression(m_onsetDetector,m_onsetCompression);
-    
-    
+    aubio_onset_set_silence(m_onsetDetector, m_onsetSilence);
+    aubio_onset_set_compression(m_onsetDetector, m_onsetCompression);
 }
 
 void NoteClassifier::resetFilterAndOnsetDetector()
 {
-    if(m_onsetDetector)
+    if (m_onsetDetector)
         del_aubio_onset(m_onsetDetector);
-    m_onsetDetector=new_aubio_onset(m_onsetMethod.c_str(),m_onsetBuffersize,m_onsetBuffersize/2,m_samplerate);
-    aubio_onset_set_threshold(m_onsetDetector,m_onsetThresh);
+    m_onsetDetector = new_aubio_onset(m_onsetMethod.c_str(), m_onsetBuffersize, m_onsetBuffersize / 2, m_samplerate);
+    aubio_onset_set_threshold(m_onsetDetector, m_onsetThresh);
     // aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
-    aubio_onset_set_silence(m_onsetDetector,m_onsetSilence);
-    aubio_onset_set_compression(m_onsetDetector,m_onsetCompression);
+    aubio_onset_set_silence(m_onsetDetector, m_onsetSilence);
+    aubio_onset_set_compression(m_onsetDetector, m_onsetCompression);
 #ifdef USE_ELLIPTIC
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
 #else
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth);
 #endif
 }
-void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten,int order)
+void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten, int order)
 {
-    m_bandwidth=bandwidth;
-    m_passbandatten=passbandatten;
-    m_order=order;
+    m_bandwidth = bandwidth;
+    m_passbandatten = passbandatten;
+    m_order = order;
 
     m_filter.reset();
 #ifdef USE_ELLIPTIC
@@ -92,64 +83,43 @@ void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten,in
 
 void NoteClassifier::setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output)
 {
-    //Set midi output
-    m_midiOutput=output;
+    // Set midi output
+    m_midiOutput = output;
 }
 void NoteClassifier::initialize()
 {
-    //Setup FILTERORDER 1st order filters. Currently Elliptic::BandPass crashes when running setup() with orders higher than 1
-    //When we solve this we can run sharper filters with narrower bandwidth and maybe drop the pitch validation below in process()
-    setFilterParameters(m_bandwidth,m_passbandatten);
-
-    //Setup a schmitt trigger as pitchdetector
-    if (mPitchDetector)
-        del_aubio_pitch(mPitchDetector);
-
-    mInBufSize = mPitchBufferSize * 4;
-
-    mPitchDetector = new_aubio_pitch("schmitt", mInBufSize, mPitchBufferSize, m_samplerate);
-    if (m_pitchbuffer)
-        delete[] m_pitchbuffer;
-    m_pitchbuffer = new float[mInBufSize];
-    m_pitchBufferCounter = 0;
-
-    if (m_pitchfreq)
-        del_fvec(m_pitchfreq);
-    m_pitchfreq = new_fvec(1);
+    // Setup FILTERORDER 1st order filters. Currently Elliptic::BandPass crashes when running setup() with orders higher than 1
+    // When we solve this we can run sharper filters with narrower bandwidth and maybe drop the pitch validation below in process()
+    setFilterParameters(m_bandwidth, m_passbandatten);
 
     if (m_bufferSize)
         m_buffer = new float[m_bufferSize];
 
-    m_meanEnv=0;
-    m_meanEnvCounter=0;
+    m_meanEnv = 0;
+    m_meanEnvCounter = 0;
 }
 
 void NoteClassifier::finalize()
 {
-    //Release ressources
+    // Release ressources
     m_filter.reset();
-    if (mPitchDetector)
-        del_aubio_pitch(mPitchDetector);
-    if (m_pitchbuffer)
-        delete[] m_pitchbuffer;
-    if (m_pitchfreq)
-        del_fvec(m_pitchfreq);
-    if(m_onsetDetector)
+
+    if (m_onsetDetector)
         del_aubio_onset(m_onsetDetector);
-    if(m_buffer)
-        delete [] m_buffer;
+    if (m_buffer)
+        delete[] m_buffer;
 }
 
 Dsp::complex_t NoteClassifier::filterResponse(float freq)
 {
-    return m_filter.response(freq/m_samplerate);
+    return m_filter.response(freq / m_samplerate);
 }
 
-float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* onsetdetected)
+float NoteClassifier::filterAndComputeMeanEnv(float *buffer, int nsamples, bool *onsetdetected)
 {
 
-    //float* buffer=new float[nsamples];
-    
+    // float* buffer=new float[nsamples];
+
     // Increase gain to increase the response in the passband
     // for (int s = 0; s < nsamples; s++)
     //     buffer[s] = 10 * buffer[s];
@@ -161,36 +131,43 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     //         // buffer[s-1] *= 2;
     //         // buffer[s+2] *= 2;
     //     }
-        
+
+#ifdef WITH_TRACING_INFO
+    timespec starttime = timer_start();
+#endif
     m_filter.process(nsamples, &buffer);
+#ifdef WITH_TRACING_INFO
+    lv2_log_trace(&g_logger, "Single overtone filtering: %ld ", timer_end(starttime));
+#endif
     float meanenv = 0;
     int count = 0;
 
-
-
-    if(m_onsetDetector)
+    if (m_onsetDetector)
     {
-        fvec_t* ons=new_fvec(1);
+        fvec_t *ons = new_fvec(1);
         fvec_t onsinput;
-        onsinput.data=(smpl_t*)buffer;
-        onsinput.length=nsamples;
-
-        aubio_onset_do(m_onsetDetector,&onsinput,ons);
-        bool onsdetected=*(*ons).data>0.0;
-        if(onsetdetected)
-            *onsetdetected=onsdetected;
-        if(onsdetected)
+        onsinput.data = (smpl_t *)buffer;
+        onsinput.length = nsamples;
+#ifdef WITH_TRACING_INFO
+        starttime = timer_start();
+#endif
+        aubio_onset_do(m_onsetDetector, &onsinput, ons);
+#ifdef WITH_TRACING_INFO
+        lv2_log_trace(&g_logger, "onset: %ld\n", timer_end(starttime));
+#endif
+        bool onsdetected = *(*ons).data > 0.0;
+        if (onsetdetected)
+            *onsetdetected = onsdetected;
+        if (onsdetected)
         {
             m_numSamplesSinceLastOnset = 0;
             m_meanEnv = -1.0;
             m_meanEnvCounter = 0;
         }
         else
-            m_numSamplesSinceLastOnset+=nsamples;
+            m_numSamplesSinceLastOnset += nsamples;
         del_fvec(ons);
-
     }
-
 
     // if(m_meanEnvCounter>48000)
     // {
@@ -199,16 +176,16 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
     // }
     // Get average envelope
 
-    float period=1/m_centerfreq;
-    int period_samples=period*m_samplerate;
-    if(m_meanEnvCounter>period_samples)
+    float period = 1 / m_centerfreq;
+    int period_samples = period * m_samplerate;
+    if (m_meanEnvCounter > period_samples)
     {
-        m_meanEnv=0;
-        m_meanEnvCounter=0;
+        m_meanEnv = 0;
+        m_meanEnvCounter = 0;
     }
     for (int s = 0; s < (nsamples); s++)
     {
-         //if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
+        // if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
         {
             float absval = fabs(buffer[s]);
             m_meanEnv += fabs(buffer[s]);
@@ -217,72 +194,36 @@ float NoteClassifier::filterAndComputeMeanEnv(float* buffer,int nsamples,bool* o
         }
     }
 
-
-    
     // if (count)
     //     meanenv /= count;
-    //delete [] buffer;
-    return m_meanEnv/m_meanEnvCounter;
+    // delete [] buffer;
+    return m_meanEnv / m_meanEnvCounter;
 }
 
-bool NoteClassifier::isNoteValid(int nsamples)
-{
-    //if(m_pitchBufferCounter==0)
-    {
-                    fvec_t Buf;
-            Buf.data = m_pitchbuffer;
-            Buf.length = mInBufSize;
-
-            aubio_pitch_do(mPitchDetector, &Buf, m_pitchfreq);
-            if (fabs(m_pitchfreq->data[0] - m_centerfreq) <= 4.0)
-            {
-                //Candidtate is valid
-                return true;
-            }
-            else
-                return false; //Candidtate is incorrect
-    }
-
-}
 void NoteClassifier::process(int nsamples)
 {
-    //The filters work inplace so we have to initialize the output with the input data
+    // The filters work inplace so we have to initialize the output with the input data
     memcpy(m_buffer, input, nsamples * sizeof(float));
 
     m_noteOnOffState = m_oldNoteOnOffState;
     // for (int s = 0; s < nsamples; s++)
     //     m_buffer[s] = 40 * m_buffer[s];
 
+    float meanenv = filterAndComputeMeanEnv(m_buffer, nsamples);
 
-    float meanenv=filterAndComputeMeanEnv(m_buffer,nsamples);
-
-    //If envelope greater then threshold consider these nsamples a candidate 
-    if (meanenv > 0.1/40)
+    // If envelope greater then threshold consider these nsamples a candidate
+    if (meanenv > 0.1 / 40)
     {
-        memcpy(m_pitchbuffer + m_pitchBufferCounter, m_buffer, sizeof(float) * nsamples);
-        m_pitchBufferCounter += nsamples;
 
-        // Check that the pitch is correct. This step is probably unneccessary if we can increase the order of the filters see comment above in initialize()
-        if (m_pitchBufferCounter >= mInBufSize)
-        {
-            m_pitchBufferCounter = 0;
-
-            m_noteOnOffState=isNoteValid(nsamples);
-        }
         m_noteOnOffState = true;
-        //is_ringing=true;
-
-
-        
-
-        
+        // is_ringing=true;
     }
     else
     {
-        //if (meanenv < 0.05)
+        // if (meanenv < 0.05)
         {
-            m_noteOnOffState = false;        // No candidate or previous note has stopped
-            //m_numSamplesSinceLastOnset = -1; // No note playing
+            m_noteOnOffState = false; // No candidate or previous note has stopped
+            // m_numSamplesSinceLastOnset = -1; // No note playing
             m_meanEnv = 0.0;
             m_meanEnvCounter = 0;
             // is_ringing=false;
@@ -293,13 +234,13 @@ void NoteClassifier::process(int nsamples)
 
 void NoteClassifier::sendMidiNote(int nsamples)
 {
-    if(m_samplesSinceLastChangeOfState>2*nsamples)
+    if (m_samplesSinceLastChangeOfState > 2 * nsamples)
     {
         if (m_noteOnOffState != m_oldNoteOnOffState)
             sendMidiNote(nsamples, m_noteOnOffState);
 
         m_oldNoteOnOffState = m_noteOnOffState;
-        m_samplesSinceLastChangeOfState=0;
+        m_samplesSinceLastChangeOfState = 0;
     }
 }
 

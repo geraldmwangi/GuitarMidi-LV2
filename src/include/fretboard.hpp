@@ -17,11 +17,13 @@
  * Boston, MA  02110-1301  USA
  */
 #pragma once
+#include <time.h>
 #include <noteclassifier.hpp>
 #include <harmonicgroup.hpp>
 #include <memory>
 #include <vector>
 #include <map>
+
 typedef enum
 {
     FRETBOARD_INPUT = 0,

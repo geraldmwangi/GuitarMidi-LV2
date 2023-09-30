@@ -30,7 +30,7 @@
 #include <lv2/urid/urid.h>
 #include <lv2/atom/atom.h>
 #include <lv2/atom/forge.h>
-
+#include <logging.hpp>
 /**
  * @brief MidiOutput abstracts lv2's midi messaging. It needs some debugging
  * 

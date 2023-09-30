@@ -69,12 +69,7 @@ private:
      */
     float m_samplerate;
 
-    /**
-     * @brief mPitchDetector: The pitch detector used to validate the response of the fillters
-     * This validation step is probably not need when we compare the responses of neighboring bands against eachother
-     * 
-     */
-    aubio_pitch_t* mPitchDetector;
+
 
     aubio_onset_t* m_onsetDetector;
 
@@ -96,35 +91,7 @@ private:
     int m_onsetBuffersize;
     string m_onsetMethod;
 
-    /**
-     * @brief m_pitchfreq: The result of the pitch estimator
-     * >
-     */
-    fvec_t* m_pitchfreq;
 
-    /**
-     * @brief m_pitchbuffer: We need to buffer audio for the pitchdetector
-     * 
-     */
-    float* m_pitchbuffer;
-
-    /**
-     * @brief m_pitchBufferCounter: Counter to meassure when m_pitchbuffer is ready to be analysed
-     * 
-     */
-    int m_pitchBufferCounter;
-
-    /**
-     * @brief mInBufSize: size of m_pitchbuffer
-     * 
-     */
-    int mInBufSize;
-
-    /**
-     * @brief mPitchBufferSize: audio buffersize set by the host
-     * 
-     */
-    int mPitchBufferSize;
 
     /**
      * @brief m_bufferSize: audio buffersize set by the host
@@ -195,7 +162,7 @@ public:
      */
     void process(int nsamples);
 
-    bool isNoteValid(int samples);
+
 
     bool getNoteOnOffState()
     {
