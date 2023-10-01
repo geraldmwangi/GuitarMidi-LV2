@@ -17,9 +17,9 @@ cd GuitarMidi-LV2
 git submodule update --init
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=~/.lv2 ..
-make
-make install
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/.lv2 ..
+cmake --build .
+cmake --install .
 ```
 * in ~/.lv2 you should see guitarmidi.lv2
 
@@ -40,6 +40,4 @@ Have fun hopefully.
     should be possible~~ Higher order filters are working, latency is reduced but still perceivable
 * Since a guitar string vibrates with many partial frequencies, it triggers 2-3 harmonic notes (playing A triggers the higher a too )
 * thats why analysis is done only upto the 5th fret
-* to deal with this problem GuitarMidi-LV2 needs a physical model of a vibrating string which predicts the amplitudes of 
-    all partials belonging to one or more vibrating strings in the input audio. This info would help to discern if only one string
-    is being played with all its partials (e.g A) or two strings/notes with overlapping harmonic structure (e.g A and a)
+* I want to look into neural nets to solve the problem of the harmonic notes, help is welcome
