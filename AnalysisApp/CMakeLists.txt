@@ -2,7 +2,8 @@
 #project("GuitarMidiAnalysisApp")
 
 find_package(PkgConfig)
-
+configure_file(${CMAKE_SOURCE_DIR}/src/include/config.hpp.in include/config.hpp)
+include_directories(${PROJECT_BINARY_DIR}/src/include)
 pkg_check_modules (FT freetype2)
 pkg_check_modules (ALSA alsa)
 pkg_check_modules (CURL libcurl)
