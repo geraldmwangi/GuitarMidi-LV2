@@ -26,4 +26,7 @@ if(${BUILD_ANALYSIS_APP})
 add_subdirectory(AnalysisApp)
 endif()
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(debian)
+
 
