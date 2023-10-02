@@ -32,24 +32,33 @@ instantiate(const LV2_Descriptor *descriptor,
 			const char *bundle_path,
 			const LV2_Feature *const *features)
 {
-	LV2_URID_Map *map = NULL;
 
-	int i;
-	const char *missing = lv2_features_query(features,
-											 LV2_LOG__log, &g_logger, false,
-											 LV2_URID__map, &map, true);
-	lv2_log_logger_set_map(&g_logger, map);
-	if (missing)
+	LV2_URID_Map *map = NULL;
+	LV2_Log_Log *log = NULL;
+	printf("Loading plugin\n");
+	for (int i = 0; features[i]; ++i)
 	{
-		lv2_log_error(&g_logger, "Missing feature <%s>\n", missing);
-		return 0;
+		if (!strcmp(features[i]->URI, LV2_URID__map))
+		{
+			map = (LV2_URID_Map *)features[i]->data;
+		}
+		else if (!strcmp(features[i]->URI, LV2_LOG__log))
+		{
+			log = (LV2_Log_Log *)features[i]->data;
+		}
+	}
+	lv2_log_logger_init(&g_logger, map, log);
+	if (!map)
+	{
+		lv2_log_error(&g_logger, "Host does not support urid:map\n");
+		return NULL;
 	}
 #ifdef USE_ELLIPTIC_FILTERS
 	lv2_log_note(&g_logger, "Using elliptic filters");
 #else
 	lv2_log_note(&g_logger, "Using butterworth filters");
 #endif
-		FretBoard *fretboard = new FretBoard(map, rate);
+	FretBoard *fretboard = new FretBoard(map, rate);
 	return (LV2_Handle)fretboard;
 }
 
