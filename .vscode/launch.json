@@ -1,6 +1,63 @@
 {
     "configurations": [
         {
+            "name": "(gdb) Launch Ardour",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/opt/ardour/bin/ardour-5.12.0",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [
+                {
+                    "name": "LIB_DIR",
+                    "value": "/opt/ardour/lib"
+                },
+                {
+                    "name": "ETC_DIR",
+                    "value": "/opt/ardour/etc"
+                },
+                {
+                    "name": "ARDOUR_DLL_PATH",
+                    "value": "/opt/ardour/lib"
+                },
+                {
+                    "name": "ARDOUR_CONFIG_PATH",
+                    "value": "/opt/ardour/etc"
+                },
+                {
+                    "name": "ARDOUR_DATA_PATH",
+                    "value": "/opt/ardour/share"
+                }
+                {
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "/opt/ardour/lib"
+                },
+                {
+                    "name": "BIN_DIR",
+                    "value": "/opt/ardour/bin"
+                },
+                {
+                    "name": "INSTALL_DIR",
+                    "value": "opt/ardour"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "(gdb) Attach",
             "type": "cppdbg",
             "request": "attach",
