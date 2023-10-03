@@ -188,8 +188,8 @@ float NoteClassifier::filterAndComputeMeanEnv(float *buffer, int nsamples, bool 
         // if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
         {
             float absval = fabs(buffer[s]);
-            m_meanEnv += fabs(buffer[s]);
-            // meanenv = (absval > meanenv) ? absval : meanenv;
+            // m_meanEnv += fabs(buffer[s]);
+            m_meanEnv = (absval > m_meanEnv) ? absval : m_meanEnv;
             m_meanEnvCounter++;
         }
     }
@@ -197,7 +197,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float *buffer, int nsamples, bool 
     // if (count)
     //     meanenv /= count;
     // delete [] buffer;
-    return m_meanEnv / m_meanEnvCounter;
+    return m_meanEnv; // / m_meanEnvCounter;
 }
 
 void NoteClassifier::process(int nsamples)
