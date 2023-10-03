@@ -40,7 +40,7 @@ void HarmonicGroup::process(int nsamples)
     {
         int numringing = 0;
         vector<NoteClassifier::Ptr> ringingnotes;
-        int getNumSamplesSinceLastOnset = m_noteClassifiers[0]->getNumSamplesSinceLastOnset();
+
         // if(numSamplesSinceLastOnset>=0)
         {
             for (auto notecl : m_noteClassifiers)

@@ -198,21 +198,20 @@ void FretBoard::process(int nsamples)
     timespec starttimer = timer_start();
 #endif
     m_midioutput->initializeSequence();
-    uint numringing = 0;
+
     for (auto notecl : m_noteClassifiers)
     {
         notecl->process(nsamples);
 
         notecl->setIsRinging(nsamples);
-        if (notecl->getNumSamplesSinceLastOnset() < 2 * nsamples)
-            numringing++;
+
         // notecl->sendMidiNote(nsamples);
     }
 #ifdef WITH_TRACING_INFO
     lv2_log_trace(&g_logger, "Number of Overtonefilters: %ld. time: %ld ", m_noteClassifiers.size(), timer_end(starttimer));
     starttimer = timer_start();
 #endif
-    float fraction_ringing = ((float)numringing) / m_noteClassifiers.size();
+
 
     //  if (fraction_ringing < 0.15)
     for (auto group : m_harmonicGroups)
