@@ -16,6 +16,7 @@ Packages for Debian/Ubuntu are available at https://github.com/geraldmwangi/Guit
 # Usage
 Currently your Host must be running with 256 samples per period at 48KHz (that will change soon). 
 Your guitarsignal should be clean, no distortion of sort. 
+* Tune the guitar to the standard E A D g b e tuning
 * Activate the bridge pickup
 * Set the input gain on the audio interface to 3/4
 * Connect the audio in of the guitarmidi plugin to the channel on your interface, to which you guitar is connected. 
