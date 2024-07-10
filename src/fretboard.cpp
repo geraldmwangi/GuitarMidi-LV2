@@ -70,7 +70,7 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
     // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 415.30,ebw));
     // m_noteClassifiers.push_back(make_shared<NoteClassifier>(map,samplerate, 440,ebw));
 
-    for (int ni = 1; ni <= 4; ni++)
+    for (int ni = 1; ni <= 8; ni++)
     {
         float n = ((float)ni);
         addNoteClassifier(82.41, n, map, samplerate);  // E
