@@ -130,15 +130,16 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
 }
 void FretBoard::addNoteClassifier(float freq, float mult, LV2_URID_Map *map, float samplerate)
 {
-    freq *= mult;
-    if (mult == 1 || freq > 987.77)
+    // freq *= mult;
+    if (mult == 1 || freq*mult > 987.77)
     {
         //Frequencies <100 Hz need higher resolution, so filters with lower bandwidth are applied
-        float bw = (freq<100)?5:10;
+        float bw = (freq*mult<100)?5:10;
 
-        auto notecl = make_shared<NoteClassifier>(map, samplerate, freq, bw);
+        auto notecl = make_shared<NoteClassifier>(map, samplerate, freq*mult, bw);
         m_noteClassifiers.push_back(notecl);
-        m_harmonicGroups[freq] = make_shared<HarmonicGroup>();
+        if (mult==1)
+            m_harmonicGroups[freq] = make_shared<HarmonicGroup>();
         m_harmonicGroups[freq]->addNoteClassifier(notecl);
     }
 }
@@ -218,6 +219,26 @@ void FretBoard::process(int nsamples)
     {
         group.second->process(nsamples);
     }
+
+    if((*m_polyphonic_detection)==false){
+        bool block_higher=false;
+        for (auto group : m_harmonicGroups){
+            if (!block_higher){
+                block_higher=group.second->m_wantToSendMidiStatus;
+            }
+            else{
+                group.second->m_wantToSendMidiStatus=false;
+            }
+        }
+
+    }
+
+    for (auto group : m_harmonicGroups)
+    {
+        group.second->sendMidi(nsamples);
+    }
+
+
 #ifdef WITH_TRACING_INFO
     lv2_log_trace(&g_logger, "Group processing: %ld \n", timer_end(starttimer));
 #endif

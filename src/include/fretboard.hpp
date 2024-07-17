@@ -28,7 +28,8 @@ typedef enum
 {
     FRETBOARD_INPUT = 0,
     FRETBOARD_OUTPUT = 1,
-    FRETBOARD_MIDIOUTPUT=2
+    FRETBOARD_MIDIOUTPUT=2,
+    FRETBOARD_POLYPHONIC_TOGGLE=3,  
 } PortIndex;
 using namespace std;
 
@@ -41,11 +42,12 @@ class FretBoard
 {
 private:
 
+    float* m_polyphonic_detection;
     /**
      * @brief m_noteClassifiers: The filterbank
      * 
      */
-
+    
 
     vector<shared_ptr<NoteClassifier>> m_noteClassifiers;
 
@@ -63,6 +65,10 @@ public:
      * @param samplerate 
      */
     FretBoard(LV2_URID_Map *map, float samplerate);
+
+    void setPolyPhonicSwitch(float* polyphonic){
+        m_polyphonic_detection=polyphonic;
+    }
 
 
     /**

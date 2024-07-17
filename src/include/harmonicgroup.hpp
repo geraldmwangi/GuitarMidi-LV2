@@ -7,7 +7,8 @@ class HarmonicGroup
 {
     private:
     vector<shared_ptr<NoteClassifier> > m_noteClassifiers;
-    bool m_oldState;
+    
+    bool m_oldMidiSentStatus;
     float* m_buffer;
     int m_bufferSize;
     public:
@@ -20,6 +21,9 @@ class HarmonicGroup
 
     void process(int nsamples);
 
+    void sendMidi(int nsamples);
+    
+    bool m_wantToSendMidiStatus;
 
 
 

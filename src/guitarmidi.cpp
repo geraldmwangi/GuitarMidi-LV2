@@ -81,6 +81,9 @@ connect_port(LV2_Handle instance,
 	case FRETBOARD_MIDIOUTPUT:
 		fretboard->setMidiOutput((LV2_Atom_Sequence *)data);
 		break;
+	case FRETBOARD_POLYPHONIC_TOGGLE:
+		fretboard->setPolyPhonicSwitch((float *)data);
+		break;
 	}
 }
 

@@ -2,7 +2,8 @@
 
 HarmonicGroup::HarmonicGroup()
 {
-    m_oldState = false;
+    m_wantToSendMidiStatus = false;
+    m_oldMidiSentStatus=m_wantToSendMidiStatus;
     m_bufferSize=256;
     m_buffer=new float[m_bufferSize];
     audioBuffer=nullptr;
@@ -85,10 +86,10 @@ void HarmonicGroup::process(int nsamples)
                 if (audioBuffer != nullptr)
                     for (int s = 0; s < nsamples; s++)
                         audioBuffer[s] = m_buffer[s];
-                if (!m_oldState&&!m_noteClassifiers[0]->block_midinote)
+                if (!m_wantToSendMidiStatus&&!m_noteClassifiers[0]->block_midinote)
                 {
-                    m_noteClassifiers[0]->sendMidiNote(nsamples, true);
-                    m_oldState = true;
+                    //m_noteClassifiers[0]->sendMidiNote(nsamples, true);
+                    m_wantToSendMidiStatus = true;
                     // for(auto ncl:ringingnotes)
                     //     cout<<"Freq: "<<ncl->getCenterFrequency()<<"Numsamples: "<<ncl->getNumSamplesSinceLastChangeOfState()<<endl;
                     // cout<<"partials: "<<numringing<<endl;
@@ -97,20 +98,30 @@ void HarmonicGroup::process(int nsamples)
             }
             else
             {
-                if (m_oldState)
+                if (m_wantToSendMidiStatus)
                 {
-                    m_noteClassifiers[0]->sendMidiNote(nsamples, false);
-                    m_oldState = false;
+                    //m_noteClassifiers[0]->sendMidiNote(nsamples, false);
+                    m_wantToSendMidiStatus = false;
                     //  cout<<"Note off: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
                     //  cout<<"note off partials: "<<numringing<<endl;
                 }
             }
         }
     }
-    else if (m_oldState)
+    else if (m_wantToSendMidiStatus)
     {
-        m_noteClassifiers[0]->sendMidiNote(nsamples, false);
-        m_oldState = false;
+        //m_noteClassifiers[0]->sendMidiNote(nsamples, false);
+        m_wantToSendMidiStatus = false;
         // cout<<"Note off: "<<m_noteClassifiers[0]->getCenterFrequency()<<endl;
     }
+}
+
+void HarmonicGroup::sendMidi(int nsamples)
+{
+    if(m_oldMidiSentStatus!=m_wantToSendMidiStatus)
+    {
+        m_noteClassifiers[0]->sendMidiNote(nsamples, m_wantToSendMidiStatus);
+        m_oldMidiSentStatus=m_wantToSendMidiStatus;
+    }
+    
 }
