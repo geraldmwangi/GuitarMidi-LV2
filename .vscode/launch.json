@@ -131,7 +131,7 @@
         "name": "(gdb) Launch jalv",
         "type": "cppdbg",
         "request": "launch",
-        "program": "/usr/bin/jalv",
+        "program": "/usr/bin/jalv.gtk",
         "args": [
             "http://github.com/geraldmwangi/GuitarMidi-LV2"
         ],

@@ -20,6 +20,10 @@ class HarmonicGroup
 
     void process(int nsamples);
 
+    bool getState(){
+        return m_oldState;
+    }
+
 
 
 

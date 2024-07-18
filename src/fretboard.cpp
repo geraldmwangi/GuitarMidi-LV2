@@ -214,9 +214,18 @@ void FretBoard::process(int nsamples)
 
 
     //  if (fraction_ringing < 0.15)
-    for (auto group : m_harmonicGroups)
-    {
-        group.second->process(nsamples);
+    if(*m_polyphonic_detection==1)
+        for (auto group : m_harmonicGroups)
+        {
+            group.second->process(nsamples);
+        }
+    else{
+        for (auto group : m_harmonicGroups)
+        {
+            group.second->process(nsamples);
+            if(group.second->getState())
+                break;
+        }       
     }
 #ifdef WITH_TRACING_INFO
     lv2_log_trace(&g_logger, "Group processing: %ld \n", timer_end(starttimer));
