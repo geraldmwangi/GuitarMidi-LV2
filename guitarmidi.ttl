@@ -23,7 +23,7 @@
 	lv2:project <http://lv2plug.in/ns/lv2> ;
 	doap:name "Guitar Midi";
 	doap:license <http://opensource.org/licenses/isc> ;
-	# lv2:optionalFeature lv2:hardRTCapable ;
+	lv2:optionalFeature lv2:hardRTCapable ;
 	lv2:port [
 		a lv2:AudioPort ,
 			lv2:InputPort ;

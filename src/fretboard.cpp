@@ -120,28 +120,45 @@ FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
         addNoteClassifier(987.77, n, map, samplerate);
     }
 
-    for (auto group : m_harmonicGroups)
-    {
-        for (auto notecl : m_noteClassifiers)
-        {
-            group.second->addNoteClassifier(notecl);
-        }
-    }
+    // for (auto group : m_harmonicGroups)
+    // {
+    //     for (auto notecl : m_noteClassifiers)
+    //     {
+    //         group.second->addNoteClassifier(notecl);
+    //     }
+    // }
 }
+// void FretBoard::addNoteClassifier(float freq, float mult, LV2_URID_Map *map, float samplerate)
+// {
+//     freq *= mult;
+//     if (mult == 1 || freq > 987.77)
+//     {
+//         //Frequencies <100 Hz need higher resolution, so filters with lower bandwidth are applied
+//         float bw = (freq<100)?5:10;
+
+//         auto notecl = make_shared<NoteClassifier>(map, samplerate, freq, bw);
+//         m_noteClassifiers.push_back(notecl);
+//         m_harmonicGroups[freq] = make_shared<HarmonicGroup>();
+//         m_harmonicGroups[freq]->addNoteClassifier(notecl);
+//     }
+// }
+
 void FretBoard::addNoteClassifier(float freq, float mult, LV2_URID_Map *map, float samplerate)
 {
-    freq *= mult;
-    if (mult == 1 || freq > 987.77)
-    {
-        //Frequencies <100 Hz need higher resolution, so filters with lower bandwidth are applied
-        float bw = (freq<100)?5:10;
-
-        auto notecl = make_shared<NoteClassifier>(map, samplerate, freq, bw);
-        m_noteClassifiers.push_back(notecl);
+    if (mult==1){
         m_harmonicGroups[freq] = make_shared<HarmonicGroup>();
-        m_harmonicGroups[freq]->addNoteClassifier(notecl);
     }
+    float f_mult=freq * mult;
+    // Frequencies <100 Hz need higher resolution, so filters with lower bandwidth are applied
+    float bw = (f_mult < 120) ? 2.5 : 5;
+    bw = (f_mult > 200) ? 10: 5;
+
+    auto notecl = make_shared<NoteClassifier>(map, samplerate, f_mult, bw);
+    m_noteClassifiers.push_back(notecl);
+    m_harmonicGroups[freq]->addNoteClassifier(notecl);
 }
+
+
 void FretBoard::setAudioInput(const float *input)
 {
     for (auto notecl : m_noteClassifiers)

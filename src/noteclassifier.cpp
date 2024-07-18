@@ -68,7 +68,7 @@ void NoteClassifier::resetFilterAndOnsetDetector()
     aubio_onset_set_compression(m_onsetDetector, m_onsetCompression);
 #endif
 #ifdef USE_ELLIPTIC_FILTERS
-    m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+    m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 18.0);
 #else
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth);
 #endif
@@ -81,7 +81,7 @@ void NoteClassifier::setFilterParameters(float bandwidth, float passbandatten, i
 
     m_filter.reset();
 #ifdef USE_ELLIPTIC_FILTERS
-    m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 15.0);
+    m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 18.0);
 #else
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth);
 #endif
