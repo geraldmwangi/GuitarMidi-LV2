@@ -37,7 +37,8 @@ void HarmonicGroup::process(int nsamples)
     if (m_noteClassifiers[0]->getCenterFrequency() < 987.77&&(!m_noteClassifiers[0]->block_midinote))//&&m_noteClassifiers[0]->is_ringing)
     {
         int numringing = 0;
-     
+            vector<float> diff_freq;
+        float last_freq=-1;
 
         // if(numSamplesSinceLastOnset>=0)
         {
@@ -56,6 +57,15 @@ void HarmonicGroup::process(int nsamples)
                     // }
                     if(notecl->is_ringing)
                     {
+                        if(last_freq==-1){
+                            last_freq=notecl->getCenterFrequency();
+                        }
+                        else{
+                            float diff=notecl->getCenterFrequency()-last_freq;
+                            diff_freq.push_back(diff);
+                            last_freq=notecl->getCenterFrequency();
+                        }
+
                         numringing+=notecl->is_ringing;
 
                         for(int s=0;s<nsamples;s++)
@@ -83,10 +93,15 @@ void HarmonicGroup::process(int nsamples)
       
             
             // numringing *= m_noteClassifiers[0]->is_ringing;
-            if(max>0.01&&m_noteClassifiers[0]->is_ringing&&numringing >= 2)//if (numringing > 2&&max>0.1)
-            {
+            //if(max>0.01&&m_noteClassifiers[0]->is_ringing&&numringing >= 2)//
 
-                if (!m_oldState&&!m_noteClassifiers[0]->block_midinote)
+
+            if (numringing > 2&&max>0.01)
+            {
+                sort(diff_freq.begin(), diff_freq.end());
+                float diff = diff_freq[diff_freq.size() / 2];
+
+                if (!m_oldState && !m_noteClassifiers[0]->block_midinote && diff == m_noteClassifiers[0]->getCenterFrequency())
                 {
                     m_noteClassifiers[0]->sendMidiNote(nsamples, true);
                     m_oldState = true;
@@ -95,7 +110,6 @@ void HarmonicGroup::process(int nsamples)
                     // cout<<"partials: "<<numringing<<endl;
                     // cout<<"max: "<<max<<endl;
                 }
-                
             }
             else
             {
