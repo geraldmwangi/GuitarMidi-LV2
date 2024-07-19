@@ -24,7 +24,13 @@ class HarmonicGroup
         return m_oldState;
     }
 
+    void block_midi(){
+        m_noteClassifiers[0]->block_midinote=true;
+    }
 
+    void unblock_midi(){
+        m_noteClassifiers[0]->block_midinote=false;
+    }
 
 
 

@@ -17,6 +17,8 @@
  * Boston, MA  02110-1301  USA
  */
 #include <fretboard.hpp>
+#include <omp.h>
+
 using namespace GuitarMidi;
 FretBoard::FretBoard(LV2_URID_Map *map, float samplerate)
 {
@@ -193,6 +195,7 @@ void FretBoard::initialize()
 {
     if (m_midioutput)
         m_midioutput->initializeSequence();
+    omp_set_num_threads(1);
     for (auto notecl : m_noteClassifiers)
     {
         notecl->initialize();
@@ -215,17 +218,18 @@ void FretBoard::process(int nsamples)
     timespec starttimer = timer_start();
 #endif
     m_midioutput->initializeSequence();
-
-    for (auto notecl : m_noteClassifiers)
+// #pragma omp parallel for 
+    for (int n=0;n<m_noteClassifiers.size();n++)
     {
+        auto notecl=m_noteClassifiers[n];
         notecl->process(nsamples);
 
-        notecl->setIsRinging(nsamples);
+       
 
         // notecl->sendMidiNote(nsamples);
     }
 #ifdef WITH_TRACING_INFO
-    lv2_log_trace(&g_logger, "Number of Overtonefilters: %ld. time: %ld ", m_noteClassifiers.size(), timer_end(starttimer));
+    lv2_log_trace(&g_logger, "Number of Overtonefilters: %ld. time: %ld\n ", m_noteClassifiers.size(), timer_end(starttimer));
     starttimer = timer_start();
 #endif
 
@@ -237,11 +241,14 @@ void FretBoard::process(int nsamples)
             group.second->process(nsamples);
         }
     else{
+        bool block_higher=false;
         for (auto group : m_harmonicGroups)
         {
+            if (block_higher)
+                group.second->block_midi();
             group.second->process(nsamples);
             if(group.second->getState())
-                break;
+                block_higher=true;
         }       
     }
 #ifdef WITH_TRACING_INFO

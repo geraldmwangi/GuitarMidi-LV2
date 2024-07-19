@@ -5,6 +5,8 @@ include_directories(${PROJECT_BINARY_DIR}/src/include)
 include_directories(/usr/include)
 include_directories(include)
 find_package(PkgConfig REQUIRED)
+
+find_package(OpenMP REQUIRED)
 pkg_check_modules(Pango REQUIRED pango)
 
 set(SRC guitarmidi.cpp  noteclassifier.cpp midioutput.cpp fretboard.cpp harmonicgroup.cpp logging.cpp)
@@ -15,7 +17,8 @@ message("Building with onset support")
 target_link_libraries(guitarmidi dsp aubio ${Pango_LIBRARIES})
 else()
 message("Building without onset support")
-target_link_libraries(guitarmidi dsp  ${Pango_LIBRARIES})
+target_link_libraries(guitarmidi PUBLIC dsp  ${Pango_LIBRARIES} )
+target_link_libraries(guitarmidi PUBLIC OpenMP::OpenMP_CXX )
 endif()
 
 install(TARGETS guitarmidi

@@ -81,6 +81,7 @@ private:
     int m_numSamplesSinceLastOnset;
 #endif
 
+    float m_currentMeanEnv;
     float m_meanEnv;
     int m_meanEnvCounter;
 
@@ -165,7 +166,7 @@ public:
     float getMeanEnv()
     {
         if (m_meanEnvCounter)
-            return m_meanEnv / m_meanEnvCounter;
+            return m_currentMeanEnv / m_meanEnvCounter;
         else
             return 0.0;
     }

@@ -101,7 +101,8 @@ void NoteClassifier::initialize()
     if (m_bufferSize)
         m_buffer = new float[m_bufferSize];
 
-    m_meanEnv = 0;
+    m_currentMeanEnv = 0;
+    m_meanEnv=0;
     m_meanEnvCounter = 0;
 }
 
@@ -139,13 +140,13 @@ float NoteClassifier::filterAndComputeMeanEnv(float *buffer, int nsamples, bool 
     //         // buffer[s+2] *= 2;
     //     }
 
-#ifdef WITH_TRACING_INFO
-    timespec starttime = timer_start();
-#endif
+// #ifdef WITH_TRACING_INFO
+//     timespec starttime = timer_start();
+// #endif
     m_filter.process(nsamples, &buffer);
-#ifdef WITH_TRACING_INFO
-    lv2_log_trace(&g_logger, "Single overtone filtering: %ld ", timer_end(starttime));
-#endif
+// #ifdef WITH_TRACING_INFO
+//     lv2_log_trace(&g_logger, "Single overtone filtering: %ld \n", timer_end(starttime));
+// #endif
     float meanenv = 0;
     int count = 0;
 #ifdef WITH_AUBIO
@@ -156,13 +157,13 @@ float NoteClassifier::filterAndComputeMeanEnv(float *buffer, int nsamples, bool 
         onsinput.data = (smpl_t *)buffer;
         onsinput.length = nsamples;
 
-#ifdef WITH_TRACING_INFO
-        starttime = timer_start();
-#endif
+// #ifdef WITH_TRACING_INFO
+//         starttime = timer_start();
+// #endif
         aubio_onset_do(m_onsetDetector, &onsinput, ons);
-#ifdef WITH_TRACING_INFO
-        lv2_log_trace(&g_logger, "onset: %ld\n", timer_end(starttime));
-#endif
+// #ifdef WITH_TRACING_INFO
+//         lv2_log_trace(&g_logger, "onset: %ld\n", timer_end(starttime));
+// #endif
 
         bool onsdetected = *(*ons).data > 0.0;
         if (onsetdetected)
@@ -189,7 +190,12 @@ float NoteClassifier::filterAndComputeMeanEnv(float *buffer, int nsamples, bool 
     int period_samples = period * m_samplerate;
     if (m_meanEnvCounter > period_samples)
     {
-        m_meanEnv = 0;
+        m_meanEnv=m_currentMeanEnv;
+        // if(floor(m_centerfreq)==82)
+        // {
+        //     lv2_log_trace(&g_logger, "current mean env %f\n",m_meanEnv);
+        // }
+        m_currentMeanEnv = 0;
         m_meanEnvCounter = 0;
     }
     for (int s = 0; s < (nsamples); s++)
@@ -198,7 +204,7 @@ float NoteClassifier::filterAndComputeMeanEnv(float *buffer, int nsamples, bool 
         {
             float absval = fabs(buffer[s]);
             // m_meanEnv += fabs(buffer[s]);
-            m_meanEnv = (absval > m_meanEnv) ? absval : m_meanEnv;
+            m_currentMeanEnv = (absval > m_currentMeanEnv) ? absval : m_currentMeanEnv;
             m_meanEnvCounter++;
         }
     }
@@ -221,7 +227,7 @@ void NoteClassifier::process(int nsamples)
     float meanenv = filterAndComputeMeanEnv(m_buffer, nsamples);
 
     // If envelope greater then threshold consider these nsamples a candidate
-    if (meanenv > 0.1 / 40)
+    if (meanenv > 0.005)
     {
 
         m_noteOnOffState = true;
@@ -233,12 +239,34 @@ void NoteClassifier::process(int nsamples)
         {
             m_noteOnOffState = false; // No candidate or previous note has stopped
             // m_numSamplesSinceLastOnset = -1; // No note playing
-            m_meanEnv = 0.0;
-            m_meanEnvCounter = 0;
+            // m_currentMeanEnv = 0.0;
+            // m_meanEnvCounter = 0;
             // is_ringing=false;
             // m_samplesSinceLastChangeOfState=0;
         }
     }
+
+    setIsRinging(nsamples);
+
+    if(m_noteOnOffState){
+        // small check
+        int ring_time_max_s = 2;
+        float sample_t=1.0/m_samplerate;
+        float ring_time_s=sample_t*m_samplesSinceLastChangeOfState;
+
+        if (ring_time_s>=ring_time_max_s){
+            lv2_log_trace(&g_logger, "WARNING Max ring time at freq: %lf. time: %lf\n ",m_centerfreq,ring_time_s);
+        }
+
+    }
+
+    float jitter=m_samplesSinceLastChangeOfState/nsamples;
+
+    // if(jitter<10){
+    //     lv2_log_trace(&g_logger, "WARNING JITTER at freq: %lf. jitter: %lf\n ",m_centerfreq,jitter);
+    // }
+
+
 }
 
 void NoteClassifier::sendMidiNote(int nsamples)

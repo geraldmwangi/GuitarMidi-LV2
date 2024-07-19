@@ -7,7 +7,7 @@
             "program": "/opt/ardour/bin/ardour-5.12.0",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [
                 {
                     "name": "LIB_DIR",
@@ -84,7 +84,7 @@
             "program": "${workspaceFolder}/build/AnalysisApp/GuitarMidiAnalysisApp",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -110,7 +110,7 @@
                 "http://github.com/geraldmwangi/TestMidi"
             ],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -136,7 +136,7 @@
             "http://github.com/geraldmwangi/GuitarMidi-LV2"
         ],
         "stopAtEntry": false,
-        "cwd": "${fileDirname}",
+        "cwd": "${workspaceFolder}",
         "environment": [],
         "externalConsole": false,
         "MIMode": "gdb",
