@@ -18,17 +18,24 @@ Currently your Host must be running with 256 samples per period at 48KHz (that w
 Your guitarsignal should be clean, no distortion of sort. 
 * Tune the guitar to the standard E A D g b e tuning
 * Activate the bridge pickup
-* Set the input gain on the audio interface to 3/4
+* Set the input gain on the audio interface to 1/4
 * Connect the audio in of the guitarmidi plugin to the channel on your interface, to which you guitar is connected. 
 * connect the midi out of guitarmidi to a synth plugin 
 * first play single notes, adjust the input gain to improve tracking
-* successivly play more strings
+* successivly play more strings (in polyphonic mode)
+
+### Monophonic mode
+By default the plugin operates in monophonic mode. 
+You can play a chord and the plugin will try to track lowest string played. 
+
+### Polyphonic mode
+In this mode the plugin tracks all strings played
 
 ## Tips
 GuitarMidi doesnt handle the attack phase of the guitar, it blows out a bunch of notes in that phase.
 To overcome this increase the attack time in the synth.
 Second, while the tracking of the bass strings E and A does work, it absolutely is not perfect.
-Playing full chords on all 6 strings doesnt work well due to the tracking on E and A string. So try a rather 'John Frusciante' style, playing on the upper strings D,g,b,e. That works somewhat well for me.
+Playing full chords on all 6 strings doesnt work well in polyphonic mode due to the tracking on E and A string. So try a rather 'John Frusciante' style, playing on the upper strings D,g,b,e. That works somewhat well for me.
 
 
 ### Current Bugs and missing things

@@ -254,9 +254,9 @@ void NoteClassifier::process(int nsamples)
         float sample_t=1.0/m_samplerate;
         float ring_time_s=sample_t*m_samplesSinceLastChangeOfState;
 
-        if (ring_time_s>=ring_time_max_s){
-            lv2_log_trace(&g_logger, "WARNING Max ring time at freq: %lf. time: %lf\n ",m_centerfreq,ring_time_s);
-        }
+        // if (ring_time_s>=ring_time_max_s){
+        //     lv2_log_trace(&g_logger, "WARNING Max ring time at freq: %lf. time: %lf\n ",m_centerfreq,ring_time_s);
+        // }
 
     }
 
