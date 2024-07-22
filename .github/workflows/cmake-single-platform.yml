@@ -18,15 +18,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3  # Use the checkout action to clone the repository
 
-    # Step 2: Set up CMake
-    - name: Set up CMake
-      uses: lukka/get-cmake@v3  # Use the lukka/get-cmake action to install CMake
+    # # Step 2: Set up CMake
+    # - name: Set up CMake
+    #   uses: threeal/cmake-action@main
 
     # Step 3: Install dependencies
     - name: Install dependencies
       run: |
         sudo apt-get update  # Update the package list
-        sudo apt-get install -y \
+        sudo apt-get install -y cmake\
           pango1.0-tools \  # Install Pango tools
           libpango1.0-dev \  # Install Pango development libraries
           pkg-config \  # Install pkg-config
