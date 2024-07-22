@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.1.6
+  Created with Projucer version: 8.0.0
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
+  Copyright (c) - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -22,20 +22,23 @@
 
 #include "WaveFileView.h"
 
+
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-WaveFileView::WaveFileView()
+WaveFileView::WaveFileView ()
     : m_thumbnailCache(1), m_thumbnail(512, m_formatManager, m_thumbnailCache)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
+
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize(600, 400);
+    setSize (600, 400);
+
 
     //[Constructor] You can add your own custom stuff here..
     m_formatManager.registerBasicFormats();
@@ -63,12 +66,14 @@ WaveFileView::~WaveFileView()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
+
+
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void WaveFileView::paint(juce::Graphics &g)
+void WaveFileView::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
@@ -97,25 +102,25 @@ void WaveFileView::resized()
     //[/UserResized]
 }
 
-void WaveFileView::mouseMove(const juce::MouseEvent &e)
+void WaveFileView::mouseMove (const juce::MouseEvent& e)
 {
     //[UserCode_mouseMove] -- Add your code here...
     //[/UserCode_mouseMove]
 }
 
-void WaveFileView::mouseEnter(const juce::MouseEvent &e)
+void WaveFileView::mouseEnter (const juce::MouseEvent& e)
 {
     //[UserCode_mouseEnter] -- Add your code here...
     //[/UserCode_mouseEnter]
 }
 
-void WaveFileView::mouseExit(const juce::MouseEvent &e)
+void WaveFileView::mouseExit (const juce::MouseEvent& e)
 {
     //[UserCode_mouseExit] -- Add your code here...
     //[/UserCode_mouseExit]
 }
 
-void WaveFileView::mouseDown(const juce::MouseEvent &e)
+void WaveFileView::mouseDown (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
     std::cout << "WaveFileView::mouseDown" << std::endl;
@@ -150,7 +155,7 @@ void WaveFileView::mouseDown(const juce::MouseEvent &e)
     //[/UserCode_mouseDown]
 }
 
-void WaveFileView::mouseDrag(const juce::MouseEvent &e)
+void WaveFileView::mouseDrag (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
     std::cout << "WaveFileView::mouseDrag" << std::endl;
@@ -184,7 +189,7 @@ void WaveFileView::mouseDrag(const juce::MouseEvent &e)
     //[/UserCode_mouseDrag]
 }
 
-void WaveFileView::mouseUp(const juce::MouseEvent &e)
+void WaveFileView::mouseUp (const juce::MouseEvent& e)
 {
     //[UserCode_mouseUp] -- Add your code here...
 
@@ -193,6 +198,8 @@ void WaveFileView::mouseUp(const juce::MouseEvent &e)
     repaint();
     //[/UserCode_mouseUp]
 }
+
+
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void WaveFileView::changeListenerCallback(juce::ChangeBroadcaster *source)
@@ -216,6 +223,7 @@ juce::AudioSampleBuffer WaveFileView::getAudioBuffer()
     return res;
 }
 //[/MiscUserCode]
+
 
 //==============================================================================
 #if 0
@@ -246,5 +254,7 @@ END_JUCER_METADATA
 */
 #endif
 
+
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

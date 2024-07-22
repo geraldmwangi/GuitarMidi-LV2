@@ -1,21 +1,33 @@
 /*
   ==============================================================================
 
-   This file is part of the JUCE library.
-   Copyright (c) 2020 - Raw Material Software Limited
+   This file is part of the JUCE framework.
+   Copyright (c) Raw Material Software Limited
 
-   JUCE is an open source library subject to commercial or open-source
+   JUCE is an open source framework subject to commercial or open source
    licensing.
 
-   The code included in this file is provided under the terms of the ISC license
-   http://www.isc.org/downloads/software-support-policy/isc-license. Permission
-   To use, copy, modify, and/or distribute this software for any purpose with or
-   without fee is hereby granted provided that the above copyright notice and
-   this permission notice appear in all copies.
+   By downloading, installing, or using the JUCE framework, or combining the
+   JUCE framework with any other source code, object code, content or any other
+   copyrightable work, you agree to the terms of the JUCE End User Licence
+   Agreement, and all incorporated terms including the JUCE Privacy Policy and
+   the JUCE Website Terms of Service, as applicable, which will bind you. If you
+   do not agree to the terms of these agreements, we will not license the JUCE
+   framework to you, and you must discontinue the installation or download
+   process and cease use of the JUCE framework.
 
-   JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
-   EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
-   DISCLAIMED.
+   JUCE End User Licence Agreement: https://juce.com/legal/juce-8-licence/
+   JUCE Privacy Policy: https://juce.com/juce-privacy-policy
+   JUCE Website Terms of Service: https://juce.com/juce-website-terms-of-service/
+
+   Or:
+
+   You may also use this code under the terms of the AGPLv3:
+   https://www.gnu.org/licenses/agpl-3.0.en.html
+
+   THE JUCE FRAMEWORK IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL
+   WARRANTIES, WHETHER EXPRESSED OR IMPLIED, INCLUDING WARRANTY OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED.
 
   ==============================================================================
 */
@@ -938,15 +950,13 @@ namespace
        #if JUCE_USE_VDSP_FRAMEWORK
         vDSP_vabs ((float*) src, 1, dest, 1, (vDSP_Length) num);
        #else
-        FloatVectorHelpers::signMask32 signMask;
+        [[maybe_unused]] FloatVectorHelpers::signMask32 signMask;
         signMask.i = 0x7fffffffUL;
         JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
                                       Mode::bit_and (s, mask),
                                       JUCE_LOAD_SRC,
                                       JUCE_INCREMENT_SRC_DEST,
                                       const Mode::ParallelType mask = Mode::load1 (signMask.f);)
-
-        ignoreUnused (signMask);
        #endif
     }
 
@@ -956,7 +966,7 @@ namespace
        #if JUCE_USE_VDSP_FRAMEWORK
         vDSP_vabsD ((double*) src, 1, dest, 1, (vDSP_Length) num);
        #else
-        FloatVectorHelpers::signMask64 signMask;
+        [[maybe_unused]] FloatVectorHelpers::signMask64 signMask;
         signMask.i = 0x7fffffffffffffffULL;
 
         JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
@@ -964,8 +974,6 @@ namespace
                                       JUCE_LOAD_SRC,
                                       JUCE_INCREMENT_SRC_DEST,
                                       const Mode::ParallelType mask = Mode::load1 (signMask.d);)
-
-        ignoreUnused (signMask);
        #endif
     }
 
@@ -1177,245 +1185,245 @@ namespace
 
 //==============================================================================
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::clear (FloatType* dest,
-                                                                                   CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::clear (FloatType* dest,
+                                                                           CountType numValues) noexcept
 {
     FloatVectorHelpers::clear (dest, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::fill (FloatType* dest,
-                                                                                  FloatType valueToFill,
-                                                                                  CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::fill (FloatType* dest,
+                                                                          FloatType valueToFill,
+                                                                          CountType numValues) noexcept
 {
     FloatVectorHelpers::fill (dest, valueToFill, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::copy (FloatType* dest,
-                                                                                  const FloatType* src,
-                                                                                  CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::copy (FloatType* dest,
+                                                                          const FloatType* src,
+                                                                          CountType numValues) noexcept
 {
     memcpy (dest, src, (size_t) numValues * sizeof (FloatType));
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::copyWithMultiply (FloatType* dest,
-                                                                                              const FloatType* src,
-                                                                                              FloatType multiplier,
-                                                                                              CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::copyWithMultiply (FloatType* dest,
+                                                                                      const FloatType* src,
+                                                                                      FloatType multiplier,
+                                                                                      CountType numValues) noexcept
 {
     FloatVectorHelpers::copyWithMultiply (dest, src, multiplier, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::add (FloatType* dest,
-                                                                                 FloatType amountToAdd,
-                                                                                 CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::add (FloatType* dest,
+                                                                         FloatType amountToAdd,
+                                                                         CountType numValues) noexcept
 {
     FloatVectorHelpers::add (dest, amountToAdd, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::add (FloatType* dest,
-                                                                                 const FloatType* src,
-                                                                                 FloatType amount,
-                                                                                 CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::add (FloatType* dest,
+                                                                         const FloatType* src,
+                                                                         FloatType amount,
+                                                                         CountType numValues) noexcept
 {
     FloatVectorHelpers::add (dest, src, amount, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::add (FloatType* dest,
-                                                                                 const FloatType* src,
-                                                                                 CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::add (FloatType* dest,
+                                                                         const FloatType* src,
+                                                                         CountType numValues) noexcept
 {
     FloatVectorHelpers::add (dest, src, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::add (FloatType* dest,
-                                                                                 const FloatType* src1,
-                                                                                 const FloatType* src2,
-                                                                                 CountType num) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::add (FloatType* dest,
+                                                                         const FloatType* src1,
+                                                                         const FloatType* src2,
+                                                                         CountType num) noexcept
 {
     FloatVectorHelpers::add (dest, src1, src2, num);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::subtract (FloatType* dest,
-                                                                                      const FloatType* src,
-                                                                                      CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::subtract (FloatType* dest,
+                                                                              const FloatType* src,
+                                                                              CountType numValues) noexcept
 {
     FloatVectorHelpers::subtract (dest, src, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::subtract (FloatType* dest,
-                                                                                      const FloatType* src1,
-                                                                                      const FloatType* src2,
-                                                                                      CountType num) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::subtract (FloatType* dest,
+                                                                              const FloatType* src1,
+                                                                              const FloatType* src2,
+                                                                              CountType num) noexcept
 {
     FloatVectorHelpers::subtract (dest, src1, src2, num);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::addWithMultiply (FloatType* dest,
-                                                                                             const FloatType* src,
-                                                                                             FloatType multiplier,
-                                                                                             CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::addWithMultiply (FloatType* dest,
+                                                                                     const FloatType* src,
+                                                                                     FloatType multiplier,
+                                                                                     CountType numValues) noexcept
 {
     FloatVectorHelpers::addWithMultiply (dest, src, multiplier, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::addWithMultiply (FloatType* dest,
-                                                                                             const FloatType* src1,
-                                                                                             const FloatType* src2,
-                                                                                             CountType num) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::addWithMultiply (FloatType* dest,
+                                                                                     const FloatType* src1,
+                                                                                     const FloatType* src2,
+                                                                                     CountType num) noexcept
 {
     FloatVectorHelpers::addWithMultiply (dest, src1, src2, num);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::subtractWithMultiply (FloatType* dest,
-                                                                                                  const FloatType* src,
-                                                                                                  FloatType multiplier,
-                                                                                                  CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::subtractWithMultiply (FloatType* dest,
+                                                                                          const FloatType* src,
+                                                                                          FloatType multiplier,
+                                                                                          CountType numValues) noexcept
 {
     FloatVectorHelpers::subtractWithMultiply (dest, src, multiplier, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::subtractWithMultiply (FloatType* dest,
-                                                                                                  const FloatType* src1,
-                                                                                                  const FloatType* src2,
-                                                                                                  CountType num) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::subtractWithMultiply (FloatType* dest,
+                                                                                          const FloatType* src1,
+                                                                                          const FloatType* src2,
+                                                                                          CountType num) noexcept
 {
     FloatVectorHelpers::subtractWithMultiply (dest, src1, src2, num);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::multiply (FloatType* dest,
-                                                                                      const FloatType* src,
-                                                                                      CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::multiply (FloatType* dest,
+                                                                              const FloatType* src,
+                                                                              CountType numValues) noexcept
 {
     FloatVectorHelpers::multiply (dest, src, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::multiply (FloatType* dest,
-                                                                                      const FloatType* src1,
-                                                                                      const FloatType* src2,
-                                                                                      CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::multiply (FloatType* dest,
+                                                                              const FloatType* src1,
+                                                                              const FloatType* src2,
+                                                                              CountType numValues) noexcept
 {
     FloatVectorHelpers::multiply (dest, src1, src2, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::multiply (FloatType* dest,
-                                                                                      FloatType multiplier,
-                                                                                      CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::multiply (FloatType* dest,
+                                                                              FloatType multiplier,
+                                                                              CountType numValues) noexcept
 {
     FloatVectorHelpers::multiply (dest, multiplier, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::multiply (FloatType* dest,
-                                                                                      const FloatType* src,
-                                                                                      FloatType multiplier,
-                                                                                      CountType num) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::multiply (FloatType* dest,
+                                                                              const FloatType* src,
+                                                                              FloatType multiplier,
+                                                                              CountType num) noexcept
 {
     FloatVectorHelpers::multiply (dest, src, multiplier, num);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::negate (FloatType* dest,
-                                                                                    const FloatType* src,
-                                                                                    CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::negate (FloatType* dest,
+                                                                            const FloatType* src,
+                                                                            CountType numValues) noexcept
 {
     FloatVectorHelpers::negate (dest, src, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::abs (FloatType* dest,
-                                                                                 const FloatType* src,
-                                                                                 CountType numValues) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::abs (FloatType* dest,
+                                                                         const FloatType* src,
+                                                                         CountType numValues) noexcept
 {
     FloatVectorHelpers::abs (dest, src, numValues);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::min (FloatType* dest,
-                                                                                 const FloatType* src,
-                                                                                 FloatType comp,
-                                                                                 CountType num) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::min (FloatType* dest,
+                                                                         const FloatType* src,
+                                                                         FloatType comp,
+                                                                         CountType num) noexcept
 {
     FloatVectorHelpers::min (dest, src, comp, num);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::min (FloatType* dest,
-                                                                                 const FloatType* src1,
-                                                                                 const FloatType* src2,
-                                                                                 CountType num) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::min (FloatType* dest,
+                                                                         const FloatType* src1,
+                                                                         const FloatType* src2,
+                                                                         CountType num) noexcept
 {
     FloatVectorHelpers::min (dest, src1, src2, num);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::max (FloatType* dest,
-                                                                                 const FloatType* src,
-                                                                                 FloatType comp,
-                                                                                 CountType num) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::max (FloatType* dest,
+                                                                         const FloatType* src,
+                                                                         FloatType comp,
+                                                                         CountType num) noexcept
 {
     FloatVectorHelpers::max (dest, src, comp, num);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::max (FloatType* dest,
-                                                                                 const FloatType* src1,
-                                                                                 const FloatType* src2,
-                                                                                 CountType num) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::max (FloatType* dest,
+                                                                         const FloatType* src1,
+                                                                         const FloatType* src2,
+                                                                         CountType num) noexcept
 {
     FloatVectorHelpers::max (dest, src1, src2, num);
 }
 
 template <typename FloatType, typename CountType>
-void JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::clip (FloatType* dest,
-                                                                                  const FloatType* src,
-                                                                                  FloatType low,
-                                                                                  FloatType high,
-                                                                                  CountType num) noexcept
+void JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::clip (FloatType* dest,
+                                                                          const FloatType* src,
+                                                                          FloatType low,
+                                                                          FloatType high,
+                                                                          CountType num) noexcept
 {
     FloatVectorHelpers::clip (dest, src, low, high, num);
 }
 
 template <typename FloatType, typename CountType>
-Range<FloatType> JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::findMinAndMax (const FloatType* src,
-                                                                                                       CountType numValues) noexcept
+Range<FloatType> JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::findMinAndMax (const FloatType* src,
+                                                                                               CountType numValues) noexcept
 {
     return FloatVectorHelpers::findMinAndMax (src, numValues);
 }
 
 template <typename FloatType, typename CountType>
-FloatType JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::findMinimum (const FloatType* src,
-                                                                                              CountType numValues) noexcept
+FloatType JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::findMinimum (const FloatType* src,
+                                                                                      CountType numValues) noexcept
 {
     return FloatVectorHelpers::findMinimum (src, numValues);
 }
 
 template <typename FloatType, typename CountType>
-FloatType JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>::findMaximum (const FloatType* src,
-                                                                                              CountType numValues) noexcept
+FloatType JUCE_CALLTYPE FloatVectorOperationsBase<FloatType, CountType>::findMaximum (const FloatType* src,
+                                                                                      CountType numValues) noexcept
 {
     return FloatVectorHelpers::findMaximum (src, numValues);
 }
 
-template struct detail::FloatVectorOperationsBase<float, int>;
-template struct detail::FloatVectorOperationsBase<float, size_t>;
-template struct detail::FloatVectorOperationsBase<double, int>;
-template struct detail::FloatVectorOperationsBase<double, size_t>;
+template struct FloatVectorOperationsBase<float, int>;
+template struct FloatVectorOperationsBase<float, size_t>;
+template struct FloatVectorOperationsBase<double, int>;
+template struct FloatVectorOperationsBase<double, size_t>;
 
 void JUCE_CALLTYPE FloatVectorOperations::convertFixedToFloat (float* dest, const int* src, float multiplier, size_t num) noexcept
 {
@@ -1430,34 +1438,44 @@ void JUCE_CALLTYPE FloatVectorOperations::convertFixedToFloat (float* dest, cons
 intptr_t JUCE_CALLTYPE FloatVectorOperations::getFpStatusRegister() noexcept
 {
     intptr_t fpsr = 0;
-  #if JUCE_INTEL && JUCE_USE_SSE_INTRINSICS
+ #if JUCE_INTEL && JUCE_USE_SSE_INTRINSICS
     fpsr = static_cast<intptr_t> (_mm_getcsr());
-  #elif defined(__arm64__) || defined(__aarch64__) || JUCE_USE_ARM_NEON
-   #if defined(__arm64__) || defined(__aarch64__)
+ #elif (JUCE_64BIT && JUCE_ARM) || JUCE_USE_ARM_NEON
+  #if _MSC_VER
+    // _control87 returns static values for x86 bits that don't exist on arm
+    // to emulate x86 behaviour. We are only ever interested in de-normal bits
+    // so mask out only those.
+    fpsr = (intptr_t) (_control87 (0, 0) & _MCW_DN);
+  #else
+   #if JUCE_64BIT
     asm volatile("mrs %0, fpcr"
                  : "=r"(fpsr));
    #elif JUCE_USE_ARM_NEON
     asm volatile("vmrs %0, fpscr"
                  : "=r"(fpsr));
    #endif
-  #else
-   #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
-    jassertfalse; // No support for getting the floating point status register for your platform
-   #endif
   #endif
+ #else
+  #if ! (defined (JUCE_INTEL) || defined (JUCE_ARM))
+    jassertfalse; // No support for getting the floating point status register for your platform
+  #endif
+ #endif
 
     return fpsr;
 }
 
-void JUCE_CALLTYPE FloatVectorOperations::setFpStatusRegister (intptr_t fpsr) noexcept
+void JUCE_CALLTYPE FloatVectorOperations::setFpStatusRegister ([[maybe_unused]] intptr_t fpsr) noexcept
 {
-  #if JUCE_INTEL && JUCE_USE_SSE_INTRINSICS
+ #if JUCE_INTEL && JUCE_USE_SSE_INTRINSICS
     // the volatile keyword here is needed to workaround a bug in AppleClang 13.0
     // which aggressively optimises away the variable otherwise
     volatile auto fpsr_w = static_cast<uint32_t> (fpsr);
     _mm_setcsr (fpsr_w);
-  #elif defined(__arm64__) || defined(__aarch64__) || JUCE_USE_ARM_NEON
-   #if defined(__arm64__) || defined(__aarch64__)
+ #elif (JUCE_64BIT && JUCE_ARM) || JUCE_USE_ARM_NEON
+  #if _MSC_VER
+    _control87 ((unsigned int) fpsr, _MCW_DN);
+  #else
+   #if JUCE_64BIT
     asm volatile("msr fpcr, %0"
                  :
                  : "ri"(fpsr));
@@ -1466,17 +1484,17 @@ void JUCE_CALLTYPE FloatVectorOperations::setFpStatusRegister (intptr_t fpsr) no
                  :
                  : "ri"(fpsr));
    #endif
-  #else
-   #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
-    jassertfalse; // No support for getting the floating point status register for your platform
-   #endif
-    ignoreUnused (fpsr);
   #endif
+ #else
+  #if ! (defined (JUCE_INTEL) || defined (JUCE_ARM))
+    jassertfalse; // No support for getting the floating point status register for your platform
+  #endif
+ #endif
 }
 
-void JUCE_CALLTYPE FloatVectorOperations::enableFlushToZeroMode (bool shouldEnable) noexcept
+void JUCE_CALLTYPE FloatVectorOperations::enableFlushToZeroMode ([[maybe_unused]] bool shouldEnable) noexcept
 {
-  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
+  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || (JUCE_64BIT && JUCE_ARM))
    #if JUCE_USE_SSE_INTRINSICS
     intptr_t mask = _MM_FLUSH_ZERO_MASK;
    #else /*JUCE_USE_ARM_NEON*/
@@ -1484,16 +1502,15 @@ void JUCE_CALLTYPE FloatVectorOperations::enableFlushToZeroMode (bool shouldEnab
    #endif
     setFpStatusRegister ((getFpStatusRegister() & (~mask)) | (shouldEnable ? mask : 0));
   #else
-   #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
+   #if ! (defined (JUCE_INTEL) || defined (JUCE_ARM))
     jassertfalse; // No support for flush to zero mode on your platform
    #endif
-    ignoreUnused (shouldEnable);
   #endif
 }
 
-void JUCE_CALLTYPE FloatVectorOperations::disableDenormalisedNumberSupport (bool shouldDisable) noexcept
+void JUCE_CALLTYPE FloatVectorOperations::disableDenormalisedNumberSupport ([[maybe_unused]] bool shouldDisable) noexcept
 {
-  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
+  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || (JUCE_64BIT && JUCE_ARM))
    #if JUCE_USE_SSE_INTRINSICS
     intptr_t mask = 0x8040;
    #else /*JUCE_USE_ARM_NEON*/
@@ -1502,9 +1519,8 @@ void JUCE_CALLTYPE FloatVectorOperations::disableDenormalisedNumberSupport (bool
 
     setFpStatusRegister ((getFpStatusRegister() & (~mask)) | (shouldDisable ? mask : 0));
   #else
-    ignoreUnused (shouldDisable);
 
-   #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
+   #if ! (defined (JUCE_INTEL) || defined (JUCE_ARM))
     jassertfalse; // No support for disable denormals mode on your platform
    #endif
   #endif
@@ -1512,7 +1528,7 @@ void JUCE_CALLTYPE FloatVectorOperations::disableDenormalisedNumberSupport (bool
 
 bool JUCE_CALLTYPE FloatVectorOperations::areDenormalsDisabled() noexcept
 {
-  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
+  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || (JUCE_64BIT && JUCE_ARM))
    #if JUCE_USE_SSE_INTRINSICS
     intptr_t mask = 0x8040;
    #else /*JUCE_USE_ARM_NEON*/
@@ -1527,7 +1543,7 @@ bool JUCE_CALLTYPE FloatVectorOperations::areDenormalsDisabled() noexcept
 
 ScopedNoDenormals::ScopedNoDenormals() noexcept
 {
-  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
+  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || (JUCE_64BIT && JUCE_ARM))
    #if JUCE_USE_SSE_INTRINSICS
     intptr_t mask = 0x8040;
    #else /*JUCE_USE_ARM_NEON*/
@@ -1541,7 +1557,7 @@ ScopedNoDenormals::ScopedNoDenormals() noexcept
 
 ScopedNoDenormals::~ScopedNoDenormals() noexcept
 {
-   #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
+   #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || (JUCE_64BIT && JUCE_ARM))
     FloatVectorOperations::setFpStatusRegister (fpsr);
    #endif
 }
@@ -1551,7 +1567,7 @@ ScopedNoDenormals::~ScopedNoDenormals() noexcept
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
-class FloatVectorOperationsTests  : public UnitTest
+class FloatVectorOperationsTests final : public UnitTest
 {
 public:
     FloatVectorOperationsTests()
@@ -1567,7 +1583,7 @@ public:
             const int num = random.nextInt (range) + 1;
 
             HeapBlock<ValueType> buffer1 (num + 16), buffer2 (num + 16);
-            HeapBlock<int> buffer3 (num + 16);
+            HeapBlock<int> buffer3 (num + 16, true);
 
            #if JUCE_ARM
             ValueType* const data1 = buffer1;
@@ -1672,7 +1688,7 @@ public:
         static bool areAllValuesEqual (const ValueType* d, int num, ValueType target)
         {
             while (--num >= 0)
-                if (*d++ != target)
+                if (! exactlyEqual (*d++, target))
                     return false;
 
             return true;

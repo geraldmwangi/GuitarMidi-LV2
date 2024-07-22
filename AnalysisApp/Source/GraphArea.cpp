@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.1.6
+  Created with Projucer version: 8.0.0
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
+  Copyright (c) - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -145,7 +145,7 @@ void GraphArea::mouseDrag (const juce::MouseEvent& e)
         auto lp=m_lastBoundsRelativToParent.getX();
         auto rp=m_lastBoundsRelativToParent.getTopRight().getX();
 
-        //Get the mouse down position in the parent coordinate frame 
+        //Get the mouse down position in the parent coordinate frame
         auto mp=m_lastMouseDownX+lp;
 
         //Transform left(right) position with affine transform
@@ -154,7 +154,7 @@ void GraphArea::mouseDrag (const juce::MouseEvent& e)
         auto rp_trans=s*(rp-mp)+mp;
 
 
-        
+
 
         //new width
         auto width=rp_trans-lp_trans;
@@ -165,7 +165,7 @@ void GraphArea::mouseDrag (const juce::MouseEvent& e)
 
 
 
-        
+
 
 
 

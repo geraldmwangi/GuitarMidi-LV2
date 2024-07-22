@@ -1,24 +1,33 @@
 /*
   ==============================================================================
 
-   This file is part of the JUCE library.
-   Copyright (c) 2020 - Raw Material Software Limited
+   This file is part of the JUCE framework.
+   Copyright (c) Raw Material Software Limited
 
-   JUCE is an open source library subject to commercial or open-source
+   JUCE is an open source framework subject to commercial or open source
    licensing.
 
-   By using JUCE, you agree to the terms of both the JUCE 6 End-User License
-   Agreement and JUCE Privacy Policy (both effective as of the 16th June 2020).
+   By downloading, installing, or using the JUCE framework, or combining the
+   JUCE framework with any other source code, object code, content or any other
+   copyrightable work, you agree to the terms of the JUCE End User Licence
+   Agreement, and all incorporated terms including the JUCE Privacy Policy and
+   the JUCE Website Terms of Service, as applicable, which will bind you. If you
+   do not agree to the terms of these agreements, we will not license the JUCE
+   framework to you, and you must discontinue the installation or download
+   process and cease use of the JUCE framework.
 
-   End User License Agreement: www.juce.com/juce-6-licence
-   Privacy Policy: www.juce.com/juce-privacy-policy
+   JUCE End User Licence Agreement: https://juce.com/legal/juce-8-licence/
+   JUCE Privacy Policy: https://juce.com/juce-privacy-policy
+   JUCE Website Terms of Service: https://juce.com/juce-website-terms-of-service/
 
-   Or: You may also use this code under the terms of the GPL v3 (see
-   www.gnu.org/licenses).
+   Or:
 
-   JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
-   EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
-   DISCLAIMED.
+   You may also use this code under the terms of the AGPLv3:
+   https://www.gnu.org/licenses/agpl-3.0.en.html
+
+   THE JUCE FRAMEWORK IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL
+   WARRANTIES, WHETHER EXPRESSED OR IMPLIED, INCLUDING WARRANTY OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED.
 
   ==============================================================================
 */
@@ -30,10 +39,10 @@ template <typename Value>
 struct ChannelInfo
 {
     ChannelInfo() = default;
-    ChannelInfo (Value** dataIn, int numChannelsIn)
+    ChannelInfo (Value* const* dataIn, int numChannelsIn)
         : data (dataIn), numChannels (numChannelsIn)  {}
 
-    Value** data = nullptr;
+    Value* const* data = nullptr;
     int numChannels = 0;
 };
 
@@ -98,7 +107,7 @@ static void initialiseIoBuffers (ChannelInfo<const float> ins,
 
         for (auto i = processorOuts; i < processorIns; ++i)
         {
-            channels[totalNumChans] = tempBuffer.getWritePointer (i - outs.numChannels);
+            channels[totalNumChans] = tempBuffer.getWritePointer (i - processorOuts);
             prepareInputChannel (i);
             ++totalNumChans;
         }
@@ -171,6 +180,9 @@ void AudioProcessorPlayer::setProcessor (AudioProcessor* const processorToPlay)
     if (processor == processorToPlay)
         return;
 
+    sampleCount = 0;
+    currentWorkgroup.reset();
+
     if (processorToPlay != nullptr && sampleRate > 0 && blockSize > 0)
     {
         defaultProcessorChannels = NumChannels { processorToPlay->getBusesLayout() };
@@ -188,6 +200,7 @@ void AudioProcessorPlayer::setProcessor (AudioProcessor* const processorToPlay)
 
         processorToPlay->setProcessingPrecision (supportsDouble ? AudioProcessor::doublePrecision
                                                                 : AudioProcessor::singlePrecision);
+
         processorToPlay->prepareToPlay (sampleRate, blockSize);
     }
 
@@ -208,6 +221,8 @@ void AudioProcessorPlayer::setDoublePrecisionProcessing (bool doublePrecision)
     {
         const ScopedLock sl (lock);
 
+        currentWorkgroup.reset();
+
         if (processor != nullptr)
         {
             processor->releaseResources();
@@ -216,6 +231,7 @@ void AudioProcessorPlayer::setDoublePrecisionProcessing (bool doublePrecision)
 
             processor->setProcessingPrecision (supportsDouble ? AudioProcessor::doublePrecision
                                                               : AudioProcessor::singlePrecision);
+
             processor->prepareToPlay (sampleRate, blockSize);
         }
 
@@ -233,13 +249,16 @@ void AudioProcessorPlayer::setMidiOutput (MidiOutput* midiOutputToUse)
 }
 
 //==============================================================================
-void AudioProcessorPlayer::audioDeviceIOCallback (const float** const inputChannelData,
-                                                  const int numInputChannels,
-                                                  float** const outputChannelData,
-                                                  const int numOutputChannels,
-                                                  const int numSamples)
+void AudioProcessorPlayer::audioDeviceIOCallbackWithContext (const float* const* const inputChannelData,
+                                                             const int numInputChannels,
+                                                             float* const* const outputChannelData,
+                                                             const int numOutputChannels,
+                                                             const int numSamples,
+                                                             const AudioIODeviceCallbackContext& context)
 {
     const ScopedLock sl (lock);
+
+    jassert (currentDevice != nullptr);
 
     // These should have been prepared by audioDeviceAboutToStart()...
     jassert (sampleRate > 0 && blockSize > 0);
@@ -265,6 +284,55 @@ void AudioProcessorPlayer::audioDeviceIOCallback (const float** const inputChann
         jassert (processor->isMidiEffect() || numOutputChannels == actualProcessorChannels.outs);
 
         const ScopedLock sl2 (processor->getCallbackLock());
+
+        if (std::exchange (currentWorkgroup, currentDevice->getWorkgroup()) != currentDevice->getWorkgroup())
+            processor->audioWorkgroupContextChanged (currentWorkgroup);
+
+        class PlayHead final : private AudioPlayHead
+        {
+        public:
+            PlayHead (AudioProcessor& proc,
+                      Optional<uint64_t> hostTimeIn,
+                      uint64_t sampleCountIn,
+                      double sampleRateIn)
+                : processor (proc),
+                  hostTimeNs (hostTimeIn),
+                  sampleCount (sampleCountIn),
+                  seconds ((double) sampleCountIn / sampleRateIn)
+            {
+                if (useThisPlayhead)
+                    processor.setPlayHead (this);
+            }
+
+            ~PlayHead() override
+            {
+                if (useThisPlayhead)
+                    processor.setPlayHead (nullptr);
+            }
+
+        private:
+            Optional<PositionInfo> getPosition() const override
+            {
+                PositionInfo info;
+                info.setHostTimeNs (hostTimeNs);
+                info.setTimeInSamples ((int64_t) sampleCount);
+                info.setTimeInSeconds (seconds);
+                return info;
+            }
+
+            AudioProcessor& processor;
+            Optional<uint64_t> hostTimeNs;
+            uint64_t sampleCount;
+            double seconds;
+            bool useThisPlayhead = processor.getPlayHead() == nullptr;
+        };
+
+        PlayHead playHead { *processor,
+                            context.hostTimeNs != nullptr ? makeOptional (*context.hostTimeNs) : nullopt,
+                            sampleCount,
+                            sampleRate };
+
+        sampleCount += (uint64_t) numSamples;
 
         if (! processor->isSuspended())
         {
@@ -303,6 +371,7 @@ void AudioProcessorPlayer::audioDeviceIOCallback (const float** const inputChann
 
 void AudioProcessorPlayer::audioDeviceAboutToStart (AudioIODevice* const device)
 {
+    currentDevice = device;
     auto newSampleRate = device->getCurrentSampleRate();
     auto newBlockSize  = device->getCurrentBufferSizeSamples();
     auto numChansIn    = device->getActiveInputChannels().countNumberOfSetBits();
@@ -317,6 +386,8 @@ void AudioProcessorPlayer::audioDeviceAboutToStart (AudioIODevice* const device)
     resizeChannels();
 
     messageCollector.reset (sampleRate);
+
+    currentWorkgroup.reset();
 
     if (processor != nullptr)
     {
@@ -340,6 +411,9 @@ void AudioProcessorPlayer::audioDeviceStopped()
     blockSize = 0;
     isPrepared = false;
     tempBuffer.setSize (1, 1);
+
+    currentDevice = nullptr;
+    currentWorkgroup.reset();
 }
 
 void AudioProcessorPlayer::handleIncomingMidiMessage (MidiInput*, const MidiMessage& message)
@@ -351,7 +425,7 @@ void AudioProcessorPlayer::handleIncomingMidiMessage (MidiInput*, const MidiMess
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
-struct AudioProcessorPlayerTests  : public UnitTest
+struct AudioProcessorPlayerTests final : public UnitTest
 {
     AudioProcessorPlayerTests()
         : UnitTest ("AudioProcessorPlayer", UnitTestCategories::audio) {}

@@ -1,24 +1,33 @@
 /*
   ==============================================================================
 
-   This file is part of the JUCE library.
-   Copyright (c) 2020 - Raw Material Software Limited
+   This file is part of the JUCE framework.
+   Copyright (c) Raw Material Software Limited
 
-   JUCE is an open source library subject to commercial or open-source
+   JUCE is an open source framework subject to commercial or open source
    licensing.
 
-   By using JUCE, you agree to the terms of both the JUCE 6 End-User License
-   Agreement and JUCE Privacy Policy (both effective as of the 16th June 2020).
+   By downloading, installing, or using the JUCE framework, or combining the
+   JUCE framework with any other source code, object code, content or any other
+   copyrightable work, you agree to the terms of the JUCE End User Licence
+   Agreement, and all incorporated terms including the JUCE Privacy Policy and
+   the JUCE Website Terms of Service, as applicable, which will bind you. If you
+   do not agree to the terms of these agreements, we will not license the JUCE
+   framework to you, and you must discontinue the installation or download
+   process and cease use of the JUCE framework.
 
-   End User License Agreement: www.juce.com/juce-6-licence
-   Privacy Policy: www.juce.com/juce-privacy-policy
+   JUCE End User Licence Agreement: https://juce.com/legal/juce-8-licence/
+   JUCE Privacy Policy: https://juce.com/juce-privacy-policy
+   JUCE Website Terms of Service: https://juce.com/juce-website-terms-of-service/
 
-   Or: You may also use this code under the terms of the GPL v3 (see
-   www.gnu.org/licenses).
+   Or:
 
-   JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
-   EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
-   DISCLAIMED.
+   You may also use this code under the terms of the AGPLv3:
+   https://www.gnu.org/licenses/agpl-3.0.en.html
+
+   THE JUCE FRAMEWORK IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL
+   WARRANTIES, WHETHER EXPRESSED OR IMPLIED, INCLUDING WARRANTY OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED.
 
   ==============================================================================
 */
@@ -37,8 +46,8 @@ namespace juce
 
     @tags{GUI}
 */
-class JUCE_API  TextEditor  : public Component,
-                              public TextInputTarget,
+class JUCE_API  TextEditor  : public TextInputTarget,
+                              public Component,
                               public SettableTooltipClient
 {
 public:
@@ -423,7 +432,7 @@ public:
     /** Returns the current index of the caret.
         @see setCaretPosition
     */
-    int getCaretPosition() const;
+    int getCaretPosition() const override;
 
     /** Moves the caret to be in front of a given character.
         @see getCaretPosition, moveCaretToEnd
@@ -443,12 +452,11 @@ public:
     */
     void scrollEditorToPositionCaret (int desiredCaretX, int desiredCaretY);
 
-    /** Get the graphical position of the caret.
+    /** Get the graphical position of the caret for a particular index in the text.
 
         The rectangle returned is relative to the component's top-left corner.
-        @see scrollEditorToPositionCaret
     */
-    Rectangle<int> getCaretRectangle() override;
+    Rectangle<int> getCaretRectangleForCharIndex (int index) const override;
 
     /** Selects a section of the text. */
     void setHighlightedRegion (const Range<int>& newSelection) override;
@@ -467,12 +475,22 @@ public:
     */
     int getTextIndexAt (int x, int y) const;
 
+    /** Finds the index of the character at a given position.
+        The coordinates are relative to the component's top-left.
+    */
+    int getTextIndexAt (Point<int>) const;
+
+    /** Like getTextIndexAt, but doesn't snap to the beginning/end of the range for
+        points vertically outside the text.
+    */
+    int getCharIndexForPoint (Point<int> point) const override;
+
     /** Counts the number of characters in the text.
 
         This is quicker than getting the text as a string if you just need to know
         the length.
     */
-    int getTotalNumChars() const;
+    int getTotalNumChars() const override;
 
     /** Returns the total width of the text, as it is currently laid-out.
 
@@ -541,7 +559,7 @@ public:
         The bounds are relative to the component's top-left and may extend beyond the bounds
         of the component if the text is long and word wrapping is disabled.
     */
-    RectangleList<int> getTextBounds (Range<int> textRange);
+    RectangleList<int> getTextBounds (Range<int> textRange) const override;
 
     //==============================================================================
     void moveCaretToEnd();
@@ -665,7 +683,23 @@ public:
     void setInputRestrictions (int maxTextLength,
                                const String& allowedCharacters = String());
 
+    /** Sets the type of virtual keyboard that should be displayed when this editor has
+        focus.
+    */
     void setKeyboardType (VirtualKeyboardType type) noexcept    { keyboardType = type; }
+
+    /** Sets the behaviour of mouse/touch interactions outside this component.
+
+        If true, then presses outside of the TextEditor will dismiss the virtual keyboard.
+        If false, then the virtual keyboard will remain onscreen for as long as the TextEditor has
+        keyboard focus.
+    */
+    void setClicksOutsideDismissVirtualKeyboard (bool);
+
+    /** Returns true if the editor is configured to hide the virtual keyboard when the mouse is
+        pressed on another component.
+    */
+    bool getClicksOutsideDismissVirtualKeyboard() const     { return clicksOutsideDismissVirtualKeyboard; }
 
     //==============================================================================
     /** This abstract base class is implemented by LookAndFeel classes to provide
@@ -717,7 +751,9 @@ public:
     /** @internal */
     void setTemporaryUnderlining (const Array<Range<int>>&) override;
     /** @internal */
-    VirtualKeyboardType getKeyboardType() override    { return keyboardType; }
+    VirtualKeyboardType getKeyboardType() override;
+    /** @internal */
+    std::unique_ptr<AccessibilityHandler> createAccessibilityHandler() override;
 
 protected:
     //==============================================================================
@@ -744,11 +780,28 @@ private:
     struct TextEditorViewport;
     struct InsertAction;
     struct RemoveAction;
+    class EditorAccessibilityHandler;
+
+    class GlobalMouseListener : private MouseListener
+    {
+    public:
+        explicit GlobalMouseListener (Component& e) : editor (e) { Desktop::getInstance().addGlobalMouseListener    (this); }
+        ~GlobalMouseListener() override                          { Desktop::getInstance().removeGlobalMouseListener (this); }
+
+        bool lastMouseDownInEditor() const { return mouseDownInEditor; }
+
+    private:
+        void mouseDown (const MouseEvent& event) override { mouseDownInEditor = event.originalComponent == &editor; }
+
+        Component& editor;
+        bool mouseDownInEditor = false;
+    };
 
     std::unique_ptr<Viewport> viewport;
     TextHolderComponent* textHolder;
     BorderSize<int> borderSize { 1, 1, 1, 3 };
     Justification justification { Justification::topLeft };
+    const GlobalMouseListener globalMouseListener { *this };
 
     bool readOnly = false;
     bool caretVisible = true;
@@ -765,13 +818,14 @@ private:
     bool valueTextNeedsUpdating = false;
     bool consumeEscAndReturnKeys = true;
     bool underlineWhitespace = true;
+    bool clicksOutsideDismissVirtualKeyboard = false;
 
     UndoManager undoManager;
     std::unique_ptr<CaretComponent> caret;
     Range<int> selection;
     int leftIndent = 4, topIndent = 4;
     unsigned int lastTransactionTime = 0;
-    Font currentFont { 14.0f };
+    Font currentFont { withDefaultMetrics (FontOptions { 14.0f }) };
     mutable int totalNumChars = 0;
     int caretPosition = 0;
     OwnedArray<UniformTextSection> sections;
@@ -795,7 +849,6 @@ private:
     ListenerList<Listener> listeners;
     Array<Range<int>> underlinedSections;
 
-    std::unique_ptr<AccessibilityHandler> createAccessibilityHandler() override;
     void moveCaret (int newCaretPos);
     void moveCaretTo (int newPosition, bool isSelecting);
     void recreateCaret();
@@ -807,7 +860,6 @@ private:
     void reinsert (int insertIndex, const OwnedArray<UniformTextSection>&);
     void remove (Range<int>, UndoManager*, int caretPositionToMoveTo);
     void getCharPosition (int index, Point<float>&, float& lineHeight) const;
-    Rectangle<float> getCaretRectangleFloat() const;
     void updateCaretPosition();
     void updateValueFromText();
     void textWasChangedByValue();

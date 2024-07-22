@@ -7,10 +7,11 @@ include_directories(${PROJECT_BINARY_DIR}/src/include)
 pkg_check_modules (FT freetype2)
 pkg_check_modules (ALSA alsa)
 pkg_check_modules (CURL libcurl)
+pkg_check_modules (FONT fontconfig)
 pkg_check_modules (WEBKITGTK webkit2gtk-4.0)
 pkg_check_modules (GTKX11 gtk+-x11-3.0)
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 # I should use pkg-config (https://cmake.org/cmake/help/latest/module/FindPkgConfig.html) to find all modules for juce, since pkg-config is used 
@@ -37,7 +38,11 @@ ${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_dsp.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_events.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_graphics.cpp
 ${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_gui_basics.cpp
-${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_gui_extra.cpp )
+${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_gui_extra.cpp 
+${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_audio_processors_ara.cpp
+${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_audio_processors_lv2_libs.cpp
+${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_core_CompilationTime.cpp
+${CMAKE_SOURCE_DIR}/AnalysisApp/JuceLibraryCode/include_juce_graphics_Harfbuzz.cpp)
 
 
 set(SRCS ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/Main.cpp
@@ -56,4 +61,4 @@ ${CMAKE_SOURCE_DIR}/AnalysisApp/Source/WaveFileView.cpp)
 
 add_executable(GuitarMidiAnalysisApp ${SRCS} ${JUCELIBSRC})
 
-target_link_libraries(GuitarMidiAnalysisApp guitarmidi dsp dl rt pthread ${ALSA_LIBRARIES}  ${FT_LIBRARIES} ${CURL_LIBRARIES} ${WEBKITGTK_LIBRARIES})
+target_link_libraries(GuitarMidiAnalysisApp guitarmidi dsp dl rt pthread ${ALSA_LIBRARIES} ${FONT_LIBRARIES} ${FT_LIBRARIES} ${CURL_LIBRARIES} ${WEBKITGTK_LIBRARIES})

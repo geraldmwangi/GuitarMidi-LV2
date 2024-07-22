@@ -1,21 +1,33 @@
 /*
   ==============================================================================
 
-   This file is part of the JUCE library.
-   Copyright (c) 2020 - Raw Material Software Limited
+   This file is part of the JUCE framework.
+   Copyright (c) Raw Material Software Limited
 
-   JUCE is an open source library subject to commercial or open-source
+   JUCE is an open source framework subject to commercial or open source
    licensing.
 
-   The code included in this file is provided under the terms of the ISC license
-   http://www.isc.org/downloads/software-support-policy/isc-license. Permission
-   To use, copy, modify, and/or distribute this software for any purpose with or
-   without fee is hereby granted provided that the above copyright notice and
-   this permission notice appear in all copies.
+   By downloading, installing, or using the JUCE framework, or combining the
+   JUCE framework with any other source code, object code, content or any other
+   copyrightable work, you agree to the terms of the JUCE End User Licence
+   Agreement, and all incorporated terms including the JUCE Privacy Policy and
+   the JUCE Website Terms of Service, as applicable, which will bind you. If you
+   do not agree to the terms of these agreements, we will not license the JUCE
+   framework to you, and you must discontinue the installation or download
+   process and cease use of the JUCE framework.
 
-   JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
-   EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
-   DISCLAIMED.
+   JUCE End User Licence Agreement: https://juce.com/legal/juce-8-licence/
+   JUCE Privacy Policy: https://juce.com/juce-privacy-policy
+   JUCE Website Terms of Service: https://juce.com/juce-website-terms-of-service/
+
+   Or:
+
+   You may also use this code under the terms of the AGPLv3:
+   https://www.gnu.org/licenses/agpl-3.0.en.html
+
+   THE JUCE FRAMEWORK IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL
+   WARRANTIES, WHETHER EXPRESSED OR IMPLIED, INCLUDING WARRANTY OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED.
 
   ==============================================================================
 */
@@ -265,12 +277,12 @@ public:
         /** Implement this callback to be informed whenever a new expressive MIDI
             note is triggered.
         */
-        virtual void noteAdded (MPENote newNote)                 { ignoreUnused (newNote); }
+        virtual void noteAdded (MPENote newNote);
 
         /** Implement this callback to be informed whenever a currently playing
             MPE note's pressure value changes.
         */
-        virtual void notePressureChanged (MPENote changedNote)   { ignoreUnused (changedNote); }
+        virtual void notePressureChanged (MPENote changedNote);
 
         /** Implement this callback to be informed whenever a currently playing
             MPE note's pitchbend value changes.
@@ -279,12 +291,12 @@ public:
             master channel pitchbend event, or if both occur simultaneously.
             Call MPENote::getFrequencyInHertz to get the effective note frequency.
         */
-        virtual void notePitchbendChanged (MPENote changedNote)  { ignoreUnused (changedNote); }
+        virtual void notePitchbendChanged (MPENote changedNote);
 
         /** Implement this callback to be informed whenever a currently playing
             MPE note's timbre value changes.
         */
-        virtual void noteTimbreChanged (MPENote changedNote)     { ignoreUnused (changedNote); }
+        virtual void noteTimbreChanged (MPENote changedNote);
 
         /** Implement this callback to be informed whether a currently playing
             MPE note's key state (whether the key is down and/or the note is
@@ -293,19 +305,19 @@ public:
             Note: If the key state changes to MPENote::off, noteReleased is
             called instead.
         */
-        virtual void noteKeyStateChanged (MPENote changedNote)   { ignoreUnused (changedNote); }
+        virtual void noteKeyStateChanged (MPENote changedNote);
 
         /** Implement this callback to be informed whenever an MPE note
             is released (either by a note-off message, or by a sustain/sostenuto
             pedal release for a note that already received a note-off),
             and should therefore stop playing.
         */
-        virtual void noteReleased (MPENote finishedNote)         { ignoreUnused (finishedNote); }
+        virtual void noteReleased (MPENote finishedNote);
 
         /** Implement this callback to be informed whenever the MPE zone layout
             or legacy mode settings of this instrument have been changed.
         */
-        virtual void zoneLayoutChanged()                         {}
+        virtual void zoneLayoutChanged();
     };
 
     //==============================================================================

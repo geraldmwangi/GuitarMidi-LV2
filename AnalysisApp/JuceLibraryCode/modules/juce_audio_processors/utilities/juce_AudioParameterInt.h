@@ -1,24 +1,33 @@
 /*
   ==============================================================================
 
-   This file is part of the JUCE library.
-   Copyright (c) 2020 - Raw Material Software Limited
+   This file is part of the JUCE framework.
+   Copyright (c) Raw Material Software Limited
 
-   JUCE is an open source library subject to commercial or open-source
+   JUCE is an open source framework subject to commercial or open source
    licensing.
 
-   By using JUCE, you agree to the terms of both the JUCE 6 End-User License
-   Agreement and JUCE Privacy Policy (both effective as of the 16th June 2020).
+   By downloading, installing, or using the JUCE framework, or combining the
+   JUCE framework with any other source code, object code, content or any other
+   copyrightable work, you agree to the terms of the JUCE End User Licence
+   Agreement, and all incorporated terms including the JUCE Privacy Policy and
+   the JUCE Website Terms of Service, as applicable, which will bind you. If you
+   do not agree to the terms of these agreements, we will not license the JUCE
+   framework to you, and you must discontinue the installation or download
+   process and cease use of the JUCE framework.
 
-   End User License Agreement: www.juce.com/juce-6-licence
-   Privacy Policy: www.juce.com/juce-privacy-policy
+   JUCE End User Licence Agreement: https://juce.com/legal/juce-8-licence/
+   JUCE Privacy Policy: https://juce.com/juce-privacy-policy
+   JUCE Website Terms of Service: https://juce.com/juce-website-terms-of-service/
 
-   Or: You may also use this code under the terms of the GPL v3 (see
-   www.gnu.org/licenses).
+   Or:
 
-   JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
-   EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
-   DISCLAIMED.
+   You may also use this code under the terms of the AGPLv3:
+   https://www.gnu.org/licenses/agpl-3.0.en.html
+
+   THE JUCE FRAMEWORK IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL
+   WARRANTIES, WHETHER EXPRESSED OR IMPLIED, INCLUDING WARRANTY OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED.
 
   ==============================================================================
 */
@@ -26,6 +35,15 @@
 namespace juce
 {
 
+/** Properties of an AudioParameterInt.
+
+    @see AudioParameterInt(), RangedAudioParameterAttributes()
+
+    @tags{Audio}
+*/
+class AudioParameterIntAttributes : public RangedAudioParameterAttributes<AudioParameterIntAttributes, int> {};
+
+//==============================================================================
 /**
     Provides a class of AudioProcessorParameter that can be used as an
     integer value with a given range.
@@ -39,11 +57,37 @@ class JUCE_API  AudioParameterInt  : public RangedAudioParameter
 public:
     /** Creates a AudioParameterInt with the specified parameters.
 
+        Note that the attributes argument is optional and only needs to be
+        supplied if you want to change options from their default values.
+
+        Example usage:
+        @code
+        auto attributes = AudioParameterIntAttributes().withStringFromValueFunction ([] (auto x, auto) { return String (x); })
+                                                       .withLabel ("things");
+        auto param = std::make_unique<AudioParameterInt> ("paramID", "Parameter Name", 0, 100, 50, attributes);
+        @endcode
+
         @param parameterID         The parameter ID to use
         @param parameterName       The parameter name to use
         @param minValue            The minimum parameter value
         @param maxValue            The maximum parameter value
         @param defaultValue        The default value
+        @param attributes          Optional characteristics
+    */
+    AudioParameterInt (const ParameterID& parameterID,
+                       const String& parameterName,
+                       int minValue,
+                       int maxValue,
+                       int defaultValue,
+                       const AudioParameterIntAttributes& attributes = {});
+
+    /** Creates a AudioParameterInt with the specified parameters.
+
+        @param parameterID         The parameter ID to use
+        @param parameterName       The parameter name to use
+        @param minValue            The minimum parameter value
+        @param maxValue            The maximum parameter value
+        @param defaultValueIn      The default value
         @param parameterLabel      An optional label for the parameter's value
         @param stringFromInt       An optional lambda function that converts a int
                                    value to a string with a maximum length. This may
@@ -52,12 +96,25 @@ public:
                                    and converts it into an int. Some hosts use this
                                    to allow users to type in parameter values.
     */
-    AudioParameterInt (const String& parameterID, const String& parameterName,
-                       int minValue, int maxValue,
-                       int defaultValue,
-                       const String& parameterLabel = String(),
+    [[deprecated ("Prefer the signature taking an Attributes argument")]]
+    AudioParameterInt (const ParameterID& parameterID,
+                       const String& parameterName,
+                       int minValue,
+                       int maxValue,
+                       int defaultValueIn,
+                       const String& parameterLabel,
                        std::function<String (int value, int maximumStringLength)> stringFromInt = nullptr,
-                       std::function<int (const String& text)> intFromString = nullptr);
+                       std::function<int (const String& text)> intFromString = nullptr)
+        : AudioParameterInt (parameterID,
+                             parameterName,
+                             minValue,
+                             maxValue,
+                             defaultValueIn,
+                             AudioParameterIntAttributes().withLabel (parameterLabel)
+                                                          .withStringFromValueFunction (std::move (stringFromInt))
+                                                          .withValueFromStringFunction (std::move (intFromString)))
+    {
+    }
 
     /** Destructor. */
     ~AudioParameterInt() override;

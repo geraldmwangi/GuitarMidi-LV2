@@ -1,24 +1,33 @@
 /*
   ==============================================================================
 
-   This file is part of the JUCE library.
-   Copyright (c) 2020 - Raw Material Software Limited
+   This file is part of the JUCE framework.
+   Copyright (c) Raw Material Software Limited
 
-   JUCE is an open source library subject to commercial or open-source
+   JUCE is an open source framework subject to commercial or open source
    licensing.
 
-   By using JUCE, you agree to the terms of both the JUCE 6 End-User License
-   Agreement and JUCE Privacy Policy (both effective as of the 16th June 2020).
+   By downloading, installing, or using the JUCE framework, or combining the
+   JUCE framework with any other source code, object code, content or any other
+   copyrightable work, you agree to the terms of the JUCE End User Licence
+   Agreement, and all incorporated terms including the JUCE Privacy Policy and
+   the JUCE Website Terms of Service, as applicable, which will bind you. If you
+   do not agree to the terms of these agreements, we will not license the JUCE
+   framework to you, and you must discontinue the installation or download
+   process and cease use of the JUCE framework.
 
-   End User License Agreement: www.juce.com/juce-6-licence
-   Privacy Policy: www.juce.com/juce-privacy-policy
+   JUCE End User Licence Agreement: https://juce.com/legal/juce-8-licence/
+   JUCE Privacy Policy: https://juce.com/juce-privacy-policy
+   JUCE Website Terms of Service: https://juce.com/juce-website-terms-of-service/
 
-   Or: You may also use this code under the terms of the GPL v3 (see
-   www.gnu.org/licenses).
+   Or:
 
-   JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
-   EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
-   DISCLAIMED.
+   You may also use this code under the terms of the AGPLv3:
+   https://www.gnu.org/licenses/agpl-3.0.en.html
+
+   THE JUCE FRAMEWORK IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL
+   WARRANTIES, WHETHER EXPRESSED OR IMPLIED, INCLUDING WARRANTY OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED.
 
   ==============================================================================
 */
@@ -31,7 +40,7 @@ namespace juce
     Base class for audio processing classes or plugins.
 
     This is intended to act as a base class of audio processor that is general enough
-    to be wrapped as a VST, AU, RTAS, etc, or used internally.
+    to be wrapped as a VST, AU, AAX, etc, or used internally.
 
     It is also used by the plugin hosting code as the wrapper around an instance
     of a loaded plugin.
@@ -40,9 +49,11 @@ namespace juce
     plugin, you should implement a global function called createPluginFilter() which
     creates and returns a new instance of your subclass.
 
+    @see AAXClientExtensions, VST2ClientExtensions, VST3ClientExtensions
+
     @tags{Audio}
 */
-class JUCE_API  AudioProcessor
+class JUCE_API  AudioProcessor : private AAXClientExtensions
 {
 protected:
     struct BusesProperties;
@@ -76,6 +87,12 @@ public:
     {
         singlePrecision,
         doublePrecision
+    };
+
+    enum class Realtime
+    {
+        no,
+        yes
     };
 
     using ChangeDetails = AudioProcessorListener::ChangeDetails;
@@ -303,29 +320,37 @@ public:
     */
     struct BusesLayout
     {
+    private:
+        template <typename This>
+        static auto& getBuses (This& t, bool isInput) { return isInput ? t.inputBuses : t.outputBuses; }
+
+    public:
         /** An array containing the list of input buses that this processor supports. */
         Array<AudioChannelSet> inputBuses;
 
         /** An array containing the list of output buses that this processor supports. */
         Array<AudioChannelSet> outputBuses;
 
+        auto& getBuses (bool isInput) const { return getBuses (*this, isInput); }
+        auto& getBuses (bool isInput)       { return getBuses (*this, isInput); }
+
         /** Get the number of channels of a particular bus */
         int getNumChannels (bool isInput, int busIndex) const noexcept
         {
-            auto& bus = (isInput ? inputBuses : outputBuses);
+            auto& bus = getBuses (isInput);
             return isPositiveAndBelow (busIndex, bus.size()) ? bus.getReference (busIndex).size() : 0;
         }
 
         /** Get the channel set of a particular bus */
         AudioChannelSet& getChannelSet (bool isInput, int busIndex) noexcept
         {
-            return (isInput ? inputBuses : outputBuses).getReference (busIndex);
+            return getBuses (isInput).getReference (busIndex);
         }
 
         /** Get the channel set of a particular bus */
         AudioChannelSet getChannelSet (bool isInput, int busIndex) const noexcept
         {
-            return (isInput ? inputBuses : outputBuses)[busIndex];
+            return getBuses (isInput)[busIndex];
         }
 
         /** Get the input channel layout on the main bus. */
@@ -412,7 +437,7 @@ public:
             @param set           The AudioChannelSet which is to be probed.
             @param currentLayout If non-null, pretend that the current layout of the AudioProcessor is
                                  currentLayout. On exit, currentLayout will be modified to
-                                 to represent the buses layouts of the AudioProcessor as if the layout
+                                 represent the buses layouts of the AudioProcessor as if the layout
                                  of the receiver had been successfully changed. This is useful as changing
                                  the layout of the receiver may change the bus layout of other buses.
 
@@ -500,12 +525,12 @@ public:
     /** Returns the audio bus with a given index and direction.
         If busIndex is invalid then this method will return a nullptr.
     */
-    Bus* getBus (bool isInput, int busIndex) noexcept               { return (isInput ? inputBuses : outputBuses)[busIndex]; }
+    Bus* getBus (bool isInput, int busIndex) noexcept               { return getBusImpl (*this, isInput, busIndex); }
 
     /** Returns the audio bus with a given index and direction.
         If busIndex is invalid then this method will return a nullptr.
     */
-    const Bus* getBus (bool isInput, int busIndex) const noexcept   { return const_cast<AudioProcessor*> (this)->getBus (isInput, busIndex); }
+    const Bus* getBus (bool isInput, int busIndex) const noexcept   { return getBusImpl (*this, isInput, busIndex); }
 
     //==============================================================================
     /**  Callback to query if a bus can currently be added.
@@ -518,7 +543,7 @@ public:
 
          @see addBus
     */
-    virtual bool canAddBus (bool isInput) const                     { ignoreUnused (isInput); return false; }
+    virtual bool canAddBus (bool isInput) const;
 
     /**  Callback to query if the last bus can currently be removed.
 
@@ -531,7 +556,7 @@ public:
 
          The default implementation will always return false.
     */
-    virtual bool canRemoveBus (bool isInput) const                  { ignoreUnused (isInput); return false; }
+    virtual bool canRemoveBus (bool isInput) const;
 
     /** Dynamically request an additional bus.
 
@@ -904,7 +929,7 @@ public:
         processBlockBypassed but use the returned parameter to control the bypass
         state instead.
 
-        A plug-in can override this function to return a parameter which control's your
+        A plug-in can override this function to return a parameter which controls your
         plug-in's bypass. You should always check the value of this parameter in your
         processBlock callback and bypass any effects if it is non-zero.
     */
@@ -922,6 +947,21 @@ public:
         @see setNonRealtime()
     */
     bool isNonRealtime() const noexcept                                 { return nonRealtime; }
+
+    /** Returns no if the processor is being run in an offline mode for rendering.
+
+        If the processor is being run live on realtime signals, this returns yes.
+        If the mode is unknown, this will assume it's realtime and return yes.
+
+        This value may be unreliable until the prepareToPlay() method has been called,
+        and could change each time prepareToPlay() is called.
+
+        @see setNonRealtime()
+    */
+    Realtime isRealtime() const noexcept
+    {
+        return isNonRealtime() ? Realtime::no : Realtime::yes;
+    }
 
     /** Called by the host to tell this processor whether it's being used in a non-realtime
         capacity for offline rendering or bouncing.
@@ -1146,19 +1186,41 @@ public:
     */
     void setRateAndBufferSizeDetails (double sampleRate, int blockSize) noexcept;
 
-    //==============================================================================
-    /** AAX plug-ins need to report a unique "plug-in id" for every audio layout
-        configuration that your AudioProcessor supports on the main bus. Override this
-        function if you want your AudioProcessor to use a custom "plug-in id" (for example
-        to stay backward compatible with older versions of JUCE).
+    /** This is called by the host when the thread workgroup context has changed.
 
-        The default implementation will compute a unique integer from the input and output
-        layout and add this value to the 4 character code 'jcaa' (for native AAX) or 'jyaa'
-        (for AudioSuite plug-ins).
+        This will only be called on the audio thread, so you can join the audio workgroup
+        in your implementation of this function.
+
+        You can use this workgroup id to synchronise any real-time threads you have.
+        Note: This is currently only called on Apple devices.
     */
-    virtual int32 getAAXPluginIDForMainBusConfig (const AudioChannelSet& mainInputLayout,
-                                                  const AudioChannelSet& mainOutputLayout,
-                                                  bool idForAudioSuite) const;
+    virtual void audioWorkgroupContextChanged ([[maybe_unused]] const AudioWorkgroup& workgroup) {}
+
+    //==============================================================================
+    /** Returns a reference to an object that implements AAX specific information regarding
+        this AudioProcessor.
+    */
+    virtual AAXClientExtensions& getAAXClientExtensions()       { return *this; }
+
+    /** Returns a non-owning pointer to an object that implements VST2 specific information
+        regarding this AudioProcessor.
+
+        By default, for backwards compatibility, this will attempt to dynamic-cast this
+        AudioProcessor to VST2ClientExtensions.
+        It is recommended to override this function to return a pointer directly to an object
+        of the correct type in order to avoid this dynamic cast.
+    */
+    virtual VST2ClientExtensions* getVST2ClientExtensions();
+
+    /** Returns a non-owning pointer to an object that implements VST3 specific information
+        regarding this AudioProcessor.
+
+        By default, for backwards compatibility, this will attempt to dynamic-cast this
+        AudioProcessor to VST3ClientExtensions.
+        It is recommended to override this function to return a pointer directly to an object
+        of the correct type in order to avoid this dynamic cast.
+    */
+    virtual VST3ClientExtensions* getVST3ClientExtensions();
 
     //==============================================================================
     /** Some plug-ins support sharing response curve data with the host so that it can
@@ -1200,10 +1262,10 @@ public:
         wrapperType_VST3,
         wrapperType_AudioUnit,
         wrapperType_AudioUnitv3,
-        wrapperType_RTAS,
         wrapperType_AAX,
         wrapperType_Standalone,
-        wrapperType_Unity
+        wrapperType_Unity,
+        wrapperType_LV2
     };
 
     /** When loaded by a plugin wrapper, this flag will be set to indicate the type
@@ -1340,8 +1402,8 @@ protected:
 
         void addBus (bool isInput, const String& name, const AudioChannelSet& defaultLayout, bool isActivatedByDefault = true);
 
-        JUCE_NODISCARD BusesProperties withInput  (const String& name, const AudioChannelSet& defaultLayout, bool isActivatedByDefault = true) const;
-        JUCE_NODISCARD BusesProperties withOutput (const String& name, const AudioChannelSet& defaultLayout, bool isActivatedByDefault = true) const;
+        [[nodiscard]] BusesProperties withInput  (const String& name, const AudioChannelSet& defaultLayout, bool isActivatedByDefault = true) const;
+        [[nodiscard]] BusesProperties withOutput (const String& name, const AudioChannelSet& defaultLayout, bool isActivatedByDefault = true) const;
     };
 
     /** Callback to query if adding/removing buses currently possible.
@@ -1452,6 +1514,12 @@ private:
         return layouts;
     }
 
+    template <typename This>
+    static auto getBusImpl (This& t, bool isInput, int busIndex) -> decltype (t.getBus (isInput, busIndex))
+    {
+        return (isInput ? t.inputBuses : t.outputBuses)[busIndex];
+    }
+
     //==============================================================================
     static BusesProperties busesPropertiesFromLayoutArray (const Array<InOutChannelPair>&);
 
@@ -1495,7 +1563,7 @@ private:
   #endif
 
     void checkForDuplicateTrimmedParamID (AudioProcessorParameter*);
-    void checkForUnsafeParamID (AudioProcessorParameter*);
+    void validateParameter (AudioProcessorParameter*);
     void checkForDuplicateParamID (AudioProcessorParameter*);
     void checkForDuplicateGroupIDs (const AudioProcessorParameterGroup&);
 

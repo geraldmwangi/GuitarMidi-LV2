@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.1.6
+  Created with Projucer version: 8.0.0
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
+  Copyright (c) - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -53,7 +53,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     virtual void changeListenerCallback (ChangeBroadcaster* source);
     void drawGraphs();
-    void setOnsetDetectors();
+    // void setOnsetDetectors();
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
