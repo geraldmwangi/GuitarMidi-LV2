@@ -25,12 +25,8 @@ jobs:
     # Step 3: Install dependencies
     - name: Install dependencies
       run: |
-        sudo apt-get update  # Update the package list
-        sudo apt-get install -y cmake \
-          pango1.0-tools \  # Install Pango tools
-          libpango1.0-dev \  # Install Pango development libraries
-          pkg-config \  # Install pkg-config
-          libomp-dev  # Install OpenMP development libraries
+        sudo apt-get update  
+        sudo apt-get install -y cmake pango1.0-tools libpango1.0-dev pkg-config libomp-dev  
 
     # Step 4: Configure the project using CMake
     - name: Configure CMake
