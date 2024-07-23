@@ -30,43 +30,17 @@ NoteClassifier::NoteClassifier(LV2_URID_Map *map, float samplerate, float center
     m_buffer = nullptr;
     m_noteOnOffState = false;
     #ifdef WITH_AUBIO
-    m_onsetDetector = nullptr;
-    setOnsetParameter("energy");
-    m_numSamplesSinceLastOnset = -1;
+
     #endif
     m_samplesSinceLastChangeOfState = 0;
     is_ringing = false;
 }
 
-#ifdef WITH_AUBIO
-void NoteClassifier::setOnsetParameter(string method, float threshold, float silence, float comp, int onsetbuffersize, bool adap_whitening)
-{
-    m_onsetMethod = method;
-    m_onsetThresh = threshold;
-    m_onsetSilence = silence;
-    m_onsetCompression = comp;
-    m_onsetBuffersize = onsetbuffersize;
-    if (m_onsetDetector)
-        del_aubio_onset(m_onsetDetector);
-    m_onsetDetector = new_aubio_onset(m_onsetMethod.c_str(), m_onsetBuffersize, m_onsetBuffersize / 2, m_samplerate);
-    aubio_onset_set_threshold(m_onsetDetector, m_onsetThresh);
-    // aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
-    aubio_onset_set_silence(m_onsetDetector, m_onsetSilence);
-    aubio_onset_set_compression(m_onsetDetector, m_onsetCompression);
-}
-#endif
+
 
 void NoteClassifier::resetFilterAndOnsetDetector()
 {
-#ifdef WITH_AUBIO
-    if (m_onsetDetector)
-        del_aubio_onset(m_onsetDetector);
-    m_onsetDetector = new_aubio_onset(m_onsetMethod.c_str(), m_onsetBuffersize, m_onsetBuffersize / 2, m_samplerate);
-    aubio_onset_set_threshold(m_onsetDetector, m_onsetThresh);
-    // aubio_onset_set_awhitening(m_onsetDetector,adap_whitening);
-    aubio_onset_set_silence(m_onsetDetector, m_onsetSilence);
-    aubio_onset_set_compression(m_onsetDetector, m_onsetCompression);
-#endif
+
 #ifdef USE_ELLIPTIC_FILTERS
     m_filter.setup(m_order, m_samplerate, m_centerfreq, m_bandwidth, m_passbandatten, 18.0);
 #else
@@ -94,6 +68,11 @@ void NoteClassifier::setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output)
 }
 void NoteClassifier::initialize()
 {
+
+#ifdef WITH_AUBIO
+    m_fine_pitch_detector=new_aubio_pitch("specacf",m_bufferSize,m_bufferSize,m_samplerate);
+    m_pitch=new_fvec(1);
+#endif
     // Setup FILTERORDER 1st order filters. Currently Elliptic::BandPass crashes when running setup() with orders higher than 1
     // When we solve this we can run sharper filters with narrower bandwidth and maybe drop the pitch validation below in process()
     setFilterParameters(m_bandwidth, m_passbandatten);
@@ -108,12 +87,14 @@ void NoteClassifier::initialize()
 
 void NoteClassifier::finalize()
 {
+#ifdef WITH_AUBIO
+
+    del_aubio_pitch(m_fine_pitch_detector);
+    del_fvec(m_pitch);
+#endif
     // Release ressources
     m_filter.reset();
-#ifdef WITH_AUBIO
-    if (m_onsetDetector)
-        del_aubio_onset(m_onsetDetector);
-#endif
+
     if (m_buffer)
         delete[] m_buffer;
 }
@@ -144,41 +125,15 @@ float NoteClassifier::filterAndComputeMeanEnv(float *buffer, int nsamples, bool 
 //     timespec starttime = timer_start();
 // #endif
     m_filter.process(nsamples, &buffer);
+
+
+
 // #ifdef WITH_TRACING_INFO
 //     lv2_log_trace(&g_logger, "Single overtone filtering: %ld \n", timer_end(starttime));
 // #endif
     float meanenv = 0;
     int count = 0;
-#ifdef WITH_AUBIO
-    if (m_onsetDetector)
-    {
-        fvec_t *ons = new_fvec(1);
-        fvec_t onsinput;
-        onsinput.data = (smpl_t *)buffer;
-        onsinput.length = nsamples;
 
-// #ifdef WITH_TRACING_INFO
-//         starttime = timer_start();
-// #endif
-        aubio_onset_do(m_onsetDetector, &onsinput, ons);
-// #ifdef WITH_TRACING_INFO
-//         lv2_log_trace(&g_logger, "onset: %ld\n", timer_end(starttime));
-// #endif
-
-        bool onsdetected = *(*ons).data > 0.0;
-        if (onsetdetected)
-            *onsetdetected = onsdetected;
-        if (onsdetected)
-        {
-            m_numSamplesSinceLastOnset = 0;
-            m_meanEnv = -1.0;
-            m_meanEnvCounter = 0;
-        }
-        else
-            m_numSamplesSinceLastOnset += nsamples;
-        del_fvec(ons);
-    }
-#endif
     // if(m_meanEnvCounter>48000)
     // {
     //     m_meanEnv=0;
@@ -229,7 +184,15 @@ void NoteClassifier::process(int nsamples)
     // If envelope greater then threshold consider these nsamples a candidate
     if (meanenv > 0.005)
     {
+        #ifdef WITH_AUBIO
+            fvec_t buf;
+            buf.data=m_buffer;
+            buf.length=nsamples;
+            aubio_pitch_do(m_fine_pitch_detector,&buf,m_pitch);
+           
+            // printf("freq: %f, fine pitch: %f\n",m_centerfreq,m_pitch->data[0]);
 
+        #endif
         m_noteOnOffState = true;
         // is_ringing=true;
     }

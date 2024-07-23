@@ -18,13 +18,13 @@
  */
 #pragma once
 #include <DspFilters/Dsp.h>
+
+#include <midioutput.hpp>
+#include <memory>
 #ifdef WITH_AUBIO
 #include <aubio/aubio.h>
 #include <aubio/pitch/pitch.h>
 #endif
-#include <midioutput.hpp>
-#include <memory>
-
 #define FILTERORDER 2 // the real order is 2*MAXORDER
 #define MAXORDER 10   // the real order is 2*MAXORDER
 // #define USE_ELLIPTIC_FILTERS 1
@@ -70,9 +70,10 @@ private:
      */
     float m_samplerate;
 
-#ifdef WITH_AUBIO
-    aubio_onset_t *m_onsetDetector;
 
+#ifdef WITH_AUBIO
+    aubio_pitch_t* m_fine_pitch_detector;
+    fvec_t* m_pitch;
     /**
      * @brief The number of samples since the last onset was detected
      * It is -1 if no note is playing
@@ -223,7 +224,7 @@ public:
      */
     void setMidiOutput(shared_ptr<GuitarMidi::MidiOutput> output);
 
-    void setOnsetParameter(string method, float threshold = 0.4, float silence = -40, float comp = 0.0, int onsetbuffersize = 512, bool adap_whitening = false);
+
 
     void setFilterParameters(float bandwidth = 20, float passbandatten = 2, int order = FILTERORDER);
 
