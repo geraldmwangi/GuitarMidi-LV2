@@ -36,26 +36,42 @@ bool MidiOutput::forge_midimessage(const uint8_t *const buffer,
     midiatom.type = m_midiEvent;
     midiatom.size = size;
 
-    if (0 == lv2_atom_forge_frame_time(&m_forge, frames))
+    // if (0 == lv2_atom_forge_frame_time(&m_forge, frames))
+    // {
+    //     printf("0 == lv2_atom_forge_frame_time\n");
+    //     return false;
+    // }
+    // if (0 == lv2_atom_forge_raw(&m_forge, &midiatom, sizeof(LV2_Atom)))
+    // {
+    //     printf("0==lv2_atom_forge_raw(&m_forge, &midiatom, sizeof(LV2_Atom)\n");
+    //     return false;
+    // }
+    // if (0 == lv2_atom_forge_raw(&m_forge, buffer, size * sizeof(uint8_t)))
+    // {
+    //     printf("0 == lv2_atom_forge_raw(&m_forge, buffer, size*sizeof(uint8_t))\n");
+    //     return false;
+    // }
+    // lv2_atom_forge_pad(&m_forge, size * sizeof(uint8_t) + sizeof(LV2_Atom));
+
+    lv2_atom_forge_sequence_head(&m_forge, &m_frame, 0);
+    if (0 == lv2_atom_forge_frame_time(&m_forge, 0))
     {
         printf("0 == lv2_atom_forge_frame_time\n");
         return false;
     }
-    if (0 == lv2_atom_forge_raw(&m_forge, &midiatom, sizeof(LV2_Atom)))
+    if (0 == lv2_atom_forge_atom(&m_forge, 3, m_midiEvent))
     {
-        printf("0==lv2_atom_forge_raw(&m_forge, &midiatom, sizeof(LV2_Atom)\n");
+        printf("0 == lv2_atom_forge_frame_time\n");
         return false;
     }
-    if (0 == lv2_atom_forge_raw(&m_forge, buffer, size * sizeof(uint8_t)))
+
+    if (0 == lv2_atom_forge_write(&m_forge, buffer, 3))
     {
-        printf("0 == lv2_atom_forge_raw(&m_forge, buffer, size*sizeof(uint8_t))\n");
+        printf("0 == lv2_atom_forge_frame_time\n");
         return false;
     }
-    lv2_atom_forge_pad(&m_forge, size * sizeof(uint8_t) + sizeof(LV2_Atom));
-    // lv2_atom_forge_frame_time(&m_forge, frames);
-    // lv2_atom_forge_raw(&m_forge, &midiatom, sizeof(LV2_Atom));
-    // lv2_atom_forge_raw(&m_forge, buffer, size*sizeof(uint8_t));
-    // lv2_atom_forge_pad(&m_forge, size*sizeof(uint8_t)+sizeof(LV2_Atom));
+
+    lv2_atom_forge_pop(&m_forge, &m_frame);
 
     return true;
 }
@@ -77,7 +93,7 @@ void MidiOutput::initializeSequence()
     {
         const uint32_t out_capacity = m_midioutput->atom.size;
         lv2_atom_forge_set_buffer(&m_forge, (uint8_t *)m_midioutput, out_capacity);
-        lv2_atom_forge_sequence_head(&m_forge, &m_frame, 0);
+       // lv2_atom_forge_sequence_head(&m_forge, &m_frame, 0);
         m_frames = 0;
     }
 }
