@@ -188,16 +188,6 @@ float NoteClassifier::filterAndComputeMeanEnv(float *buffer, int nsamples, bool 
 
     float period = 1 / m_centerfreq;
     int period_samples = period * m_samplerate;
-    if (m_meanEnvCounter > period_samples)
-    {
-        m_meanEnv=m_currentMeanEnv;
-        // if(floor(m_centerfreq)==82)
-        // {
-        //     lv2_log_trace(&g_logger, "current mean env %f\n",m_meanEnv);
-        // }
-        m_currentMeanEnv = 0;
-        m_meanEnvCounter = 0;
-    }
     for (int s = 0; s < (nsamples); s++)
     {
         // if (fabs(buffer[s]) > fabs(buffer[s - 1]) && fabs(buffer[s]) > fabs(buffer[s + 1]) && fabs(buffer[s]) > 0)
@@ -206,6 +196,16 @@ float NoteClassifier::filterAndComputeMeanEnv(float *buffer, int nsamples, bool 
             // m_meanEnv += fabs(buffer[s]);
             m_currentMeanEnv = (absval > m_currentMeanEnv) ? absval : m_currentMeanEnv;
             m_meanEnvCounter++;
+            if (m_meanEnvCounter >= period_samples)
+            {
+                m_meanEnv = m_currentMeanEnv;
+                // if(floor(m_centerfreq)==82)
+                // {
+                //     lv2_log_trace(&g_logger, "current mean env %f\n",m_meanEnv);
+                // }
+                m_currentMeanEnv = 0;
+                m_meanEnvCounter = 0;
+            }
         }
     }
 
