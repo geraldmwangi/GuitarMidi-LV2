@@ -8,3 +8,4 @@
 Makefile~
 build
 bin
+*.npy
