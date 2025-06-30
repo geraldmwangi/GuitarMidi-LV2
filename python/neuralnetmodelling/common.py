@@ -25,10 +25,10 @@ def save_data_slices(output_dir,nn_slices,batch_size):
 
         # Save the slices
         np.save(input_filepath, current_in)
-        if i % 1000 == 0:
-            print(f"Saved slice {i}/{totalsamples}")
+        # if i % 1000 == 0:
+        #     print(f"Saved slice {i}/{totalsamples}")
 
-    print(f"Serialization complete. Files saved in '{output_dir}'.")
+    print(f"Serialization complete. {totalsamples} Files saved in '{output_dir}'.")
     
     
     
