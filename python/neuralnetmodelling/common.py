@@ -4,7 +4,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 # Common parameters
 frame_size=256
-
+image_height = 256
+image_width = 312 # Assuming this is your updated 288+some context/padding, or just 288 filter outputs
+num_channels = 1
+num_classes = 89 # For MIDI notes
+INPUT_SHAPE = (image_height, image_width, num_channels)
+OUTPUT_DIM_NOTES = num_classes # For notes output
+OUTPUT_DIM_ONSETS = 1 # For onsets output
 
 # Common functions
 def save_data_slices(output_dir,nn_slices,batch_size):
@@ -68,3 +74,62 @@ def plot_heatmap(plotdata):
     plt.ylabel('Row Index')
     plt.show()
     print("Heatmap displayed.")
+    
+    
+def reshape_to_nn_input(indata):
+    num_cols=indata.shape[1]
+    num_rows=indata.shape[0]
+    downsample_factor = frame_size
+    # --- Downsampling the data ---
+    print(f"reshape data by a factor of {downsample_factor}...")
+    # Calculate the new number of columns after downsampling
+    new_num_cols = num_cols // downsample_factor
+
+    # Ensure the original number of columns is a multiple of the downsample_factor
+    # If not, you might lose some data at the end or need a more complex aggregation.
+    # For simplicity, we'll slice to a multiple of downsample_factor
+    effective_cols = new_num_cols * downsample_factor
+    data_sliced = indata[:, :effective_cols]
+    print(data_sliced.shape)
+    # Reshape the data for averaging:
+    # -1: infer dimension
+    # downsample_factor: group columns into blocks
+    # num_rows: keep rows as isp
+    # This reshapes (19, M*N) to (19, M, N)
+    reshaped_data = data_sliced.reshape(num_rows, new_num_cols, downsample_factor,1)
+    reshaped_data=np.swapaxes(reshaped_data,0,1)
+    reshaped_data=np.swapaxes(reshaped_data,1,2)
+    
+    print('Reshaped the input data to  ')
+    print(reshaped_data.shape)
+    return reshaped_data
+
+def reshape_to_nn_output(outdata):
+    num_samples=outdata.shape[1]
+    num_midi_classes=outdata.shape[0]
+    downsample_factor = frame_size
+    # --- Downsampling the data ---
+    print(f"reshape data by a factor of {downsample_factor}...")
+    # Calculate the new number of columns after downsampling
+    num_frames = num_samples // downsample_factor
+
+    # Ensure the original number of columns is a multiple of the downsample_factor
+    # If not, you might lose some data at the end or need a more complex aggregation.
+    # For simplicity, we'll slice to a multiple of downsample_factor
+    effective_cols = num_frames * downsample_factor
+    data_sliced = outdata[:, :effective_cols]
+    print(data_sliced.shape)
+    # Reshape the data for averaging:
+    # -1: infer dimension
+    # downsample_factor: group columns into blocks
+    # num_rows: keep rows as isp
+    # This reshapes (19, M*N) to (19, M, N)
+    reshaped_data = data_sliced.reshape(num_midi_classes, num_frames, downsample_factor)
+    
+    #Take only one sample per frame
+    reshaped_data=np.max(reshaped_data,axis=2)
+    reshaped_data=np.swapaxes(reshaped_data,0,1)
+    
+    print('Reshaped the output data to  ')
+    print(reshaped_data.shape)
+    return reshaped_data
