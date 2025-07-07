@@ -7,20 +7,20 @@ def build_cnn_model(input_shape, output_dim_notes): # Removed output_dim_onsets
     inputs = layers.Input(shape=input_shape, dtype=tf.float32, name='input_features')
 
     # --- Shared Feature Extractor ---
-    x = layers.Conv2D(filters=32, kernel_size=(7,7), padding='same', activation=None)(inputs)
+    x = layers.Conv2D(filters=32, kernel_size=(3,3), padding='same', activation=None)(inputs)
     x = layers.BatchNormalization()(x)
     x = layers.Activation(activation='relu')(x)
     x = layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(x)
     x = layers.SpatialDropout2D(0.2)(x)
 
-    x = layers.Conv2D(filters=64, kernel_size=(7,7), padding='same', activation=None)(x)
+    x = layers.Conv2D(filters=64, kernel_size=(3,3), padding='same', activation=None)(x)
     x = layers.BatchNormalization()(x)
     x = layers.Activation(activation='relu')(x)
     x = layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(x)
     x = layers.SpatialDropout2D(0.25)(x)
     
     # --- Continue shared feature extraction for the Note branch ---
-    x = layers.Conv2D(filters=128, kernel_size=(7, 7), padding='same', activation=None)(x) # Use x_conv_features
+    x = layers.Conv2D(filters=128, kernel_size=(3, 3), padding='same', activation=None)(x) # Use x_conv_features
     x = layers.BatchNormalization()(x)
     x = layers.Activation(activation='relu')(x)
     x = layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(x)
