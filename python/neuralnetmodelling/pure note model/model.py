@@ -9,12 +9,12 @@ def build_cnn_model(input_shape, output_dim_notes):
     model.add(layers.Input(shape=input_shape))
 
     # 2D CNN Block 1
-    model.add(layers.Conv2D(filters=32, kernel_size=(3, 3), padding='same', activation='relu'))
+    model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), padding='same', activation='relu'))
     model.add(layers.BatchNormalization())
     model.add(layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
     model.add(layers.SpatialDropout2D(0.2))
     # 2D CNN Block 2
-    model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), padding='same', activation='relu'))
+    model.add(layers.Conv2D(filters=128, kernel_size=(3, 3), padding='same', activation='relu'))
     model.add(layers.BatchNormalization())
     model.add(layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
     model.add(layers.SpatialDropout2D(0.25))
