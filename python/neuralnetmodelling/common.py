@@ -47,15 +47,15 @@ def fast_gpu_map(ipath,training=True):
     
     # --- Vectorized Normalization ---
     # We find the peak activation across all filters for this specific window
-    max_val = tf.reduce_max(envelopes)
+    # max_val = tf.reduce_max(envelopes)
     
     # If the peak is > 0.1, we scale the whole tensor down so the peak is 1.0
     # Using tf.where prevents division by zero and applies the condition element-wise
-    envelopes = tf.cond(
-        max_val > 0.1,
-        lambda: envelopes / max_val, 
-        lambda: envelopes
-    )
+    # envelopes = tf.cond(
+    #     max_val > 0.1,
+    #     lambda: envelopes / max_val, 
+    #     lambda: envelopes
+    # )
     
     # Reshape for CNN
     input_tensor = tf.cast(envelopes, tf.float32)
