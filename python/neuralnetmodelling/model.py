@@ -38,16 +38,16 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
     print(f"Initial input shape: {x.shape}")
     # 2. Time-Domain Processing (per filter)
     # We use a small 2D kernel to look at neighboring filters and time
-    x = layers.Conv1D(32, 5, padding='same', activation=None)(x)
+    x = layers.Conv1D(32, 3, padding='same', activation=None)(x)
     x = layers.BatchNormalization()(x)
     x = layers.LeakyReLU()(x)
     # x=layers.MaxPooling1D(2)(x)
-    x = layers.SpatialDropout1D(0.2)(x, training=training)
-    x = layers.Conv1D(64, 5, padding='same', activation=None)(x)
+    x = layers.SpatialDropout1D(0.3)(x, training=training)
+    x = layers.Conv1D(64, 3, padding='same', activation=None)(x)
     x = layers.BatchNormalization()(x)
     x = layers.LeakyReLU()(x)
     x=layers.MaxPooling1D(2)(x)
-    x = layers.SpatialDropout1D(0.2)(x, training=training)
+    x = layers.SpatialDropout1D(0.3)(x, training=training)
     print(f"After first Conv2D: {x.shape}")
     #x = layers.MaxPooling2D((1, 4))(x) # Reduce time, keep filter resolution
     # print(f"After first Conv2D and MaxPooling2D: {x.shape}")
@@ -62,22 +62,22 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
         s = layers.Lambda(lambda y, st=start, en=end: y[:, st:en, :])(x)
         print(f"String {i+1} section shape: {s.shape}")
         # String-specific processing
-        s = layers.Conv1D(128, 5, padding='same', activation=None)(s)
+ # String-specific processing with Dilation to capture temporal shape
+        s = layers.Conv1D(64, 3, padding='same', dilation_rate=1)(s)
+        s = layers.LeakyReLU(0.2)(s)
+        s = layers.Conv1D(64, 3, padding='same', dilation_rate=2)(s) # Sees further in time
         s = layers.BatchNormalization()(s)
-        s = layers.LeakyReLU()(s)
+
         print(f"String {i+1} after first Conv1D: {s.shape}")
         s=layers.MaxPooling1D(4)(s)
         s = layers.SpatialDropout1D(0.3)(s, training=training)
-        # #s = layers.MaxPooling2D((1, 4))(s)
-        # s = layers.Conv1D(256, 5, padding='same', activation=None)(s)
-        # s = layers.BatchNormalization()(s)
-        # s = layers.LeakyReLU()(s)
-        # print(f"String {i+1} after second Conv1D: {s.shape}")
-        # s=layers.MaxPooling1D(4)(s)
 
 
-        s = layers.GlobalMaxPooling1D()(s)
-        string_features.append(s)
+
+        s_max = layers.GlobalMaxPooling1D()(s)
+        s_avg = layers.GlobalAveragePooling1D()(s)
+        s_combined = layers.Concatenate()([s_max, s_avg])
+        string_features.append(s_combined)
     
     # 4. Recombine for Note Classification
     concat = layers.Concatenate()(string_features)
