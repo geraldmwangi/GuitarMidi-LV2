@@ -32,7 +32,7 @@ def create_static_mask(fretboard_obj, num_samples, sample_rate):
 # Global constant
 FILTER_MASK = create_static_mask(fretboard, INPUT_SHAPE_AUDIO[1], SAMPLERATE)
 print("Filter mask created with shape:", FILTER_MASK.shape)
-def fast_gpu_map(ipath, fretboard_idx,training=True):
+def fast_gpu_map(ipath,training=True):
     parsed = tf.io.parse_single_example(ipath, feature_description)
     audio = tf.io.decode_raw(parsed["input"], tf.float32)
     label = tf.io.decode_raw(parsed["output"], tf.int8)
