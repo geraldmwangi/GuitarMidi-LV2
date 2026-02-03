@@ -87,7 +87,7 @@ namespace GuitarMidi
         msg.str("");
         msg<<"Output data:";
         for(int i=0;i<min(output_size,OUTPUT_DIM);i++){
-            if(output_data[i]>0.3){
+            if(output_data[i]>0.5){
                 msg<<" "<<i<<"("<<output_data[i]<<")";
                 
 

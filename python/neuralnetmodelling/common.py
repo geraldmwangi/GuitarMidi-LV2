@@ -18,6 +18,45 @@ SAMPLERATE=48000
 from scipy import signal
 from fretboard import FretBoard
 fretboard=FretBoard(17.5,SAMPLERATE)
+
+def extract_iir_coefficients(fretboard_obj):
+    b_list = []
+    a_list = []
+    for fret in fretboard_obj.frets:
+        for string in fret.strings:
+            for filt in string.harmonics:
+                # Store as [b0, b1, b2] and [1.0, a1, a2]
+                b_list.append(filt.b)
+                a_list.append(filt.a)
+    
+    return (tf.constant(b_list, dtype=tf.float32), 
+            tf.constant(a_list, dtype=tf.float32))
+
+B_COEFFS, A_COEFFS = extract_iir_coefficients(fretboard)
+# Shapes: [312, 3]
+def apply_iir_filterbank(audio, b, a):
+    x = tf.expand_dims(audio, axis=-1) 
+    initial_state = tf.zeros((tf.shape(b)[0], 2), dtype=tf.float32)
+
+    # Note the change here: 'state' is now unpacked into (s_internal, y_prev)
+    def iir_step(state, x_n):
+        s_internal, _ = state  # s_internal is [312, 2]
+        
+        # y[n] = b0*x[n] + s1
+        y_n = b[:, 0] * x_n + s_internal[:, 0]
+        
+        # Update internal states
+        new_s1 = b[:, 1] * x_n - a[:, 1] * y_n + s_internal[:, 1]
+        new_s2 = b[:, 2] * x_n - a[:, 2] * y_n
+        
+        # Return a tuple matching the initializer structure
+        return (tf.stack([new_s1, new_s2], axis=-1), y_n)
+
+    # Scan results in a tuple of (states_history, outputs_history)
+    _, outputs = tf.scan(iir_step, x, initializer=(initial_state, tf.zeros(312)))
+    
+    return tf.transpose(outputs) # [312, 256]
+
 def create_static_mask(fretboard_obj, num_samples, sample_rate):
     freq_bins = num_samples // 2 + 1
     f = np.linspace(0, sample_rate / 2, freq_bins)
@@ -63,6 +102,54 @@ def fast_gpu_map(ipath,training=True):
     output_tensor = tf.cast(tf.reshape(label, [OUTPUT_DIM_NOTES]), tf.float32)
     
     return input_tensor, output_tensor
+
+
+# def fast_gpu_map(ipath, training=True):
+#     parsed = tf.io.parse_single_example(ipath, feature_description)
+#     audio = tf.io.decode_raw(parsed["input"], tf.float32)
+#     label = tf.io.decode_raw(parsed["output"], tf.int8)
+    
+#     if training:
+#         audio, label = augment_audio(audio, label)
+    
+#     # --- Time-Domain Forward-Backward Filtering ---
+#     # 1. Forward pass
+#     fwd = apply_iir_filterbank(audio, B_COEFFS, A_COEFFS)
+    
+#     # 2. Backward pass (simulates zero-phase / squared magnitude)
+#     rev_input = tf.reverse(fwd, axis=[-1])
+#     # Note: We must process each filter's reverse output individually
+#     # but apply_iir_filterbank already handles 312 channels.
+#     # We map over the 312 channels to re-filter
+#     bwd = apply_iir_filterbank_reversed(rev_input, B_COEFFS, A_COEFFS)
+#     envelopes = tf.abs(tf.reverse(bwd, axis=[-1]))
+
+#     # --- Reshape and Normalization ---
+#     # (Optional: insert your peak-normalization logic here)
+    
+#     input_tensor = tf.expand_dims(tf.cast(envelopes, tf.float32), axis=-1)
+#     output_tensor = tf.cast(tf.reshape(label, [OUTPUT_DIM_NOTES]), tf.float32)
+    
+#     return input_tensor, output_tensor
+
+def apply_iir_filterbank_reversed(audio_bank, b, a):
+    x_bank = tf.transpose(audio_bank) # [256, 312]
+    initial_state = tf.zeros((tf.shape(b)[0], 2), dtype=tf.float32)
+
+    def iir_step_bank(state, x_n_bank):
+        s_internal, _ = state 
+        
+        y_n = b[:, 0] * x_n_bank + s_internal[:, 0]
+        
+        new_s1 = b[:, 1] * x_n_bank - a[:, 1] * y_n + s_internal[:, 1]
+        new_s2 = b[:, 2] * x_n_bank - a[:, 2] * y_n
+        
+        return (tf.stack([new_s1, new_s2], axis=-1), y_n)
+
+    _, outputs = tf.scan(iir_step_bank, x_bank, initializer=(initial_state, tf.zeros(312)))
+    return tf.transpose(outputs)
+
+
 def augment_audio(audio, label):
     # Randomly scale volume (0.5x to 1.2x)
     gain = tf.random.uniform([], 0.5, 1.2)
