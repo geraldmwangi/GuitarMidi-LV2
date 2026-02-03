@@ -15,6 +15,62 @@ INPUT_SHAPE_AUDIO = (1,image_width, num_channels)
 OUTPUT_DIM_NOTES = num_classes # For notes output
 OUTPUT_DIM_ONSETS = 1 # For onsets output
 SAMPLERATE=48000
+from scipy import signal
+from fretboard import FretBoard
+fretboard=FretBoard(17.5,SAMPLERATE)
+def create_static_mask(fretboard_obj, num_samples, sample_rate):
+    freq_bins = num_samples // 2 + 1
+    f = np.linspace(0, sample_rate / 2, freq_bins)
+    mask = []
+    for fret in fretboard_obj.frets:
+        for string in fret.strings:
+            for filt in string.harmonics:
+                _, h = signal.freqz(filt.b, filt.a, worN=f, fs=sample_rate)
+                mask.append(np.abs(h)**2) # Simulates filtfilt
+    return tf.constant(np.array(mask), dtype=tf.complex64)
+
+# Global constant
+FILTER_MASK = create_static_mask(fretboard, INPUT_SHAPE_AUDIO[1], SAMPLERATE)
+print("Filter mask created with shape:", FILTER_MASK.shape)
+def fast_gpu_map(ipath, fretboard_idx,training=True):
+    parsed = tf.io.parse_single_example(ipath, feature_description)
+    audio = tf.io.decode_raw(parsed["input"], tf.float32)
+    label = tf.io.decode_raw(parsed["output"], tf.int8)
+    
+    if training:
+        audio, label = augment_audio(audio, label)
+    
+    # --- Vectorized Filtering ---
+    audio_fft = tf.signal.rfft(audio) 
+    filtered_fft = FILTER_MASK * tf.cast(audio_fft, tf.complex64)
+    envelopes = tf.abs(tf.signal.irfft(filtered_fft)) # Shape: [312, 256]
+    
+    # --- Vectorized Normalization ---
+    # We find the peak activation across all filters for this specific window
+    max_val = tf.reduce_max(envelopes)
+    
+    # If the peak is > 0.1, we scale the whole tensor down so the peak is 1.0
+    # Using tf.where prevents division by zero and applies the condition element-wise
+    envelopes = tf.cond(
+        max_val > 0.1,
+        lambda: envelopes / max_val, 
+        lambda: envelopes
+    )
+    
+    # Reshape for CNN
+    input_tensor = tf.cast(envelopes, tf.float32)
+    input_tensor = tf.expand_dims(input_tensor, axis=-1)
+    output_tensor = tf.cast(tf.reshape(label, [OUTPUT_DIM_NOTES]), tf.float32)
+    
+    return input_tensor, output_tensor
+def augment_audio(audio, label):
+    # Randomly scale volume (0.5x to 1.2x)
+    gain = tf.random.uniform([], 0.5, 1.2)
+    audio = audio * gain
+    
+    # Add a tiny bit of white noise to mask filter "ringing"
+    noise = tf.random.normal(shape=tf.shape(audio), stddev=0.001)
+    return audio + noise, label
 # Common functions
 def save_data_slices(output_dir,nn_slices,batch_size,filenum_offset=0):
     totalsamples=nn_slices.shape[0]
