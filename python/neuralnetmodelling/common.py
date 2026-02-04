@@ -35,39 +35,92 @@ def create_static_mask(fretboard_obj, num_samples, sample_rate):
 # Global constant
 FILTER_MASK = create_static_mask(fretboard, INPUT_SHAPE_AUDIO[1], SAMPLERATE)
 print("Filter mask created with shape:", FILTER_MASK.shape)
-def fast_gpu_map(ipath,training=True):
+# def fast_gpu_map(ipath,training=True):
+#     parsed = tf.io.parse_single_example(ipath, feature_description)
+#     audio = tf.io.decode_raw(parsed["input"], tf.float32)
+#     label = tf.io.decode_raw(parsed["output"], tf.int8)
+    
+#     if training:
+#         audio, label = augment_audio(audio, label)
+    
+#     # --- Vectorized Filtering ---
+#     audio_fft = tf.signal.rfft(audio) 
+#     filtered_fft = FILTER_MASK * tf.cast(audio_fft, tf.complex64)
+#     envelopes = tf.abs(tf.signal.irfft(filtered_fft)) # Shape: [312, 256]
+    
+#     # --- Vectorized Normalization ---
+#     # We find the peak activation across all filters for this specific window
+#     # max_val = tf.reduce_max(envelopes)
+    
+#     # If the peak is > 0.1, we scale the whole tensor down so the peak is 1.0
+#     # Using tf.where prevents division by zero and applies the condition element-wise
+#     # envelopes = tf.cond(
+#     #     max_val > 0.1,
+#     #     lambda: envelopes / max_val, 
+#     #     lambda: envelopes
+#     # )
+    
+#     # Reshape for CNN
+#     input_tensor = tf.cast(envelopes, tf.float32)
+#     input_tensor = tf.expand_dims(input_tensor, axis=-1)
+#     output_tensor = tf.cast(tf.reshape(label, [OUTPUT_DIM_NOTES]), tf.float32)
+    
+#     return input_tensor, output_tensor
+
+def generate_long_ir_kernels(fretboard_obj, ir_length=1024):
+    """Captures the full decay of your Butterworth filters."""
+    impulse = np.zeros(ir_length, dtype=np.float32)
+    impulse[0] = 1.0
+    
+    num_filts = fretboard_obj.get_num_filters()
+    ir_buffer = np.zeros((num_filts, ir_length), dtype=np.float32)
+    
+    # Process the impulse through your existing FretBoard class
+    fretboard_obj.process(impulse, ir_buffer)
+    
+    # Apply a Hanning taper to the last 15% to prevent truncation clicks
+    taper_len = int(ir_length * 0.15)
+    taper = np.ones(ir_length)
+    taper[-taper_len:] = np.hanning(taper_len * 2)[taper_len:]
+    ir_buffer = ir_buffer * taper
+
+    # Conv1D Shape: [kernel_width, in_channels, out_channels]
+    ir_kernels = ir_buffer.T[:, np.newaxis, :] 
+    return tf.constant(ir_kernels, dtype=tf.float32)
+
+# Global Filterbank Kernel
+
+fretboard = FretBoard(17.5, SAMPLERATE)
+IR_KERNELS = generate_long_ir_kernels(fretboard, 1024)
+
+def fast_gpu_map(ipath, training=True):
     parsed = tf.io.parse_single_example(ipath, feature_description)
     audio = tf.io.decode_raw(parsed["input"], tf.float32)
     label = tf.io.decode_raw(parsed["output"], tf.int8)
     
     if training:
-        audio, label = augment_audio(audio, label)
+        # Standard volume/noise augmentation
+        gain = tf.random.uniform([], 0.8, 1.2)
+        audio = audio * gain
+        audio = audio + tf.random.normal(tf.shape(audio), stddev=0.0001)
+
+    # --- 1D Convolutional Filterbank ---
+    audio_in = tf.reshape(audio, [1, frame_size, 1])
+    # Uses 1024-sample kernels on 256-sample audio
+    filtered = tf.nn.conv1d(audio_in, IR_KERNELS, stride=1, padding='SAME')
     
-    # --- Vectorized Filtering ---
-    audio_fft = tf.signal.rfft(audio) 
-    filtered_fft = FILTER_MASK * tf.cast(audio_fft, tf.complex64)
-    envelopes = tf.abs(tf.signal.irfft(filtered_fft)) # Shape: [312, 256]
+    # --- Rectification & Envelope Extraction ---
+    envelopes = tf.abs(tf.squeeze(filtered)) # [256, 312]
+    envelopes = tf.transpose(envelopes)      # [312, 256]
     
-    # --- Vectorized Normalization ---
-    # We find the peak activation across all filters for this specific window
-    # max_val = tf.reduce_max(envelopes)
+    # --- Stability Buffer ---
+    # Adding epsilon (1e-7) prevents NaN in log-based loss functions
+    envelopes = envelopes + 1e-7
     
-    # If the peak is > 0.1, we scale the whole tensor down so the peak is 1.0
-    # Using tf.where prevents division by zero and applies the condition element-wise
-    # envelopes = tf.cond(
-    #     max_val > 0.1,
-    #     lambda: envelopes / max_val, 
-    #     lambda: envelopes
-    # )
-    
-    # Reshape for CNN
-    input_tensor = tf.cast(envelopes, tf.float32)
-    input_tensor = tf.expand_dims(input_tensor, axis=-1)
+    input_tensor = tf.expand_dims(tf.cast(envelopes, tf.float32), axis=-1)
     output_tensor = tf.cast(tf.reshape(label, [OUTPUT_DIM_NOTES]), tf.float32)
     
     return input_tensor, output_tensor
-
-
 
 
 
