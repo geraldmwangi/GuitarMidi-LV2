@@ -152,11 +152,11 @@ def apply_iir_filterbank_reversed(audio_bank, b, a):
 
 def augment_audio(audio, label):
     # Randomly scale volume (0.5x to 1.2x)
-    gain = tf.random.uniform([], 0.5, 1.2)
+    gain = tf.random.uniform([], 0.9, 1.1)
     audio = audio * gain
     
     # Add a tiny bit of white noise to mask filter "ringing"
-    noise = tf.random.normal(shape=tf.shape(audio), stddev=0.001)
+    noise = tf.random.normal(shape=tf.shape(audio), stddev=0.0001)
     return audio + noise, label
 # Common functions
 def save_data_slices(output_dir,nn_slices,batch_size,filenum_offset=0):
