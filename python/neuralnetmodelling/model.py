@@ -23,66 +23,57 @@ def partitioned_average_pooling_1d(x):
 
 def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), output_dim=OUTPUT_DIM_NOTES, training=True,
                        gru_units=128, gru_layers=1, bidirectional=True, stateful=False):  # Added GRU params
-# Input: (Batch, Filters, Time)
+# Input shape: (Batch, 312, 256)
     inputs = layers.Input(batch_shape=(batch_sz, *input_shape))
     
-        # 1. Temporal Compression: Keep some temporal info rather than just 'max'
-    # We use a large stride to reduce 256 -> 32 while learning features
+    # 1. Initial Temporal Compression
+    # We reduce the 256 time-samples to 32 to keep the "shape" of the attack
     x = layers.Reshape((312, 256, 1))(inputs)
     x = layers.Conv2D(16, (1, 16), strides=(1, 8), padding='same')(x)
-    x = layers.LeakyReLU(0.2)(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.LeakyReLU(0.2)(x) 
+    # Current Shape: (Batch, 312, 32, 16)
+
+    # 2. Harmonic Stacking Reshape
+    # We turn the 312 filters into (6 Strings, 13 Frets, 4 Harmonics)
+    # This allows the model to look at all 4 harmonics of a note simultaneously
+    x = layers.Reshape((6, 13, 4, 32, 16))(x)
     
-    # Flatten time into features so we can use Conv1D on filters
-    # Shape: (Batch, 312, 16 * 32)
-    x = layers.Reshape((312, 512))(x)
-    print(f"Initial input shape: {x.shape}")
-    # 2. Time-Domain Processing (per filter)
-    # We use a small 2D kernel to look at neighboring filters and time
-    x = layers.Conv1D(32, 5, padding='same', activation=None)(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.LeakyReLU()(x)
-    # x=layers.MaxPooling1D(2)(x)
-    x = layers.SpatialDropout1D(0.3)(x, training=training)
-    x = layers.Conv1D(64, 5, padding='same', activation=None)(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.LeakyReLU()(x)
-    x=layers.MaxPooling1D(2)(x)
-    x = layers.SpatialDropout1D(0.3)(x, training=training)
-    print(f"After first Conv2D: {x.shape}")
-    #x = layers.MaxPooling2D((1, 4))(x) # Reduce time, keep filter resolution
-    # print(f"After first Conv2D and MaxPooling2D: {x.shape}")
-    # 3. String-Specific Partitioning
-    # Instead of manual slicing at the END, slice now.
-    # Assuming 312 filters / 6 strings = 52 filters per string
-    string_features = []
+    # Flatten the 'Time' and 'Features' dimensions for convolution
+    # New Shape: (Batch, 6, 13, 4, 512)
+    x = layers.Reshape((6, 13, 4, 512))(x)
+
+    string_outputs = []
+    
+    # 3. String-Specific Processing (Branching)
     for i in range(6):
-        start=i*26
-        end=(i+1)*26
-        print(f"Extracting string {i+1} from filters {start} to {end}")
-        s = layers.Lambda(lambda y, st=start, en=end: y[:, st:en, :])(x)
-        print(f"String {i+1} section shape: {s.shape}")
-        # String-specific processing
- # String-specific processing with Dilation to capture temporal shape
-        s = layers.Conv1D(128, 5, padding='same', dilation_rate=1)(s)
+        # Slice one string: (Batch, 13 Frets, 4 Harmonics, 512 Features)
+        s = layers.Lambda(lambda y, idx=i: y[:, idx, :, :, :])(x)
+        
+        # Cross-Harmonic Convolution
+        # Kernel (1, 4) looks across all 4 harmonics for each fret
+        s = layers.Conv2D(64, (1, 4), padding='valid')(s)
         s = layers.LeakyReLU(0.2)(s)
-        # s = layers.Conv1D(64, 5, padding='same', dilation_rate=2)(s) # Sees further in time
+        
+        # Fret-Wise Processing
+        # Kernel (3, 1) looks at neighboring frets (helpful for slides/vibrato)
+        s = layers.Conv2D(128, (3, 1), padding='same')(s)
         s = layers.BatchNormalization()(s)
+        s = layers.SpatialDropout2D(0.2)(s, training=training)
+        
+        # Reduce to a per-string feature vector
+        s = layers.GlobalMaxPooling2D()(s)
+        string_outputs.append(s)
 
-        print(f"String {i+1} after first Conv1D: {s.shape}")
-        s=layers.MaxPooling1D(4)(s)
-        s = layers.SpatialDropout1D(0.3)(s, training=training)
-
-
-
-        s_max = layers.GlobalMaxPooling1D()(s)
-        # s_avg = layers.GlobalAveragePooling1D()(s)
-        # s_combined = layers.Concatenate()([s_max, s_avg])
-        string_features.append(s_max)#(s_combined)
+    # 4. Global Feature Integration
+    concat = layers.Concatenate()(string_outputs)
+    x = layers.Dense(512)(concat)
+    x = layers.LeakyReLU(0.2)(x)
+    x = layers.Dropout(0.4)(x, training=training)
     
-    # 4. Recombine for Note Classification
-    concat = layers.Concatenate()(string_features)
-    # x = layers.Dense(256, activation='relu')(concat)
-    concat = layers.Dropout(0.4)(concat, training=training)
-    outputs = layers.Dense(output_dim, activation='sigmoid',dtype='float32')(concat)
+    # 5. Output Head
+    # Using 1e-4 epsilon for mixed_float16 stability
+    outputs = layers.Dense(output_dim, activation='sigmoid', dtype='float32')(x)
     
-    return models.Model(inputs, outputs)
+    model = models.Model(inputs, outputs)
+    return model
