@@ -63,9 +63,9 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
         print(f"String {i+1} section shape: {s.shape}")
         # String-specific processing
  # String-specific processing with Dilation to capture temporal shape
-        s = layers.Conv1D(64, 5, padding='same', dilation_rate=1)(s)
+        s = layers.Conv1D(128, 5, padding='same', dilation_rate=1)(s)
         s = layers.LeakyReLU(0.2)(s)
-        s = layers.Conv1D(64, 5, padding='same', dilation_rate=2)(s) # Sees further in time
+        # s = layers.Conv1D(64, 5, padding='same', dilation_rate=2)(s) # Sees further in time
         s = layers.BatchNormalization()(s)
 
         print(f"String {i+1} after first Conv1D: {s.shape}")
@@ -75,9 +75,9 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
 
 
         s_max = layers.GlobalMaxPooling1D()(s)
-        s_avg = layers.GlobalAveragePooling1D()(s)
-        s_combined = layers.Concatenate()([s_max, s_avg])
-        string_features.append(s_combined)
+        # s_avg = layers.GlobalAveragePooling1D()(s)
+        # s_combined = layers.Concatenate()([s_max, s_avg])
+        string_features.append(s_max)#(s_combined)
     
     # 4. Recombine for Note Classification
     concat = layers.Concatenate()(string_features)
