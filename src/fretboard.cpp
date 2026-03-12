@@ -83,7 +83,7 @@ void FretBoard::finalize()
 
 void FretBoard::process(int nsamples)
 {
-    m_filterbank.process(nsamples);
+    //m_filterbank.process(nsamples);
     m_noteinferencer.process(nsamples);
 
 }

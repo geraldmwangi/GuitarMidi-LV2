@@ -250,12 +250,13 @@ Model: "functional"
 │ spatial_dropout2d_1 │ (512, 6, 256, 32) │          0 │ leaky_re_lu_15[0… │
 │ (SpatialDropout2D)  │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ flatten (Flatten)   │ (512, 49152)      │          0 │ spatial_dropout2… │
+│ global_average_poo… │ (512, 32)         │          0 │ spatial_dropout2… │
+│ (GlobalAveragePool… │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ dropout_2 (Dropout) │ (512, 49152)      │          0 │ flatten[0][0]     │
+│ dropout_2 (Dropout) │ (512, 32)         │          0 │ global_average_p… │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ dense_2 (Dense)     │ (512, 44)         │  2,162,732 │ dropout_2[0][0]   │
+│ dense_2 (Dense)     │ (512, 44)         │      1,452 │ dropout_2[0][0]   │
 └─────────────────────┴───────────────────┴────────────┴───────────────────┘
- Total params: 4,553,244 (17.37 MB)
- Trainable params: 4,548,348 (17.35 MB)
+ Total params: 2,391,964 (9.12 MB)
+ Trainable params: 2,387,068 (9.11 MB)
  Non-trainable params: 4,896 (19.12 KB)

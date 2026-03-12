@@ -177,7 +177,7 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
     x = layers.SpatialDropout2D(0.2)(x)
     
     # 4. Final Classification
-    concat = layers.Flatten()(x)
+    concat = layers.GlobalAveragePooling2D()(x)# layers.Flatten()(x)
     concat = layers.Dropout(0.4)(concat)
     outputs = layers.Dense(output_dim, activation='sigmoid',dtype='float32')(concat)
     
