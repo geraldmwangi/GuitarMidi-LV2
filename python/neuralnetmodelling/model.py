@@ -37,11 +37,11 @@ def string_layer(x,start,end,max_x,training):
         
         
 
-    s = layers.Conv1D(256, 7, padding='same', activation=None,kernel_initializer='he_normal')(s)
+    s = layers.Conv1D(64, 7, padding='same', activation=None,kernel_initializer='he_normal')(s)
     s = layers.BatchNormalization()(s)
     s = layers.LeakyReLU()(s)
         
-    s = layers.MaxPooling1D(pool_size=4)(s)
+    #s=layers.MaxPooling1D(2)(s)
 
     #s = layers.AveragePooling1D(pool_size=2)(s)  # small reduction
     # s = layers.Flatten()(s)  
@@ -153,11 +153,11 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
     e_end = (window_size + offset) / totalnotes # Final end is 24 + 13 = 37 (1.0)
     string_features = []
     Estr=string_layer(x,E_begin,int(E_end*max_x),max_x,training)
-    Astr=string_layer(x,int(A_begin*max_x),int(A_end*max_x),max_x,training)
-    dstr=string_layer(x,int(d_begin*max_x),int(d_end*max_x),max_x,training)
-    gstr=string_layer(x,int(g_begin*max_x),int(g_end*max_x),max_x,training)
-    bstr=string_layer(x,int(b_begin*max_x),int(b_end*max_x),max_x,training)
-    estr=string_layer(x,int(e_begin*max_x),int(max_x-1),max_x,training)
+    Astr=string_layer(x,int(A_begin*max_x)+1,int(A_end*max_x),max_x,training)
+    dstr=string_layer(x,int(d_begin*max_x)+1,int(d_end*max_x),max_x,training)
+    gstr=string_layer(x,int(g_begin*max_x)+1,int(g_end*max_x),max_x,training)
+    bstr=string_layer(x,int(b_begin*max_x)+1,int(b_end*max_x),max_x,training)
+    estr=string_layer(x,int(e_begin*max_x)+1,int(max_x-1),max_x,training)
 
     
 
@@ -168,13 +168,12 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
     stacked = layers.Lambda(lambda x: tf.stack(x, axis=1))(string_features)
     
     # 2. Reshape for 2D Conv: (Batch, 6, 256, 1)
-    stacked_2d = layers.Reshape((6, 256, 1))(stacked)
+    stacked_2d = layers.Reshape((6, 64, 1))(stacked)
     
     # 3. Chord Logic Conv2D: Looks at 3 strings at a time (e.g., power chords/triads)
     x = layers.Conv2D(32, kernel_size=(3, 7), padding='same')(stacked_2d)
     x = layers.BatchNormalization()(x)
     x = layers.LeakyReLU()(x)
-    x = layers.MaxPooling2D(pool_size=(1, 4))(x) 
     x = layers.SpatialDropout2D(0.2)(x)
     
     # 4. Final Classification
