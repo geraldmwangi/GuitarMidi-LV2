@@ -94,7 +94,7 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
     x = layers.Reshape((image_height, 512))(x)
     # x=layers.Lambda(lambda x: tf.reduce_max(x, axis=2))(inputs)
 
-    x = transformer_block(x, num_heads=2, head_size=64, ff_dim=256, dropout=0.2)
+    x = transformer_block(x, num_heads=6, head_size=64, ff_dim=256, dropout=0.2)
 
     # x=layers.Normalization(axis=-1)(x)
     # x=layers.Lambda(lambda x: tf.math.log(tf.abs(x) + 1e-4))(x)
@@ -153,11 +153,11 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
     e_end = (window_size + offset) / totalnotes # Final end is 24 + 13 = 37 (1.0)
     string_features = []
     Estr=string_layer(x,E_begin,int(E_end*max_x),max_x,training)
-    Astr=string_layer(x,int(A_begin*max_x),int(A_end*max_x),max_x,training)
-    dstr=string_layer(x,int(d_begin*max_x),int(d_end*max_x),max_x,training)
-    gstr=string_layer(x,int(g_begin*max_x),int(g_end*max_x),max_x,training)
-    bstr=string_layer(x,int(b_begin*max_x),int(b_end*max_x),max_x,training)
-    estr=string_layer(x,int(e_begin*max_x),int(max_x-1),max_x,training)
+    Astr=string_layer(x,int(A_begin*max_x)+1,int(A_end*max_x),max_x,training)
+    dstr=string_layer(x,int(d_begin*max_x)+1,int(d_end*max_x),max_x,training)
+    gstr=string_layer(x,int(g_begin*max_x)+1,int(g_end*max_x),max_x,training)
+    bstr=string_layer(x,int(b_begin*max_x)+1,int(b_end*max_x),max_x,training)
+    estr=string_layer(x,int(e_begin*max_x)+1,int(max_x-1),max_x,training)
 
     
 
@@ -179,6 +179,7 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
     # 4. Final Classification
     concat = layers.Flatten()(x)
     concat = layers.Dropout(0.4)(concat)
+    #concat=layers.Dense(256, activation='relu',dtype='float32')(concat)
     outputs = layers.Dense(output_dim, activation='sigmoid',dtype='float32')(concat)
     
     return models.Model(inputs, outputs)
