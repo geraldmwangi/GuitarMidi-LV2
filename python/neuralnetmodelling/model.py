@@ -24,32 +24,37 @@ def partitioned_average_pooling_1d(x):
 def string_layer(x,start,end,max_x,training):
     end=min(end,max_x)
     start=max(0,start)
-    print(f"Extracting string from filters {start} to {end}")
+# 1. Frequency Slice
     s = layers.Lambda(lambda y, st=start, en=end: y[:, st:en, :])(x)
-    print(f"String {start} section shape: {s.shape}")
-    # String-specific processing
-    s = layers.Conv1D(128, 7, padding='same', activation=None,kernel_initializer='he_normal')(s)
-    s = layers.BatchNormalization()(s)
+    
+    # 2. String-specific processing
+    s = layers.Conv1D(128, 7, padding='same', kernel_initializer='he_normal')(s)
+    s = layers.LayerNormalization()(s)
     s = layers.LeakyReLU()(s)
-    print(f"String {start} after first Conv1D: {s.shape}")
-    s=layers.MaxPooling1D(4)(s)
+    
+    # --- FIXED FEATURE POOLING ---
+    # We want to reduce the 128 filters to 32 (or 256 to 64 later)
+    # We reshape to (Batch, Time, New_Feature_Dim, Pool_Size)
+    current_channels = s.shape[-1] # 128
+    s = layers.Reshape((-1, current_channels // 4, 4))(s)
+    # Max pool across the last axis (the groups of 4 features)
+    s = layers.Lambda(lambda t: tf.reduce_mean(t, axis=3))(s) 
+    # Resulting shape: (Batch, Time, 32)
+    
     s = layers.SpatialDropout1D(0.3)(s)
         
-        
-
-    s = layers.Conv1D(64, 7, padding='same', activation=None,kernel_initializer='he_normal')(s)
-    s = layers.BatchNormalization()(s)
+    s = layers.Conv1D(256, 7, padding='same', kernel_initializer='he_normal')(s)
+    s = layers.LayerNormalization()(s)
     s = layers.LeakyReLU()(s)
         
-    #s=layers.MaxPooling1D(2)(s)
+    # Repeat Feature Pooling for the 256 -> 64 reduction
+    s = layers.Reshape((-1, 64, 4))(s)
+    smax = layers.Lambda(lambda t: tf.reduce_max(t, axis=3))(s)
+    smean=layers.Lambda(lambda t: tf.reduce_mean(t, axis=3))(s)
+    # Resulting shape: (Batch, Time, 64)
+    s=layers.Add()([smax,smean])
 
-    #s = layers.AveragePooling1D(pool_size=2)(s)  # small reduction
-    # s = layers.Flatten()(s)  
     return layers.GlobalAveragePooling1D()(s)
-    # savg= layers.GlobalAveragePooling1D()(s)
-    # s=layers.Concatenate()([smax,savg])
-    # return s
-    return s
 def transformer_block(x, num_heads=4, head_size=64, ff_dim=512, dropout=0.2):
     """
     A lightweight Transformer layer designed for real-time audio feature maps.
@@ -175,7 +180,7 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), out
     x = layers.BatchNormalization()(x)
     x = layers.LeakyReLU()(x)
     x = layers.SpatialDropout2D(0.2)(x)
-    
+    x= layers.Conv2D(8,kernel_size=(1,4),strides=(1,4),padding='same',activation=None)(x)
     # 4. Final Classification
     concat = layers.Flatten()(x)
     concat = layers.Dropout(0.4)(concat)
