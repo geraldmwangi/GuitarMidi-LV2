@@ -38,7 +38,7 @@ void GuitarMidi::ModelInferencer::inferencing_loop()
 void GuitarMidi::ModelInferencer::initialize()
 {
             // Load model
-        m_model = FlatBufferModel::BuildFromFile("/home/gerald/workspace/src/GuitarMidi-LV2/python/neuralnetmodelling/guitarmidi.tflite");
+        m_model = FlatBufferModel::BuildFromFile("/usr/lib/lv2/guitarmidi.lv2/guitarmidi.tflite");
         TFLITE_MINIMAL_CHECK(m_model != nullptr);
         ops::builtin::BuiltinOpResolver resolver;
         InterpreterBuilder builder(*m_model, resolver);

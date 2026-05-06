@@ -50,7 +50,7 @@ include_directories(${TENSORFLOW_SOURCE_DIR}  ${TENSORFLOW_SOURCE_DIR}/tensorflo
 add_subdirectory(
   "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite"
   "${CMAKE_CURRENT_BINARY_DIR}/tensorflow-lite"
-  #EXCLUDE_FROM_ALL
+  EXCLUDE_FROM_ALL
 )
 
 
@@ -77,5 +77,5 @@ endif()
 install(TARGETS guitarmidi
         DESTINATION guitarmidi.lv2)
 
-install(FILES ../manifest.ttl ../guitarmidi.ttl
+install(FILES ../manifest.ttl ../guitarmidi.ttl ../python/neuralnetmodelling/guitarmidi.tflite
         DESTINATION guitarmidi.lv2)
