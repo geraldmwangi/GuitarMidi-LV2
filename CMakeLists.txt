@@ -7,9 +7,7 @@ project("GuitarMidi-LV2")
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
-include(setversionfromgit)
 
-setversionfromgit()
 # specify the C++ standard
 option(BUILD_ANALYSIS_APP "Build analysis app, usefull for development" OFF)
 
@@ -43,6 +41,14 @@ add_subdirectory(AnalysisApp)
 endif()
 
 
-include(debian)
+
+#Debian packaging
+option(BUILD_DEB "Build debian package" ON)
+if(BUILD_DEB)
+	include(setversionfromgit)
+
+	setversionfromgit()
+	include(debian)
+endif()
 
 
