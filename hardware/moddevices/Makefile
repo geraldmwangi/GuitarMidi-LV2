@@ -27,6 +27,8 @@ $(PLUGIN).so:
         -DPTHREADPOOL_SOURCE_DIR=$(EXT_DIR)/pthreadpool/pthreadpool-c2ba5c50bb58d1397b693740cf75fad836a0d1bf \
         -DFP16_SOURCE_DIR=$(EXT_DIR)/fp16/FP16-0a92994d729ff76a58f692d3028ca1b64b145d91 \
         -DFXDIV_SOURCE_DIR=$(EXT_DIR)/fxdiv/FXdiv-b408327ac2a15ec3e43352421954f5b1967701d1 \
+        -DFETCHCONTENT_SOURCE_DIR_FLATBUFFERS=$(EXT_DIR)/flatbuffers/flatbuffers-24.3.25 \
+        -Dflatbuffers_SOURCE_DIR=$(EXT_DIR)/flatbuffers/flatbuffers-24.3.25 \
         -DCMAKE_SYSTEM_NAME=Linux \
         -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
 	-DXNNPACK_TARGET_PROCESSOR:STRING=generic \

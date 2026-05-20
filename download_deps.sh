@@ -40,5 +40,9 @@ cd "$EXT_DIR/kleidiai"
 wget -nc https://github.com/ARM-software/kleidiai/archive/dc69e899945c412a8ce39ccafd25139f743c60b1.zip
 unzip -n dc69e899945c412a8ce39ccafd25139f743c60b1.zip
 
+mkdir -p "$EXT_DIR/flatbuffers"
+cd "$EXT_DIR/flatbuffers"
+wget https://github.com/google/flatbuffers/archive/refs/tags/v24.3.25.tar.gz
+tar -xzf v24.3.25.tar.gz
 echo "All dependencies downloaded."
 
