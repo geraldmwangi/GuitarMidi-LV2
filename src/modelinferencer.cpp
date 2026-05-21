@@ -59,13 +59,21 @@
             xnnpack_options.weight_cache_file_path = TfLiteXNNPackDelegateInMemoryFilePath();
             // xnnpack_options.logging_level = TFLITE_XNNPACK_LOGGING_LEVEL_ERROR;
 
+            // if (m_interpreter->ModifyGraphWithDelegate(
+            //         TfLiteXNNPackDelegateCreate(&xnnpack_options)) != kTfLiteOk)
+            // {
+            //     // Handle error, but usually optional
+            //     lv2_log_error(&g_logger, "Failed to apply XNNPack delegate\n");
+            //     return false;
+            // }
             if (m_interpreter->ModifyGraphWithDelegate(
-                    TfLiteXNNPackDelegateCreate(&xnnpack_options)) != kTfLiteOk)
+                    TfLiteGpuDelegateV2Create(/*default options=*/nullptr)) != kTfLiteOk)
             {
                 // Handle error, but usually optional
                 lv2_log_error(&g_logger, "Failed to apply XNNPack delegate\n");
                 return false;
             }
+            
             // Allocate tensor buffers.
             TFLITE_MINIMAL_CHECK(m_interpreter->AllocateTensors() == kTfLiteOk);
             printf("=== Pre-invoke Interpreter State ===\n");

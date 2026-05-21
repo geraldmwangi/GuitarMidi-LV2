@@ -49,7 +49,7 @@ set(TFLITE_ENABLE_XNNPACK ON CACHE BOOL "Enable XNNPACK" FORCE)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 set(FETCHCONTENT_BASE_DIR "${CMAKE_BINARY_DIR}/_deps" CACHE PATH "" FORCE)
 
-include_directories(${TENSORFLOW_SOURCE_DIR}  ${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/delegates/xnnpack)
+include_directories(${TENSORFLOW_SOURCE_DIR}  ${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/delegates/xnnpack ${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/delegates/gpu)
 add_subdirectory(
   "${TENSORFLOW_SOURCE_DIR}/tensorflow/lite"
   "${CMAKE_CURRENT_BINARY_DIR}/tensorflow-lite"
@@ -63,13 +63,13 @@ set(SRC guitarmidi.cpp  midioutput.cpp fretboard.cpp fretboardrepresentation.cpp
 
 add_library(guitarmidi SHARED ${SRC})
 
-
+find_package(OpenGL REQUIRED)
 if(WITH_AUBIO=On)
 message("Building with onset support")
 target_link_libraries(guitarmidi dsp aubio ${Pango_LIBRARIES})
 else()
 message("Building without onset support")
-target_link_libraries(guitarmidi PUBLIC dsp  ${Pango_LIBRARIES} tensorflow-lite  )
+target_link_libraries(guitarmidi PUBLIC dsp  ${Pango_LIBRARIES} tensorflow-lite absl::log OpenGL::GL OpenGL::GLU OpenGL::EGL)
 #target_link_libraries(guitarmidi PUBLIC OpenMP::OpenMP_CXX )
 endif()
 

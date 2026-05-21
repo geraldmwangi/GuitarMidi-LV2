@@ -31,6 +31,7 @@
 #include "tensorflow/lite/model_builder.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 #include "tensorflow/lite/delegates/xnnpack/xnnpack_delegate.h"
+#include "tensorflow/lite/delegates/gpu/delegate.h"
 using namespace std;
 using namespace tflite;
 //#define RING_BUFFER_SIZE 8 // Number of frames to store in the ring buffer
