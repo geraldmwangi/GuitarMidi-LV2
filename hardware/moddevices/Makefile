@@ -1,10 +1,10 @@
 PREFIX ?= /usr
 LV2DIR ?= $(PREFIX)/lib/lv2
 
-PLUGIN = guitarmidi-lv2
+PLUGIN = guitarmidi
 BUNDLE = $(PLUGIN).lv2
 
-INSTALL_DIR = $(DESTDIR)$(LV2DIR)/$(BUNDLE)
+INSTALL_DIR = $(DESTDIR)$(LV2DIR)
 BUILD_DIR = build
 # Use absolute path for SOURCE_DIR to avoid pathing issues in sub-cmake calls
 SOURCE_DIR = $(shell pwd)/../../
@@ -13,7 +13,9 @@ EXT_DIR = $(SOURCE_DIR)/ext
 # Use -march=armv8-a to strictly stick to MOD Dwarf (RK3399) capabilities
 ARMCC_FLAGS="-funsafe-math-optimizations -march=armv8-a -mcpu=generic"
 
+# this flatbuffers version must be installed on the host system
 $(PLUGIN).so: 
+	echo "Source dir $(SOURCE_DIR). Dest dir $(DESTDIR). Install dir $(INSTALL_DIR)"
 	mkdir -p $(BUILD_DIR)
 	cd $(BUILD_DIR) && cmake -DBUILD_DEB=OFF \
         -DCMAKE_C_FLAGS=$(ARMCC_FLAGS) \
@@ -28,7 +30,7 @@ $(PLUGIN).so:
         -DFP16_SOURCE_DIR=$(EXT_DIR)/fp16/FP16-0a92994d729ff76a58f692d3028ca1b64b145d91 \
         -DFXDIV_SOURCE_DIR=$(EXT_DIR)/fxdiv/FXdiv-b408327ac2a15ec3e43352421954f5b1967701d1 \
         -DFETCHCONTENT_SOURCE_DIR_FLATBUFFERS=$(EXT_DIR)/flatbuffers/flatbuffers-24.3.25 \
-        -Dflatbuffers_SOURCE_DIR=$(EXT_DIR)/flatbuffers/flatbuffers-24.3.25 \
+	-Dflatbuffers_SOURCE_DIR=$(EXT_DIR)/flatbuffers/flatbuffers-24.3.25 \
         -DCMAKE_SYSTEM_NAME=Linux \
         -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
 	-DXNNPACK_TARGET_PROCESSOR:STRING=generic \
@@ -52,10 +54,10 @@ $(PLUGIN).so:
         -DXNN_ENABLE_ARM_FP16_SCALAR:BOOL=OFF \
         -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
         $(SOURCE_DIR)
-	cd $(BUILD_DIR) && cmake --build .
+	cd $(BUILD_DIR) && cmake  --build . -j 15
 
-install: $(PLUGIN).so
-	cd $(BUILD_DIR) && cmake --install .
+install:
+	cd $(BUILD_DIR) && cmake --install . --prefix /usr/lib/lv2 #$(INSTALL_DIR) 
 
 clean:
 	rm -rf $(BUILD_DIR)
