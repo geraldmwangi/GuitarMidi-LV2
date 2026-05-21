@@ -11,8 +11,8 @@ SOURCE_DIR = $(shell pwd)/../../
 EXT_DIR = $(SOURCE_DIR)/ext
 
 # Use -march=armv8-a to strictly stick to MOD Dwarf (RK3399) capabilities
-#ARMCC_FLAGS="-O3 -march=armv8-a -mtune=cortex-a35 -ffast-math -funsafe-math-optimizations -fomit-frame-pointer" 
-ARMCC_FLAGS="-funsafe-math-optimizations -march=armv8-a -mcpu=generic"
+ARMCC_FLAGS="-O3 -march=armv8-a -mtune=cortex-a35 -ffast-math -funsafe-math-optimizations -fomit-frame-pointer" 
+#ARMCC_FLAGS="-funsafe-math-optimizations -march=armv8-a -mcpu=generic"
 
 # this flatbuffers version must be installed on the host system
 $(PLUGIN).so: 
