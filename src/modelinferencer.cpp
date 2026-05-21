@@ -54,7 +54,7 @@
             builder(&m_interpreter);
             TfLiteXNNPackDelegateOptions xnnpack_options =
                 TfLiteXNNPackDelegateOptionsDefault();
-            xnnpack_options.num_threads = 4; // Set number of threads as appropriate for your
+            xnnpack_options.num_threads = NUM_INFERENCE_THREADS; // Set number of threads as appropriate for your
                                             // platform and application needs.
             xnnpack_options.weight_cache_file_path = TfLiteXNNPackDelegateInMemoryFilePath();
             // xnnpack_options.logging_level = TFLITE_XNNPACK_LOGGING_LEVEL_ERROR;
@@ -71,6 +71,10 @@
             printf("=== Pre-invoke Interpreter State ===\n");
             // tflite::PrintInterpreterState(m_interpreter.get());
             tflite::LoggerOptions::SetMinimumLogSeverity(tflite::TFLITE_LOG_ERROR);
+            lv2_log_note(&g_logger, "Model loaded and interpreter initialized successfully.\n");
+            //log the ring buffer and inference thread info
+            lv2_log_note(&g_logger, "Inference thread count: %d\n", NUM_INFERENCE_THREADS);
+            lv2_log_note(&g_logger, "Ring buffer size: %d frames\n", RING_BUFFER_SIZE);
             return true;
     }
 

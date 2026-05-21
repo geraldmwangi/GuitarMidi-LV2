@@ -13,9 +13,11 @@ option(BUILD_ANALYSIS_APP "Build analysis app, usefull for development" OFF)
 
 option(WITH_TRACING_INFO "Build with tracing logs" OFF)
 option(WITH_AUBIO "Build aubio for onset detection" OFF)
-set(RING_BUFFER_SIZE "8" CACHE STRING "Number of frames to store in the ring buffer")
+set(RING_BUFFER_SIZE "8" CACHE STRING "Number of frames to store in the ring buffer") 
+set(NUM_INFERENCE_THREADS "4" CACHE STRING "Number of threads to use for inference")
 
 message("Ring buffer size: ${RING_BUFFER_SIZE}")
+message("Number of inference threads: ${NUM_INFERENCE_THREADS}")
 option(USE_ELLIPTIC_FILTERS "Build using elliptic filters. These are slower than the default butterworth filter but perform better at lower frequencies" OFF)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
