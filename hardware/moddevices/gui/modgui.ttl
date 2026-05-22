@@ -1,0 +1,38 @@
+@prefix modgui: <http://moddevices.com/ns/modgui#> .
+@prefix lv2:    <http://lv2plug.in/ns/lv2core#> .
+
+<http://github.com/geraldmwangi/GuitarMidi-LV2>
+    modgui:gui [
+        modgui:resourcesDirectory <modgui> ;
+        modgui:iconTemplate <modgui/icon-guitar-midi.html> ;
+        modgui:stylesheet <modgui/stylesheet-guitar-midi.css> ;
+        modgui:screenshot <modgui/screenshot-guitar-midi.png> ;
+        modgui:thumbnail <modgui/thumbnail-guitar-midi.png> ;
+        modgui:brand "Drift Audio" ;
+        modgui:label "Guitar Midi" ;
+        modgui:model "boxy" ;
+        modgui:panel "1-select-4-knobs" ;
+        modgui:color "flowerpower" ;
+        modgui:knob "steel" ;
+        modgui:port [
+            lv2:index 0 ;
+            lv2:symbol "onsetsmoothing" ;
+            lv2:name "Onset Smoothing" ;
+        ] , [
+            lv2:index 1 ;
+            lv2:symbol "offsetsmoothing" ;
+            lv2:name "Offset Smoothing" ;
+        ] , [
+            lv2:index 2 ;
+            lv2:symbol "onsetconfthr" ;
+            lv2:name "Onset Confidence Threshold" ;
+        ] , [
+            lv2:index 3 ;
+            lv2:symbol "offsetconfthr" ;
+            lv2:name "Offset Confidence Threshold" ;
+        ] , [
+            lv2:index 4 ;
+            lv2:symbol "onsetenthr" ;
+            lv2:name "Onset Energy Threshold (dB)" ;
+        ] ;
+    ] .
