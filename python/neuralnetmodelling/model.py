@@ -89,6 +89,23 @@ for s, f, n in scatter_indices:
         mask[s * N_FRETS + f, n] = 1.0
 
 mask_tensor = tf.constant(mask)  # (78, 37)
+# Instead of Lambda for hollow suppression, use a proper layer:
+class HollowSuppression(tf.keras.layers.Layer):
+    def call(self, y):
+        y_padded = tf.pad(y, [[0,0],[1,1],[0,0]])
+        left  = y_padded[:, :-2, :]
+        right = y_padded[:, 2:,  :]
+        return y - (left + right) / 2.0
+
+# Same for append_silence and strip_silence
+class AppendSilence(tf.keras.layers.Layer):
+    def call(self, x):
+        silence = tf.zeros_like(x[:, :1])
+        return tf.concat([x, silence], axis=1)
+
+class StripSilence(tf.keras.layers.Layer):
+    def call(self, x):
+        return x[:, :-1]
 
 
 class SparseGuitarOutput(tf.keras.layers.Layer):
@@ -153,22 +170,9 @@ def string_layer(x, start, end, max_x, training, string_idx=0):
     #s=layers.Add(name=f"{prefix}_res1_conv1")([s, res])
     # Now shape is (batch, 13, 64) — one vector per note
 
-    # --- Strict "Hollow" Neighborhood Suppression ---
-    def hollow_suppression(y):
-        # Pad by 1 on the spatial dimension (frets) to handle the 0th and 12th frets safely
-        y_padded = tf.pad(y, [[0, 0], [1, 1], [0, 0]])
-        
-        # Shifted views to get strictly the neighbors
-        left_neighbors = y_padded[:, :-2, :]   # Fret - 1
-        right_neighbors = y_padded[:, 2:, :]   # Fret + 1
-        
-        # Average strictly the surrounding frets (leaving the center out entirely)
-        surround_avg = (left_neighbors + right_neighbors) / 2.0
-        
-        # Subtract the bleeding energy from the center note
-        return y - surround_avg
 
-    s = layers.Lambda(hollow_suppression, name=f"{prefix}_hollow_suppress")(s)
+
+    s = HollowSuppression(name=f"{prefix}_hollow_suppress")(s)
     s = layers.LeakyReLU(name=f"{prefix}_hollow_act")(s)
 
     # Optional: A 1x1 conv to mix the newly sharpened features
@@ -245,14 +249,9 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
         s=layers.Dropout(0.1, name=f"{name_prefix}_drop_str{i}")(s)   
         s=layers.Dense(1,bias_initializer=tf.initializers.Constant(-4),name=f"{name_prefix}_fretlogits_str{i}", kernel_regularizer=reg)(s)   
         s=layers.Flatten(name=f"{name_prefix}_flatten_str{i}")(s)
-        def append_silence(x):
-            silence_logit=tf.zeros_like(x[:, :1])  # (B, 1)
-            return tf.concat([x, silence_logit], axis=1)  # (B, 14)
-        s = layers.Lambda(append_silence, name=f"{name_prefix}_append_silence_str{i}")(s)
+        s = AppendSilence(name=f"{name_prefix}_append_silence_str{i}")(s)
         s=layers.Softmax(name=f"{name_prefix}_softmax_str{i}")(s)
-        def strip_silence(x):
-            return x[:,:-1]
-        s = layers.Lambda(strip_silence, name=f"{name_prefix}_strip_silence_str{i}")(s)
+        s = StripSilence(name=f"{name_prefix}_strip_silence_str{i}")(s)
         # s = layers.GlobalMaxPooling1D(name=f"{name_prefix}_gmax_str{i}")(s)
         # # s = layers.Dense(64, name=f"{name_prefix}_dense_str{i}", kernel_regularizer=reg)(s)
         # s = layers.LayerNormalization(name=f"{name_prefix}_ln_str{i}")(s) 
