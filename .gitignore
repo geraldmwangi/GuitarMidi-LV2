@@ -8,3 +8,6 @@
 Makefile~
 build
 bin
+**tfrecord
+
+python

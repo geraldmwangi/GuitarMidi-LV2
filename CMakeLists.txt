@@ -2,9 +2,9 @@
 cmake_minimum_required(VERSION 3.6)
 project("GuitarMidi-LV2")
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include(setversionfromgit)
+# include(setversionfromgit)
 
-setversionfromgit()
+# setversionfromgit()
 # specify the C++ standard
 option(BUILD_ANALYSIS_APP "Build analysis app, usefull for development" OFF)
 
@@ -30,6 +30,6 @@ add_subdirectory(AnalysisApp)
 endif()
 
 
-include(debian)
+
 
 
