@@ -66,7 +66,10 @@ In essence, it's a sophisticated pattern-matching system that learns to recogniz
 
 
 # Donations
-You can support the development by donating via my paypal
+You can support the development by donating via [Github Sponsors](https://github.com/sponsors/geraldmwangi)
+
+
+or my paypal
 
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=7ELJYWWJ2BKRQ)
 
