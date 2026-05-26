@@ -125,7 +125,11 @@ activate(LV2_Handle instance)
 static void
 run(LV2_Handle instance, uint32_t n_samples)
 {
-
+	if(n_samples!=256)	
+		{
+			lv2_log_error(&g_logger,"plugin only supports 256 samples at 48khz");
+			return;
+		}
 	timespec start = timer_start();
 	FretBoard *notecl = (FretBoard *)instance;
 	notecl->process(n_samples);
