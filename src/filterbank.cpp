@@ -1,9 +1,12 @@
 #include <filterbank.hpp>
-
+#include <pmmintrin.h>  
+#include <xmmintrin.h> 
+// based on https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
 GuitarMidi::FilterBank::FilterBank()
 {
 
-
+    _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+    _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 }
 
 GuitarMidi::FilterBank::~FilterBank()
@@ -24,13 +27,28 @@ void GuitarMidi::FilterBank::setup(map<uint, FilterRepresentation> filterreps, i
     lv2_log_note(&g_logger,"Setting up filterbank with %d filters and windowsize %d\n",m_filterbankbuffer.num_filters,m_filterbankbuffer.window_size);
 
     m_filterbankbuffer.audio_buffer_2D=new float[m_filterbankbuffer.num_filters*m_filterbankbuffer.window_size];
-    // for(auto f:filterreps){
-    //     shared_ptr<Filter>  filter=make_shared<Filter>(f.second,samplerate);
+    float q=Q_FACTOR;
+    for(auto f:filterreps){
+        float center_freq=f.second.center_freq;
+        int filter_id=f.second.filter_id;
+        // comptue biquad bandpasscoefficients for the filter based on the center frequency and q factor
+        float omega=2*M_PI*center_freq/samplerate;
+        float alpha=sin(omega)/(2*q);
+        float bw=center_freq/q;
+        float a0=1.0+alpha;
+        float a1= -2*cos(2*M_PI*center_freq/samplerate);
+        float a2=1.0-alpha;
+        float b0=q*alpha;
+        float b1=0.0;
+        float b2=-q*alpha;
+        m_a0[filter_id]=a0/a0;
+        m_a1[filter_id]=a1/a0;
+        m_a2[filter_id]=a2/a0;
+        m_b0[filter_id]=b0/a0;
+        m_b1[filter_id]=b1/a0;
+        m_b2[filter_id]=b2/a0;
 
-    //     filter->setOutput((m_filterbankbuffer.audio_buffer_2D+f.first*m_filterbankbuffer.window_size));
-    //     m_filters.insert(make_pair(f.first,filter));
-
-    // }
+    }
 }
 
     /**
@@ -55,10 +73,11 @@ void GuitarMidi::FilterBank::process(int nsamples)
         float b0=m_b0[f];
         float b1=m_b1[f];
         float b2=m_b2[f];
-        float* output=(m_filterbankbuffer.audio_buffer_2D+f*m_filterbankbuffer.window_size);
+        float* __restrict output=(m_filterbankbuffer.audio_buffer_2D+f*m_filterbankbuffer.window_size);
         for(int s=0;s<nsamples;s++){
-            v =  m_input[s] - a1*d1 - a2*d2 + 1e-20f;
-            output[s]= b0*v + b1*d1 + b2*d2 + 1e-20f;
+            v =  m_input[s] - a1*d1 - a2*d2;
+           // output[s]=fabs (b0*v + b1*d1 + b2*d2); b1=0 for bandpass filters
+            output[s]=fabs (b0*v + b2*d2);
             d2=d1;
             d1=v;
            
