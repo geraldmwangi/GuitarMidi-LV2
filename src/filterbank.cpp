@@ -1,12 +1,12 @@
 #include <filterbank.hpp>
-#include <pmmintrin.h>  
-#include <xmmintrin.h> 
+// #include <pmmintrin.h>  
+// #include <xmmintrin.h> 
 // based on https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
 GuitarMidi::FilterBank::FilterBank()
 {
-
-    _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-    _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+    // doesnt work on mod dwarf
+    // _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+    // _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 }
 
 GuitarMidi::FilterBank::~FilterBank()
