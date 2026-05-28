@@ -21,13 +21,8 @@ message("Number of inference threads: ${NUM_INFERENCE_THREADS}")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
-set(JSON_Install ON CACHE BOOL "Enable installation rules for nlohmann_json dependency")
-# add_subdirectory(ext/eigen)
-# add_subdirectory(ext/FunctionalPlus)
-# # add_subdirectory(ext/json)
-# add_subdirectory(ext/frugally-deep)
+
 add_subdirectory(src)
-#add_subdirectory(src/tflite_custom_op_example)
 
 if(${BUILD_ANALYSIS_APP})
 add_subdirectory(AnalysisApp)
