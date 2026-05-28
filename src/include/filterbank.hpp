@@ -40,15 +40,19 @@ namespace GuitarMidi{
         private:
             map<int,shared_ptr<Filter>> m_filters;
             AudioBuffer2D m_filterbankbuffer; //number of filters x buffersize
-
-            float m_a0[NUM_NOTES*NUM_HARMONICS]={0};
+            //filter coefficients for the filters in the filter bank for direct form II implementation
+            //float m_a0[NUM_NOTES*NUM_HARMONICS]={0};
             float m_a1[NUM_NOTES*NUM_HARMONICS]={0};
             float m_a2[NUM_NOTES*NUM_HARMONICS]={0};
             float m_b0[NUM_NOTES*NUM_HARMONICS]={0};
-            float m_b1[NUM_NOTES*NUM_HARMONICS]={0};
+            //float m_b1[NUM_NOTES*NUM_HARMONICS]={0};
             float m_b2[NUM_NOTES*NUM_HARMONICS]={0};
+
+            //state variables for the filters in the filter bank for direct form II implementation
             float m_d1[NUM_NOTES*NUM_HARMONICS]={0};
             float m_d2[NUM_NOTES*NUM_HARMONICS]={0};
+            float m_stage2_d1[NUM_NOTES*NUM_HARMONICS]={0};
+            float m_stage2_d2[NUM_NOTES*NUM_HARMONICS]={0};
             float *m_input;
             public:
             FilterBank();

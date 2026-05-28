@@ -39,13 +39,13 @@ void GuitarMidi::FilterBank::setup(map<uint, FilterRepresentation> filterreps, i
         float a1= -2*cos(2*M_PI*center_freq/samplerate);
         float a2=1.0-alpha;
         float b0=q*alpha;
-        float b1=0.0;
+        // float b1=0.0;
         float b2=-q*alpha;
-        m_a0[filter_id]=a0/a0;
+        // m_a0[filter_id]=a0/a0;
         m_a1[filter_id]=a1/a0;
         m_a2[filter_id]=a2/a0;
         m_b0[filter_id]=b0/a0;
-        m_b1[filter_id]=b1/a0;
+        // m_b1[filter_id]=b1/a0;
         m_b2[filter_id]=b2/a0;
 
     }
@@ -71,18 +71,31 @@ void GuitarMidi::FilterBank::process(int nsamples)
         float a1=m_a1[f];
         float a2=m_a2[f];
         float b0=m_b0[f];
-        float b1=m_b1[f];
+        // float b1=m_b1[f];
         float b2=m_b2[f];
         float* __restrict output=(m_filterbankbuffer.audio_buffer_2D+f*m_filterbankbuffer.window_size);
         for(int s=0;s<nsamples;s++){
             v =  m_input[s] - a1*d1 - a2*d2;
-           // output[s]=fabs (b0*v + b1*d1 + b2*d2); b1=0 for bandpass filters
-            output[s]=fabs (b0*v + b2*d2);
+           // output[s]=b0*v + b1*d1 + b2*d2; b1=0 for bandpass filters
+            output[s]=b0*v + b2*d2;
             d2=d1;
             d1=v;
            
         }
         m_d1[f]=d1;
         m_d2[f]=d2;
+
+        d1=m_stage2_d1[f];
+        d2=m_stage2_d2[f];
+        for(int s=0;s<nsamples;s++){
+            v =  output[s] - a1*d1 - a2*d2;
+           // output[s]=fabs (b0*v + b1*d1 + b2*d2); b1=0 for bandpass filters
+            output[s]=fabs (b0*v + b2*d2);
+            d2=d1;
+            d1=v;
+           
+        }
+        m_stage2_d1[f]=d1;
+        m_stage2_d2[f]=d2;
     }
 }
