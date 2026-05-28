@@ -23,6 +23,8 @@
 #include <memory>
 #include <common.hpp>
 using namespace std;
+#define NUM_FILTERS     (NUM_NOTES * NUM_HARMONICS)
+#define NUM_SECTIONS    2      // = N (LP prototype order). BP order = 2*N = 4.
 namespace GuitarMidi{
 
     /**
@@ -41,22 +43,28 @@ namespace GuitarMidi{
             map<int,shared_ptr<Filter>> m_filters;
             AudioBuffer2D m_filterbankbuffer; //number of filters x buffersize
             //filter coefficients for the filters in the filter bank for direct form II implementation
-            //float m_a0[NUM_NOTES*NUM_HARMONICS]={0};
-            float m_a1[NUM_NOTES*NUM_HARMONICS]={0};
-            float m_a2[NUM_NOTES*NUM_HARMONICS]={0};
-            float m_b0[NUM_NOTES*NUM_HARMONICS]={0};
-            //float m_b1[NUM_NOTES*NUM_HARMONICS]={0};
-            float m_b2[NUM_NOTES*NUM_HARMONICS]={0};
+            // Per filter, per section: biquad coefficients (a0 normalized to 1)
+            float m_b0[NUM_FILTERS][NUM_SECTIONS];
+            float m_b1[NUM_FILTERS][NUM_SECTIONS];
+            float m_b2[NUM_FILTERS][NUM_SECTIONS];
+            float m_a1[NUM_FILTERS][NUM_SECTIONS];
+            float m_a2[NUM_FILTERS][NUM_SECTIONS];
 
-            //state variables for the filters in the filter bank for direct form II implementation
-            float m_d1[NUM_NOTES*NUM_HARMONICS]={0};
-            float m_d2[NUM_NOTES*NUM_HARMONICS]={0};
-            float m_stage2_d1[NUM_NOTES*NUM_HARMONICS]={0};
-            float m_stage2_d2[NUM_NOTES*NUM_HARMONICS]={0};
+            // Direct Form II state: two input history, two output history per section
+            float m_s1[NUM_FILTERS][NUM_SECTIONS];
+            float m_s2[NUM_FILTERS][NUM_SECTIONS];
             float *m_input;
             public:
-            FilterBank();
-            ~FilterBank();
+            FilterBank(){
+                // Allocate the 2D audio buffer (num_filters x window_size)
+                m_filterbankbuffer.num_filters = NUM_FILTERS;
+                m_filterbankbuffer.window_size = BUFFER_SIZE;
+                m_filterbankbuffer.audio_buffer_2D = new float[NUM_FILTERS * m_filterbankbuffer.window_size];
+            };
+            ~FilterBank(){
+                // Free the 2D audio buffer
+                delete[] m_filterbankbuffer.audio_buffer_2D;
+            };
 
             void setup(map<uint,FilterRepresentation> filterreps,int samplerate);
 
@@ -74,6 +82,8 @@ namespace GuitarMidi{
             AudioBuffer2D get_buffer(){
                 return m_filterbankbuffer;
             }
+
+            void reset();
 
 
 
