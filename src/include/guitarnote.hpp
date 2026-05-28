@@ -26,11 +26,7 @@ using namespace std;
 
 namespace GuitarMidi
 {
-    struct FilterRepresentation{
-        int filter_id;
-        float center_freq;
 
-    };
 
     /**
      * The GuitarNote class represents a note on the guitar fretboard.

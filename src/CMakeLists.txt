@@ -59,19 +59,13 @@ add_subdirectory(
 
 
 
-set(SRC guitarmidi.cpp  midioutput.cpp fretboard.cpp fretboardrepresentation.cpp guitarnote.cpp logging.cpp filterbank.cpp filter.cpp guitarstring.cpp noteinferencer.cpp modelinferencer.cpp)
+set(SRC guitarmidi.cpp  midioutput.cpp fretboard.cpp fretboardrepresentation.cpp guitarnote.cpp logging.cpp filterbank.cpp guitarstring.cpp noteinferencer.cpp modelinferencer.cpp)
 
 add_library(guitarmidi SHARED ${SRC})
 
 
-if(WITH_AUBIO=On)
-message("Building with onset support")
-target_link_libraries(guitarmidi dsp aubio ${Pango_LIBRARIES})
-else()
-message("Building without onset support")
-target_link_libraries(guitarmidi PUBLIC dsp  ${Pango_LIBRARIES} tensorflow-lite  )
-#target_link_libraries(guitarmidi PUBLIC OpenMP::OpenMP_CXX )
-endif()
+target_link_libraries(guitarmidi PUBLIC tensorflow-lite  )
+
 
 
 

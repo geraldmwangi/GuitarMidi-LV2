@@ -18,7 +18,6 @@
  * Boston, MA  02110-1301  USA
  */
 #include <vector>
-#include <filter.hpp>
 #include <map>
 #include <memory>
 #include <common.hpp>
@@ -40,7 +39,7 @@ namespace GuitarMidi{
     class FilterBank{
 
         private:
-            map<int,shared_ptr<Filter>> m_filters;
+           
             AudioBuffer2D m_filterbankbuffer; //number of filters x buffersize
             //filter coefficients for the filters in the filter bank for direct form II implementation
             // Per filter, per section: biquad coefficients (a0 normalized to 1)

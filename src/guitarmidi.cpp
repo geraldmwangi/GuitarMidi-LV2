@@ -53,11 +53,7 @@ instantiate(const LV2_Descriptor *descriptor,
 		lv2_log_error(&g_logger, "Host does not support urid:map\n");
 		return NULL;
 	}
-#ifdef USE_ELLIPTIC_FILTERS
-	lv2_log_note(&g_logger, "Using elliptic filters");
-#else
-	lv2_log_note(&g_logger, "Using butterworth filters");
-#endif
+
 	FretBoard *fretboard = new FretBoard(map, rate);
 	if (!fretboard->initialize(std::string(bundle_path)))
 	{

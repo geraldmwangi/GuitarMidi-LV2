@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 /* GuitarMidi-LV2 Library
  * Copyright (C) 2022 Gerald Mwangi
  *
@@ -23,7 +23,13 @@
 #define NOTE_OFFSET 40
 #define NUM_HARMONICS 4
 #define NUM_NOTES 37
-namespace GuitarMidi{
+
+#define NUM_STRINGS 6
+#define NUM_FRETS 12
+
+#define Q_FACTOR 6
+namespace GuitarMidi
+{
 
     /*
     * A 2D audio buffer structure.
@@ -32,9 +38,21 @@ namespace GuitarMidi{
         * audio_buffer_2D: A pointer to a 2D array that holds the audio data. The dimensions of this array are determined by num_filters and window_size.
 
     */
-    struct AudioBuffer2D{
+    struct AudioBuffer2D
+    {
         int num_filters;
         int window_size;
-        float* audio_buffer_2D;
+        float *audio_buffer_2D;
+    };
+
+    /* 
+    * A structure to represent the filter characteristics for a specific note in the guitar fretboard.
+    * filter_id: An integer that uniquely identifies the filter associated with a particular note or its overtones.
+    * center_freq: A float that represents the center frequency of the filter
+    */
+    struct FilterRepresentation
+    {
+        int filter_id;
+        float center_freq;
     };
 }

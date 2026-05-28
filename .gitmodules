@@ -1,6 +1,3 @@
-[submodule "DSPFilters"]
-	path = DSPFilters
-	url = https://github.com/vinniefalco/DSPFilters.git
 [submodule "ext/tensorflow"]
 	path = ext/tensorflow
 	url = git@github.com:tensorflow/tensorflow.git

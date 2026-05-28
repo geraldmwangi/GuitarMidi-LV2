@@ -12,24 +12,15 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
 option(BUILD_ANALYSIS_APP "Build analysis app, usefull for development" OFF)
 
 option(WITH_TRACING_INFO "Build with tracing logs" OFF)
-option(WITH_AUBIO "Build aubio for onset detection" OFF)
 set(RING_BUFFER_SIZE "8" CACHE STRING "Number of frames to store in the ring buffer") 
 set(NUM_INFERENCE_THREADS "4" CACHE STRING "Number of threads to use for inference")
 
 message("Ring buffer size: ${RING_BUFFER_SIZE}")
 message("Number of inference threads: ${NUM_INFERENCE_THREADS}")
-option(USE_ELLIPTIC_FILTERS "Build using elliptic filters. These are slower than the default butterworth filter but perform better at lower frequencies" OFF)
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
-set(DSPFiltersDir DSPFilters/shared/DSPFilters)
-include_directories( ${DSPFiltersDir}/include/ /usr/include)
-message(${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
-set(DSPFiltersSRCs ${DSPFiltersDir}/source/Cascade.cpp
-    ${DSPFiltersDir}/source/Biquad.cpp
-    ${DSPFiltersDir}/source/Elliptic.cpp
-    ${DSPFiltersDir}/source/Butterworth.cpp
-    ${DSPFiltersDir}/source/PoleFilter.cpp)
-add_library(dsp STATIC ${DSPFiltersSRCs})
+
 set(JSON_Install ON CACHE BOOL "Enable installation rules for nlohmann_json dependency")
 # add_subdirectory(ext/eigen)
 # add_subdirectory(ext/FunctionalPlus)
