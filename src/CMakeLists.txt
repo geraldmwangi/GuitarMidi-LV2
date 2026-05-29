@@ -74,5 +74,13 @@ target_link_libraries(guitarmidi PUBLIC tensorflow-lite  )
 install(TARGETS guitarmidi
         DESTINATION guitarmidi.lv2)
 
+if(WITH_AUDIO_OUTPUT)
+#rename ../guitarmidi-audiooutput.ttl to /tmp/guitarmidi.ttl then copy to the install directory, this is a workaround to avoid having to maintain two separate ttl files with only minor differences 
+file(COPY_FILE ../guitarmidi-audiooutput.ttl /tmp/guitarmidi.ttl)
+
+install(FILES ../manifest.ttl /tmp/guitarmidi.ttl ../python/neuralnetmodelling/guitarmidi.tflite
+        DESTINATION guitarmidi.lv2)
+else()
 install(FILES ../manifest.ttl ../guitarmidi.ttl ../python/neuralnetmodelling/guitarmidi.tflite
         DESTINATION guitarmidi.lv2)
+endif()

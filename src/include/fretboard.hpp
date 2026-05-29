@@ -24,6 +24,7 @@
 #include <vector>
 #include <map>
 #include <noteinferencer.hpp>
+#include <config.hpp>
 typedef enum
 {
     FRETBOARD_INPUT = 0,
@@ -33,7 +34,8 @@ typedef enum
     FRETBOARD_ONSET_THRESHOLD=4,
     FRETBOARD_OFFSET_THRESHOLD=5,
     FRETBOARD_ONSET_ENERGY_THRESHOLD=6,
-    FRETBOARD_OFFSET_ENERGY_THRESHOLD=7
+    FRETBOARD_OFFSET_ENERGY_THRESHOLD=7,
+    FRETBOARD_AUDIO_OUTPUT=8
 } PortIndex;
 using namespace std;
 using namespace GuitarMidi;
@@ -106,6 +108,12 @@ public:
     void setOffsetEnergyThreshold(float* threshold){
         m_noteinferencer.setOffsetEnergyThreshold(threshold);
     }
+#ifdef WITH_AUDIO_OUTPUT
+    void setAudioOutputBuffer(float *output)
+    {
+        m_noteinferencer.setAudioOutputBuffer(output);
+    }
+#endif
 
     /**
      * @brief initialize the filterbank

@@ -103,6 +103,11 @@ connect_port(LV2_Handle instance,
 	case FRETBOARD_OFFSET_ENERGY_THRESHOLD:
 		fretboard->setOffsetEnergyThreshold((float *)data);
 		break;
+#ifdef WITH_AUDIO_OUTPUT
+	case FRETBOARD_AUDIO_OUTPUT:
+		fretboard->setAudioOutputBuffer((float *)data);
+		break;
+#endif
 	default:
 		break;
 	}

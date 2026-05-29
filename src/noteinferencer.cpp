@@ -78,6 +78,15 @@ namespace GuitarMidi
                         msg << " " << i << "(" << smoothed_onsetoutput[i] << ")" << " energy:" << smoothed_noteenergies[i];
                         uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x7f};
                         lv2_log_note(&g_logger, "Notes: %s\n", msg.str().c_str());
+
+                        #ifdef WITH_AUDIO_OUTPUT
+                        // visualize the detected notes in the audio output buffer by adding a sine wave at the corresponding note frequency
+                        float frequency = 440.0f * pow(2.0f, (i - 9) / 12.0f); // calculate the frequency of the note
+                        for (int w = 0; w < BUFFER_SIZE; w++)
+                        {
+                            audio_output[ w] = 0.1f * sin(2 * M_PI * frequency * (m_frames + w) / 48000.0f); // add a sine wave to the audio output buffer for visualization
+                        }
+                        #endif
                         m_midioutput.sendMidiMessage(midinote, m_frames);
                         m_note_on[i] = true;
                     }

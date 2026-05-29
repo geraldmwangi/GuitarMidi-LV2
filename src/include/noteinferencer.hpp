@@ -20,6 +20,7 @@
 #include <memory>
 #include <midioutput.hpp>
 #include <common.hpp>
+#include <config.hpp>
 #include <tensorflow/lite/version.h>
 #include "tensorflow/core/public/release_version.h"
 #include "tensorflow/core/public/version.h"
@@ -39,6 +40,7 @@ namespace GuitarMidi{
        
         GuitarMidi::MidiOutput m_midioutput;
         AudioBuffer2D m_audiobuffer;
+
         float* m_onset_threshold;
         float* m_offset_threshold;
         float* m_onset_energy_threshold;
@@ -84,5 +86,11 @@ namespace GuitarMidi{
         }
         void process(int nsamples);
 
+#ifdef WITH_AUDIO_OUTPUT
+        float *audio_output;
+        void setAudioOutputBuffer(float* output){
+            audio_output=output;
+        }
+#endif
     };
 }
