@@ -60,7 +60,7 @@ bool GuitarMidi::ModelInferencer::initialize(const std::string &bundle_path)
     resolver.AddCustom(edgetpu::kCustomOp, edgetpu::RegisterCustomOp());
     #endif
     InterpreterBuilder builder(*m_model, resolver);
-    builder.SetNumThreads(1);
+    builder.SetNumThreads(4);
     builder(&m_interpreter);
 #ifndef USE_TPU
     TfLiteXNNPackDelegateOptions xnnpack_options =
@@ -78,8 +78,19 @@ bool GuitarMidi::ModelInferencer::initialize(const std::string &bundle_path)
         return false;
     }
 #else
-    m_edgetpu_ctx =
-        edgetpu::EdgeTpuManager::GetSingleton()->OpenDevice();
+auto* manager = edgetpu::EdgeTpuManager::GetSingleton();
+auto devices = manager->EnumerateEdgeTpu();
+
+lv2_log_note(&g_logger, "Found %zu Edge TPU device(s)\n", devices.size());
+for (const auto& d : devices) {
+    lv2_log_note(&g_logger, "  Type: %s, Path: %s\n",
+        d.type == edgetpu::DeviceType::kApexPci ? "PCIe" : "USB",
+        d.path.c_str());
+}
+lv2_log_note(&g_logger, "libedgetpu version: %s\n", manager->Version().c_str());
+
+    m_edgetpu_ctx =manager->OpenDevice();
+       
     if (m_edgetpu_ctx == nullptr)
     {
         lv2_log_error(&g_logger, "Failed to open tpu device\n");

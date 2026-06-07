@@ -31,7 +31,7 @@
 #include "tensorflow/lite/model_builder.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 #include "tensorflow/lite/delegates/xnnpack/xnnpack_delegate.h"
-//#define USE_TPU 
+#define USE_TPU 
 
 #ifdef USE_TPU
 #include <edgetpu.h>
