@@ -31,6 +31,11 @@
 #include "tensorflow/lite/model_builder.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 #include "tensorflow/lite/delegates/xnnpack/xnnpack_delegate.h"
+//#define USE_TPU 
+
+#ifdef USE_TPU
+#include <edgetpu.h>
+#endif
 using namespace std;
 using namespace tflite;
 //#define RING_BUFFER_SIZE 8 // Number of frames to store in the ring buffer
@@ -93,6 +98,9 @@ class ModelInferencer {
         SpscRingBuffer<RING_BUFFER_SIZE, NUM_NOTES*NUM_HARMONICS*BUFFER_SIZE> audio_input_buffer;
         SpscRingBuffer<RING_BUFFER_SIZE, NUM_NOTES> model_output_buffer;
         std::thread inferencing_thread;
+        #ifdef USE_TPU
+        std::shared_ptr<edgetpu::EdgeTpuContext> m_edgetpu_ctx;
+        #endif
         bool stop_thread;
         void inferencing_loop();
         

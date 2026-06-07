@@ -8,6 +8,11 @@ set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+message ("Building Debug build. Installing to $ENV{HOME}/.lv2")
+set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.lv2" CACHE PATH "Install Path" FORCE)
+
+endif()
 # specify the C++ standard
 option(BUILD_ANALYSIS_APP "Build analysis app, usefull for development" OFF)
 
