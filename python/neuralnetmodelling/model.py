@@ -91,11 +91,31 @@ for s, f, n in scatter_indices:
 mask_tensor = tf.constant(mask)  # (78, 37)
 # Instead of Lambda for hollow suppression, use a proper layer:
 class HollowSuppression(tf.keras.layers.Layer):
+    def build(self, input_shape):
+        channels = input_shape[-1]
+        kernel = np.zeros((3, 1, channels, 1), dtype=np.float32)
+        kernel[0, 0, :, 0] = -0.5
+        kernel[1, 0, :, 0] =  1.0
+        kernel[2, 0, :, 0] = -0.5
+        self.kernel = self.add_weight(
+            name="hollow_kernel",
+            shape=(3, 1, channels, 1),
+            initializer=tf.constant_initializer(kernel),
+            trainable=False,
+            dtype=self.dtype  # ← matches layer/model dtype
+        )
+
     def call(self, y):
-        y_padded = tf.pad(y, [[0,0],[1,1],[0,0]])
-        left  = y_padded[:, :-2, :]
-        right = y_padded[:, 2:,  :]
-        return y - (left + right) / 2.0
+        y4d = tf.expand_dims(y, 1)  # (B, 1, T, C)
+        out = tf.nn.depthwise_conv2d(
+            y4d,
+            tf.cast(self.kernel, y.dtype),  # ← always matches input
+            strides=[1, 1, 1, 1],
+            padding='SAME'
+        )
+        return tf.squeeze(out, 1)
+
+
 
 # Same for append_silence and strip_silence
 class AppendSilence(tf.keras.layers.Layer):
@@ -209,6 +229,39 @@ def transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, nam
     # 3. Add to x1 WITHOUT normalizing the result (Clear highway!)
     return layers.Add(name=f"{name_prefix}_ffn_add")([x1, ffn])
 
+def dilated_freq_block(x, filters, dilations, dropout_rate=0.1, name_prefix="freq_ctx"):
+    x = layers.Conv1D(64, 1, padding='same', kernel_initializer='he_normal',
+                      kernel_regularizer=reg, name="context_squeeze")(x)
+    x = layers.BatchNormalization(name="context_squeeze_bn")(x)
+    x = layers.LeakyReLU(name="context_squeeze_act")(x)
+    # 1. Project input to the desired number of filters (if shapes don't match)
+    if x.shape[-1] != filters:
+        x = layers.Conv1D(filters, 1, padding='same', kernel_initializer='he_normal', 
+                          kernel_regularizer=reg, name=f"{name_prefix}_proj")(x)
+        x = layers.BatchNormalization(name=f"{name_prefix}_proj_bn")(x)
+        x = layers.LeakyReLU(name=f"{name_prefix}_proj_act")(x)
+
+    # 2. Cascade of dilated convolutions across FREQUENCY
+    for i, d in enumerate(dilations):
+        residual = x
+        
+        # Convolves along the 148 frequency bins. 
+        # Dilation expands the reach to grab distant upper harmonics.
+        x = layers.Conv1D(filters, kernel_size=3, padding='same', dilation_rate=d,
+                          kernel_initializer='he_normal', kernel_regularizer=reg,
+                          name=f"{name_prefix}_conv_d{d}")(x)
+        x = layers.BatchNormalization(name=f"{name_prefix}_bn_d{d}")(x)
+        x = layers.LeakyReLU(name=f"{name_prefix}_act_d{d}")(x)
+        
+        if dropout_rate > 0:
+            x = layers.SpatialDropout1D(dropout_rate, name=f"{name_prefix}_drop_d{d}")(x)
+        
+        # Residual connection
+        x = layers.Add(name=f"{name_prefix}_add_d{d}")([residual, x])
+        
+    return x
+
+
 def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(3,4), name_prefix="chord"):
     # store the original string features for later as residuals
     
@@ -244,7 +297,8 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
     for i, s in enumerate(split_chords):
         # Add residual connection from original string features
         #s = layers.Add(name=f"{name_prefix}_res_str{i}")([s, string_residuals[i]])
-        s = layers.LayerNormalization(name=f"{name_prefix}_ln_str{i}")(s) 
+        s = layers.BatchNormalization(name=f"{name_prefix}_bn_str{i}")(s)
+
         s = layers.LeakyReLU(name=f"{name_prefix}_act_str{i}")(s)
         s=layers.Dropout(0.1, name=f"{name_prefix}_drop_str{i}")(s)   
         s=layers.Dense(1,bias_initializer=tf.initializers.Constant(-4),name=f"{name_prefix}_fretlogits_str{i}", kernel_regularizer=reg)(s)   
@@ -302,7 +356,14 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width),
     #x = layers.MaxPooling1D(2, name="backbone_pool")(x)
     # x = layers.SpatialDropout1D(0.2, name="backbone_drop")(x)
     # --- Stage 3: Transformer ---
-    x = transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, name_prefix="tfm_block1")
+   # x = transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, name_prefix="tfm_block1")
+    x = dilated_freq_block(
+            x, 
+            filters=64, 
+            dilations=[1,2, 4, 8], 
+            dropout_rate=0.1, 
+            name_prefix="harmonic_ctx"
+        )
 
     num_pool_layers = 0
     max_x = image_height / (num_pool_layers + 1)
