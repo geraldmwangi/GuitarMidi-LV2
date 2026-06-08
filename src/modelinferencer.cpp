@@ -23,13 +23,17 @@ void GuitarMidi::ModelInferencer::inferencing_loop()
         {
             float *input_buffer = m_interpreter->typed_input_tensor<float>(0);
             audio_input_buffer.get_latest_data(input_buffer); // Assuming 1 frame of input
+            #ifdef WITH_TRACING_INFO
             auto timer_start=std::chrono::high_resolution_clock::now();
+            #endif
             TFLITE_MINIMAL_CHECK(m_interpreter->Invoke() == kTfLiteOk);
+            #ifdef WITH_TRACING_INFO
             auto timer_end=std::chrono::high_resolution_clock::now();
             std::chrono::duration<double,std::milli> duration=timer_end-timer_start;
             stringstream msg;
             msg<<"Inference time: "<<duration.count()<<" ms"<<endl;
             lv2_log_note(&g_logger,msg.str().c_str());
+            #endif
 
             TfLiteTensor *output = m_interpreter->output_tensor(0);
             float *output_data = m_interpreter->typed_output_tensor<float>(0);
@@ -60,7 +64,7 @@ bool GuitarMidi::ModelInferencer::initialize(const std::string &bundle_path)
     resolver.AddCustom(edgetpu::kCustomOp, edgetpu::RegisterCustomOp());
     #endif
     InterpreterBuilder builder(*m_model, resolver);
-    builder.SetNumThreads(4);
+    builder.SetNumThreads(1);
     builder(&m_interpreter);
 #ifndef USE_TPU
     TfLiteXNNPackDelegateOptions xnnpack_options =

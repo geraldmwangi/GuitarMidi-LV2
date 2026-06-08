@@ -37,7 +37,9 @@ namespace GuitarMidi
         float output_data[NUM_NOTES];
         if (m_model.get_model_output(output_data, 1))
         {
+            #ifdef WITH_TRACING_INFO
             msg << "Output data:";
+            #endif
             for (int i = 0; i < NUM_NOTES; i++)
             {
                 // check if all harmonics of the note are active before sending note on message
@@ -72,12 +74,18 @@ namespace GuitarMidi
 
                         if (smoothed_noteenergies[i] < threshold)
                         {
+                            #ifdef WITH_TRACING_INFO
                             lv2_log_note(&g_logger, "Note %d detected but energy %f is below threshold %f, not sending MIDI message\n", i, smoothed_noteenergies[i], threshold);
+                            #endif
                             continue;
                         }
+                        #ifdef WITH_TRACING_INFO
                         msg << " " << i << "(" << smoothed_onsetoutput[i] << ")" << " energy:" << smoothed_noteenergies[i];
-                        uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x7f};
                         lv2_log_note(&g_logger, "Notes: %s\n", msg.str().c_str());
+                        #endif
+                        
+
+                        
 
                         #ifdef WITH_AUDIO_OUTPUT
                         // visualize the detected notes in the audio output buffer by adding a sine wave at the corresponding note frequency
@@ -87,6 +95,7 @@ namespace GuitarMidi
                             audio_output[ w] = 0.1f * sin(2 * M_PI * frequency * (m_frames + w) / 48000.0f); // add a sine wave to the audio output buffer for visualization
                         }
                         #endif
+                        uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x7f};
                         m_midioutput.sendMidiMessage(midinote, m_frames);
                         m_note_on[i] = true;
                     }
@@ -99,7 +108,9 @@ namespace GuitarMidi
 
                     if (smoothed_offsetnoteenergies[i] > threshold)
                     {
+                        #ifdef WITH_TRACING_INFO
                         lv2_log_note(&g_logger, "Note %d detected but energy %f is below threshold %f, not sending MIDI message\n", i, smoothed_offsetnoteenergies[i], threshold);
+                        #endif
                         continue;
                     }
                     // lv2_log_note(&g_logger, "Note %d OFF with confidence %f\n", i, output_data[i]);
