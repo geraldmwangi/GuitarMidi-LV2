@@ -134,23 +134,32 @@ class SparseGuitarOutput(tf.keras.layers.Layer):
         self.mask = tf.constant(mask, dtype=tf.float32)  # (78, 37)
 
     def call(self, x):
+        # batch = tf.shape(x)[0]
+        # x_flat = tf.reshape(x, (batch, N_STRINGS * N_FRETS))
+        # x_exp = tf.expand_dims(x_flat, 2)
+        # mask_exp = tf.expand_dims(tf.cast(self.mask, x.dtype), 0)
+        # xmasked = x_exp * mask_exp
+        # # negative and operation of probilities to get the most prominent string/fret combination per note, without loss of the other combinations that contribute to the same note
+        # # its the equivalent of the logical OR operation for probabilities: P(A or B) = 1 - (1 - P(A)) * (1 - P(B))
+        # negprod=tf.reduce_prod(1.0 - xmasked, axis=1)
+
+        # return 1.0 - negprod
         batch = tf.shape(x)[0]
+        # x: (B, 6, 13) → (B, 78)
         x_flat = tf.reshape(x, (batch, N_STRINGS * N_FRETS))
-        x_exp = tf.expand_dims(x_flat, 2)
-        mask_exp = tf.expand_dims(tf.cast(self.mask, x.dtype), 0)
-        xmasked = x_exp * mask_exp
-        # negative and operation of probilities to get the most prominent string/fret combination per note, without loss of the other combinations that contribute to the same note
-        # its the equivalent of the logical OR operation for probabilities: P(A or B) = 1 - (1 - P(A)) * (1 - P(B))
-        #negprod=tf.reduce_prod(1.0 - xmasked, axis=1)
-        eps = 1e-6
-        log_complement = tf.math.log(1.0 - xmasked + eps)
+
+        # For each note, take max over all (string, fret) that map to it
+        # mask: (78, 37) - each column is a note, rows are string/fret combos
+        # Expand: (B, 78, 1) * (1, 78, 37) → (B, 78, 37)
+        x_exp = tf.expand_dims(x_flat, 2)                          # (B, 78, 1)
+        mask_exp = tf.expand_dims(self.mask, 0)                    # (1, 78, 37)
         
-        # Zero out unmasked positions (they should contribute 1.0 to product)
-        mask_broadcast = tf.expand_dims(tf.cast(self.mask, x.dtype), 0)
-        log_complement = log_complement * mask_broadcast  
-        
-        negprod = tf.exp(tf.reduce_sum(log_complement, axis=1))
-        return 1.0 - negprod
+        # Zero out non-contributing string/fret pairs
+        xmasked = x_exp * tf.cast(mask_exp, x.dtype)               # (B, 78, 37)
+
+        # Max over string/fret axis → (B, 37)
+        # max approximates OR-probability well when values are small
+        return tf.reduce_max(xmasked, axis=1)                      # (B, 37)
 
 
 
