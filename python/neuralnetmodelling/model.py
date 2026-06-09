@@ -141,8 +141,15 @@ class SparseGuitarOutput(tf.keras.layers.Layer):
         xmasked = x_exp * mask_exp
         # negative and operation of probilities to get the most prominent string/fret combination per note, without loss of the other combinations that contribute to the same note
         # its the equivalent of the logical OR operation for probabilities: P(A or B) = 1 - (1 - P(A)) * (1 - P(B))
-        negprod=tf.reduce_prod(1.0 - xmasked, axis=1)
-
+        #negprod=tf.reduce_prod(1.0 - xmasked, axis=1)
+        eps = 1e-6
+        log_complement = tf.math.log(1.0 - xmasked + eps)
+        
+        # Zero out unmasked positions (they should contribute 1.0 to product)
+        mask_broadcast = tf.expand_dims(tf.cast(self.mask, x.dtype), 0)
+        log_complement = log_complement * mask_broadcast  
+        
+        negprod = tf.exp(tf.reduce_sum(log_complement, axis=1))
         return 1.0 - negprod
 
 
@@ -163,16 +170,16 @@ def string_layer(x, start, end, max_x, training, string_idx=0):
     #                     kernel_regularizer=reg, name=f"{prefix}_res_proj")(s)
     x = layers.Conv1D(32, 1, padding='same', kernel_initializer='he_normal', name=f"{prefix}_backbone_squeeze", kernel_regularizer=reg)(s)
     x = layers.BatchNormalization(name=f"{prefix}_backbone_squeeze_bn")(x)
-    x = layers.LeakyReLU(name=f"{prefix}_backbone_squeeze_act")(x)
+    x = layers.ReLU(name=f"{prefix}_backbone_squeeze_act")(x)
 
     x = layers.Conv1D(32, 8, padding='same', kernel_initializer='he_normal', name=f"{prefix}_backbone_conv1", kernel_regularizer=reg)(x)
     x = layers.BatchNormalization(name=f"{prefix}_backbone_bn1")(x)
-    x = layers.LeakyReLU(name=f"{prefix}_backbone_act1")(x)
+    x = layers.ReLU(name=f"{prefix}_backbone_act1")(x)
     x = layers.SpatialDropout1D(0.2, name=f"{prefix}_backbone_drop1")(x)
 
     x = layers.Conv1D(64, 8, padding='same', kernel_initializer='he_normal', name=f"{prefix}_backbone_conv2", kernel_regularizer=reg)(x)
     x = layers.BatchNormalization(name=f"{prefix}_backbone_bn2")(x)
-    s = layers.LeakyReLU(name=f"{prefix}_backbone_act2")(x)
+    s = layers.ReLU(name=f"{prefix}_backbone_act2")(x)
 
     
 
@@ -180,7 +187,7 @@ def string_layer(x, start, end, max_x, training, string_idx=0):
     s = layers.Conv1D(64, 4, strides=4, padding='valid', 
                       kernel_regularizer=reg, name=f"{prefix}_harmonic_collapse")(s)
     s = layers.BatchNormalization(name=f"{prefix}_harmonic_bn")(s)
-    s = layers.LeakyReLU(name=f"{prefix}_harmonic_act")(s)
+    s = layers.ReLU(name=f"{prefix}_harmonic_act")(s)
 
     if string_idx==5:
         s = layers.SpatialDropout1D(0.2, name=f"{prefix}_harmonic_drop")(s)
@@ -193,12 +200,12 @@ def string_layer(x, start, end, max_x, training, string_idx=0):
 
 
     s = HollowSuppression(name=f"{prefix}_hollow_suppress")(s)
-    s = layers.LeakyReLU(name=f"{prefix}_hollow_act")(s)
+    s = layers.ReLU(name=f"{prefix}_hollow_act")(s)
 
     # Optional: A 1x1 conv to mix the newly sharpened features
     s = layers.Conv1D(64, 1, padding='same', kernel_regularizer=reg, name=f"{prefix}_post_suppress_conv")(s)
     s = layers.BatchNormalization(name=f"{prefix}_post_suppress_bn")(s)
-    s = layers.LeakyReLU(name=f"{prefix}_post_suppress_act")(s)
+    s = layers.ReLU(name=f"{prefix}_post_suppress_act")(s)
 
     return s
 
@@ -233,13 +240,13 @@ def dilated_freq_block(x, filters, dilations, dropout_rate=0.1, name_prefix="fre
     x = layers.Conv1D(64, 1, padding='same', kernel_initializer='he_normal',
                       kernel_regularizer=reg, name="context_squeeze")(x)
     x = layers.BatchNormalization(name="context_squeeze_bn")(x)
-    x = layers.LeakyReLU(name="context_squeeze_act")(x)
+    x = layers.ReLU(name="context_squeeze_act")(x)
     # 1. Project input to the desired number of filters (if shapes don't match)
     if x.shape[-1] != filters:
         x = layers.Conv1D(filters, 1, padding='same', kernel_initializer='he_normal', 
                           kernel_regularizer=reg, name=f"{name_prefix}_proj")(x)
         x = layers.BatchNormalization(name=f"{name_prefix}_proj_bn")(x)
-        x = layers.LeakyReLU(name=f"{name_prefix}_proj_act")(x)
+        x = layers.ReLU(name=f"{name_prefix}_proj_act")(x)
 
     # 2. Cascade of dilated convolutions across FREQUENCY
     for i, d in enumerate(dilations):
@@ -251,7 +258,7 @@ def dilated_freq_block(x, filters, dilations, dropout_rate=0.1, name_prefix="fre
                           kernel_initializer='he_normal', kernel_regularizer=reg,
                           name=f"{name_prefix}_conv_d{d}")(x)
         x = layers.BatchNormalization(name=f"{name_prefix}_bn_d{d}")(x)
-        x = layers.LeakyReLU(name=f"{name_prefix}_act_d{d}")(x)
+        x = layers.ReLU(name=f"{name_prefix}_act_d{d}")(x)
         
         if dropout_rate > 0:
             x = layers.SpatialDropout1D(dropout_rate, name=f"{name_prefix}_drop_d{d}")(x)
@@ -280,12 +287,12 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
 
     c1=layers.Conv2D(filters, kernel_size, padding='same', name=f"{name_prefix}_conv1",kernel_regularizer=reg2d)(stacked)
     c1=layers.BatchNormalization(name=f"{name_prefix}_bn1")(c1)
-    c1 = layers.ELU(name=f"{name_prefix}_act1")(c1)
+    c1 = layers.ReLU(name=f"{name_prefix}_act1")(c1)
 
 
     c2=layers.Conv2D(2*filters, kernel_size, padding='same', name=f"{name_prefix}_conv2",kernel_regularizer=reg2d)(c1)
     c2=layers.BatchNormalization(name=f"{name_prefix}_bn2")(c2)
-    c2=layers.LeakyReLU(name=f"{name_prefix}_act2")(c2)
+    c2=layers.ReLU(name=f"{name_prefix}_act2")(c2)
     chord=c2#layers.Add(name=f"{name_prefix}_res_c1_c2")([c2, c1])
     chord=layers.SpatialDropout2D(0.2, name=f"{name_prefix}_drop1")(chord)
     # Split the chord features back into per-string tensors
@@ -299,7 +306,7 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
         #s = layers.Add(name=f"{name_prefix}_res_str{i}")([s, string_residuals[i]])
         s = layers.BatchNormalization(name=f"{name_prefix}_bn_str{i}")(s)
 
-        s = layers.LeakyReLU(name=f"{name_prefix}_act_str{i}")(s)
+        s = layers.ReLU(name=f"{name_prefix}_act_str{i}")(s)
         s=layers.Dropout(0.1, name=f"{name_prefix}_drop_str{i}")(s)   
         s=layers.Dense(1,bias_initializer=tf.initializers.Constant(-4),name=f"{name_prefix}_fretlogits_str{i}", kernel_regularizer=reg)(s)   
         s=layers.Flatten(name=f"{name_prefix}_flatten_str{i}")(s)
@@ -309,7 +316,7 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
         # s = layers.GlobalMaxPooling1D(name=f"{name_prefix}_gmax_str{i}")(s)
         # # s = layers.Dense(64, name=f"{name_prefix}_dense_str{i}", kernel_regularizer=reg)(s)
         # s = layers.LayerNormalization(name=f"{name_prefix}_ln_str{i}")(s) 
-        # s = layers.LeakyReLU(name=f"{name_prefix}_act_str{i}")(s)
+        # s = layers.ReLU(name=f"{name_prefix}_act_str{i}")(s)
         # s=layers.Dropout(0.1, name=f"{name_prefix}_drop_str{i}")(s)
         # s=layers.Dense(output_dim, activation= None,
         #                 bias_initializer=tf.initializers.Constant(-4),
@@ -330,28 +337,28 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width),
     x = layers.Conv2D(8, (1, 16), strides=(1, 4), padding='same',
                       kernel_initializer='he_normal', name="freq_compress_conv2d")(x)
     x = layers.BatchNormalization(name="freq_compress_bn")(x)
-    x = layers.LeakyReLU(0.2, name="freq_compress_act")(x)
+    x = layers.ReLU(0.2, name="freq_compress_act")(x)
     x = layers.SpatialDropout2D(0.1, name="freq_compress_drop")(x)
     x = layers.Reshape((image_height, 512), name="reshape_to_1d")(x)
 
     # --- Stage 2: Conv1D backbone ---
     # x = layers.Conv1D(32, 1, padding='same', kernel_initializer='he_normal', name="backbone_squeeze", kernel_regularizer=reg)(x)
     # x = layers.BatchNormalization(name="backbone_squeeze_bn")(x)
-    # x = layers.LeakyReLU(name="backbone_squeeze_act")(x)
+    # x = layers.ReLU(name="backbone_squeeze_act")(x)
 
     # x = layers.Conv1D(32, 8, padding='same', kernel_initializer='he_normal', name="backbone_conv1", kernel_regularizer=reg)(x)
     # x = layers.BatchNormalization(name="backbone_bn1")(x)
-    # x = layers.LeakyReLU(name="backbone_act1")(x)
+    # x = layers.ReLU(name="backbone_act1")(x)
     # x = layers.SpatialDropout1D(0.2, name="backbone_drop1")(x)
 
     # x = layers.Conv1D(64, 8, padding='same', kernel_initializer='he_normal', name="backbone_conv2", kernel_regularizer=reg)(x)
     # x = layers.BatchNormalization(name="backbone_bn2")(x)
-    # x = layers.LeakyReLU(name="backbone_act2")(x)
+    # x = layers.ReLU(name="backbone_act2")(x)
     # x = layers.MaxPooling1D(2, name="backbone_pool")(x)
     # x = layers.SpatialDropout1D(0.2, name="backbone_drop2")(x)
     # x = layers.Conv1D(64, 1, padding='same', kernel_initializer='he_normal', kernel_regularizer=reg, name="backbone_squeeze")(x)
     # x = layers.BatchNormalization(name="backbone_squeeze_bn")(x)
-    # x = layers.LeakyReLU(name="backbone_squeeze_act")(x)
+    # x = layers.ReLU(name="backbone_squeeze_act")(x)
 
     #x = layers.MaxPooling1D(2, name="backbone_pool")(x)
     # x = layers.SpatialDropout1D(0.2, name="backbone_drop")(x)
