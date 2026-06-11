@@ -21,8 +21,11 @@ option(WITH_AUDIO_OUTPUT "Build with audio output support" OFF)
 set(RING_BUFFER_SIZE "8" CACHE STRING "Number of frames to store in the ring buffer") 
 set(NUM_INFERENCE_THREADS "4" CACHE STRING "Number of threads to use for inference")
 
+message("Build type: ${CMAKE_BUILD_TYPE}")
 message("Ring buffer size: ${RING_BUFFER_SIZE}")
 message("Number of inference threads: ${NUM_INFERENCE_THREADS}")
+message("Building with tracing info: ${WITH_TRACING_INFO}")
+message("Building with audio output support: ${WITH_AUDIO_OUTPUT}")
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
