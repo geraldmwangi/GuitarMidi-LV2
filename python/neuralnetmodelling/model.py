@@ -106,10 +106,13 @@ class HollowSuppression(tf.keras.layers.Layer):
         )
 
     def call(self, y):
-        y4d = tf.expand_dims(y, 1)  # (B, 1, T, C)
+        # y has shape (B, F, C). We want to apply a depthwise conv with the hollow suppression kernel across the frequency dimension.
+        # add a dummy spatial dimension so we can use depthwise_conv2d: (B,F,C)->(B, F,1, C)
+        y4d = tf.expand_dims(y, 2)  # (B, F,1, C)
+        # the input to depthwise_conv2d has the form (B, F,1, C)
         out = tf.nn.depthwise_conv2d(
             y4d,
-            tf.cast(self.kernel, y.dtype),  # ← always matches input
+            tf.cast(self.kernel, y.dtype), 
             strides=[1, 1, 1, 1],
             padding='SAME'
         )
