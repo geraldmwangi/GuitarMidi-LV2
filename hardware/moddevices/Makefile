@@ -4,7 +4,7 @@ LV2DIR ?= $(PREFIX)/lib/lv2
 PLUGIN = guitarmidi
 BUNDLE = $(PLUGIN).lv2
 
-INSTALL_DIR = $(DESTDIR)$(LV2DIR)
+INSTALL_DIR = $(LV2DIR)
 BUILD_DIR = build
 # Use absolute path for SOURCE_DIR to avoid pathing issues in sub-cmake calls
 SOURCE_DIR = $(shell pwd)/../../
@@ -23,7 +23,8 @@ $(PLUGIN).so:
         -DCMAKE_CXX_FLAGS=$(ARMCC_FLAGS) \
         -DCMAKE_ASM_FLAGS=$(ARMCC_FLAGS) \
         -DTFLITE_HOST_TOOLS_DIR="/usr/bin" \
-        -DNUM_INFERENCE_THREADS=2 \
+        -DNUM_INFERENCE_THREADS=3 \
+	-DWITH_TRACING_INFO=OFF  \
         -DRING_BUFFER_SIZE=1 \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR) \
@@ -57,10 +58,11 @@ $(PLUGIN).so:
         -DXNN_ENABLE_ARM_FP16_SCALAR:BOOL=OFF \
         -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
         $(SOURCE_DIR)
-	cd $(BUILD_DIR) && cmake  --build . -j 15
+	cd $(BUILD_DIR) && make -j 15
 
 install:
-	cd $(BUILD_DIR) && cmake --install . --prefix /usr/lib/lv2 #$(INSTALL_DIR) 
+	echo "Source dir $(SOURCE_DIR). Dest dir $(DESTDIR). Install dir $(INSTALL_DIR)"
+	cd $(BUILD_DIR) && make install 
 
 clean:
 	rm -rf $(BUILD_DIR)
