@@ -116,7 +116,7 @@ class HollowSuppression(tf.keras.layers.Layer):
             strides=[1, 1, 1, 1],
             padding='SAME'
         )
-        return tf.squeeze(out, 1)
+        return tf.squeeze(out, 2)
 
 
 
