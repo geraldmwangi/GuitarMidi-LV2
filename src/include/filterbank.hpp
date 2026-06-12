@@ -53,6 +53,7 @@ namespace GuitarMidi{
             float m_s1[NUM_FILTERS][NUM_SECTIONS];
             float m_s2[NUM_FILTERS][NUM_SECTIONS];
             float *m_input;
+            float *m_gain_db;
             public:
             FilterBank(){
                 // Allocate the 2D audio buffer (num_filters x window_size)
@@ -66,7 +67,9 @@ namespace GuitarMidi{
             };
 
             void setup(map<uint,FilterRepresentation> filterreps,int samplerate);
-
+            void setGain(float* gain_db){
+                m_gain_db = gain_db;
+            }
             void setInput(const float *input)
             {
                 m_input = const_cast<float *>(input);

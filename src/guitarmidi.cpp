@@ -84,7 +84,9 @@ connect_port(LV2_Handle instance,
 		fretboard->setMidiOutput((LV2_Atom_Sequence *)data);
 		break;
 
-
+	case FRETBOARD_INPUT_GAIN:
+		fretboard->setGain((float *)data);
+		break;
 	case FRETBOARD_SMOOTHING:
 		fretboard->setSmoothing((float *)data);
 		break;

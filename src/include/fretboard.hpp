@@ -29,13 +29,14 @@ typedef enum
 {
     FRETBOARD_INPUT = 0,
     FRETBOARD_MIDIOUTPUT=1,
-    FRETBOARD_SMOOTHING=2,
-    FRETBOARD_SMOOTHING_OFFSET=3,
-    FRETBOARD_ONSET_THRESHOLD=4,
-    FRETBOARD_OFFSET_THRESHOLD=5,
-    FRETBOARD_ONSET_ENERGY_THRESHOLD=6,
-    FRETBOARD_OFFSET_ENERGY_THRESHOLD=7,
-    FRETBOARD_AUDIO_OUTPUT=8
+    FRETBOARD_INPUT_GAIN=2,
+    FRETBOARD_SMOOTHING=3,
+    FRETBOARD_SMOOTHING_OFFSET=4,
+    FRETBOARD_ONSET_THRESHOLD=5,
+    FRETBOARD_OFFSET_THRESHOLD=6,
+    FRETBOARD_ONSET_ENERGY_THRESHOLD=7,
+    FRETBOARD_OFFSET_ENERGY_THRESHOLD=8,
+    FRETBOARD_AUDIO_OUTPUT=9
 } PortIndex;
 using namespace std;
 using namespace GuitarMidi;
@@ -107,6 +108,9 @@ public:
     }
     void setOffsetEnergyThreshold(float* threshold){
         m_noteinferencer.setOffsetEnergyThreshold(threshold);
+    }  
+    void setGain(float* gain_db){
+        m_filterbank.setGain(gain_db);
     }
 #ifdef WITH_AUDIO_OUTPUT
     void setAudioOutputBuffer(float *output)

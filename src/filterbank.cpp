@@ -137,6 +137,8 @@ void FilterBank::reset()
 
 void FilterBank::process(int nsamples)
 {
+    float gain = powf(10.0f, *m_gain_db * 0.05f); 
+
     for (int f = 0; f < NUM_FILTERS; ++f) {
         const float b0_0 = m_b0[f][0], b1_0 = m_b1[f][0], b2_0 = m_b2[f][0];
         const float a1_0 = m_a1[f][0], a2_0 = m_a2[f][0];
@@ -150,7 +152,7 @@ void FilterBank::process(int nsamples)
             m_filterbankbuffer.audio_buffer_2D + f * m_filterbankbuffer.window_size;
 
         for (int n = 0; n < nsamples; ++n) {
-            const float x = m_input[n];
+            const float x = gain * m_input[n];
 
             // Section 0 (Transposed Direct Form II)
             const float y0 = b0_0 * x + s1_0;
