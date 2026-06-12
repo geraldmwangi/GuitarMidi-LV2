@@ -123,7 +123,7 @@ public:
      * @brief initialize the filterbank
      * 
      */
-    bool initialize(const std::string& bundle_path);
+    bool initialize(const std::string& bundle_path,float samplerate,int buffer_size);
 
     /**
      * @brief finalize all filters and release allocated resources

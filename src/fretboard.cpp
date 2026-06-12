@@ -23,9 +23,7 @@ using namespace GuitarMidi;
 FretBoard::FretBoard(LV2_URID_Map *map, float samplerate):m_noteinferencer(map)
 {
     
-    m_fretboard_rep=FretBoardRepresentation();
-    m_filterbank.setup(m_fretboard_rep.get_filterrepresentations(),samplerate);
-    m_noteinferencer.setAudioInputBuffer(m_filterbank.get_buffer());
+
   
 
 
@@ -57,12 +55,14 @@ void FretBoard::setMidiOutput(LV2_Atom_Sequence *output)
     //     // }
     // }
 }
-
-bool FretBoard::initialize(const std::string& bundle_path)
+bool FretBoard::initialize(const std::string &bundle_path, float samplerate, int buffer_size)
 {
+        m_fretboard_rep=FretBoardRepresentation();
+    m_filterbank.setup(m_fretboard_rep.get_filterrepresentations(),samplerate);
+    m_noteinferencer.setAudioInputBuffer(m_filterbank.get_buffer());
     return m_noteinferencer.initialize(bundle_path);
-
 }
+
 
 void FretBoard::finalize()
 {

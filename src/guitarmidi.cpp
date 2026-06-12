@@ -22,9 +22,28 @@
 #include <math.h>
 #include <stdlib.h>
 #include <lv2/core/lv2.h>
+#include <lv2/options/options.h>
+#include <lv2/urid/urid.h>
 #include <fretboard.hpp>
 
-#define AMP_URI "http://github.com/geraldmwangi/GuitarMidi-LV2"
+#define GUITARMIDI_URI "http://github.com/geraldmwangi/GuitarMidi-LV2"
+
+// define URIDS options to get the buffer size and sample rate from the host
+typedef struct {
+	LV2_URID_Map *map;
+	LV2_URID samplerate;
+	LV2_URID buffersize;
+} GuitarMidiURIDs;
+
+
+static void map_options(LV2_URID_Map *map, GuitarMidiURIDs *urids)
+{
+	urids->map = map;
+	urids->samplerate = map->map(map->handle, LV2_CORE__sampleRate);
+	urids->buffersize = map->map(map->handle, 	LV2_BUF_SIZE__maxBlockLength);
+}
+
+
 
 static LV2_Handle
 instantiate(const LV2_Descriptor *descriptor,
@@ -55,7 +74,7 @@ instantiate(const LV2_Descriptor *descriptor,
 	}
 
 	FretBoard *fretboard = new FretBoard(map, rate);
-	if (!fretboard->initialize(std::string(bundle_path)))
+	if (!fretboard->initialize(std::string(bundle_path),rate,BUFFER_SIZE))
 	{
 		lv2_log_error(&g_logger, "Failed to initialize FretBoard\n");
 		delete fretboard;
@@ -163,7 +182,7 @@ extension_data(const char *uri)
 }
 
 static const LV2_Descriptor descriptor = {
-	AMP_URI,
+	GUITARMIDI_URI,
 	instantiate,
 	connect_port,
 	activate,
