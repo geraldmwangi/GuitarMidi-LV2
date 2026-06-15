@@ -76,6 +76,7 @@ install(TARGETS guitarmidi
 
 if(WITH_AUDIO_OUTPUT)
 #rename ../guitarmidi-audiooutput.ttl to /tmp/guitarmidi.ttl then copy to the install directory, this is a workaround to avoid having to maintain two separate ttl files with only minor differences 
+file(REMOVE  /tmp/guitarmidi.ttl)
 file(COPY_FILE ../guitarmidi-audiooutput.ttl /tmp/guitarmidi.ttl)
 
 install(FILES ../manifest.ttl /tmp/guitarmidi.ttl ../python/neuralnetmodelling/guitarmidi.tflite

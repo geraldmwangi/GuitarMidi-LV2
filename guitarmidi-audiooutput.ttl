@@ -100,5 +100,35 @@
 		lv2:index 9 ;
 		lv2:symbol "out" ;
 		lv2:name "Out"
+	],[
+		a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 10 ;
+        lv2:symbol "noteselect" ;
+        lv2:name "Selected Note" ;
+        lv2:portProperty lv2:integer ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 36 ;
+	],[
+		a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 11 ;
+        lv2:symbol "harmonicselect" ;
+        lv2:name "Selected Harmonic" ;
+        lv2:portProperty lv2:integer ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 4 ;
+        # Custom labels for the GUI slider/dropdown:
+        lv2:scalePoint [ rdfs:label "1st Harmonic" ; rdf:value 0 ] ;
+        lv2:scalePoint [ rdfs:label "2nd Harmonic" ; rdf:value 1 ] ;
+        lv2:scalePoint [ rdfs:label "3rd Harmonic" ; rdf:value 2 ] ;
+        lv2:scalePoint [ rdfs:label "4th Harmonic" ; rdf:value 3 ] ;
+        lv2:scalePoint [ rdfs:label "Sum of All" ; rdf:value 4 ] ;
+	], [
+		a lv2:AudioPort ,
+			lv2:OutputPort ;
+		lv2:index 12 ;
+		lv2:symbol "filterout" ;
+		lv2:name "Filter Out"
 	] .
 

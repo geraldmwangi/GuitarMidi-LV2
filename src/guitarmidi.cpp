@@ -152,6 +152,15 @@ connect_port(LV2_Handle instance,
 	case FRETBOARD_AUDIO_OUTPUT:
 		fretboard->setAudioOutputBuffer((float *)data);
 		break;
+	case FRETBOARD_FILTER_OUTPUT:
+		fretboard->setFilterOutputBuffer((float *)data);
+		break;
+	case FRETBOARD_NOTE_SELECT:
+		fretboard->setNoteSelectControl((float*)data);
+		break;
+	case FRETBOARD_HARMONIC_SELECT:
+		fretboard->setHarmonicSelectControl((float*)data);
+		break;
 #endif
 	default:
 		break;
@@ -171,11 +180,11 @@ activate(LV2_Handle instance)
 static void
 run(LV2_Handle instance, uint32_t n_samples)
 {
-	if(n_samples!=256)	
-		{
-			lv2_log_error(&g_logger,"plugin only supports 256 samples at 48khz");
-			return;
-		}
+	// if(n_samples!=256)	
+	// 	{
+	// 		lv2_log_error(&g_logger,"plugin only supports 256 samples at 48khz");
+	// 		return;
+	// 	}
 	timespec start = timer_start();
 	FretBoard *notecl = (FretBoard *)instance;
 	notecl->process(n_samples);

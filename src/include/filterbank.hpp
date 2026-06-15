@@ -56,6 +56,11 @@ namespace GuitarMidi{
             float *m_gain_db;
             int m_hostbuffer_size;
             int m_current_buffer_offset;
+            #ifdef WITH_AUDIO_OUTPUT
+            float *m_filter_output_buffer;  
+            float* m_note_select;
+            float* m_harmonic_select;
+            #endif
             public:
             FilterBank(){
                 // Allocate the 2D audio buffer (num_filters x window_size)
@@ -89,7 +94,18 @@ namespace GuitarMidi{
             }
 
             void reset();
-
+#ifdef WITH_AUDIO_OUTPUT
+            void setAudioOutputBuffer(float *output)
+            {
+                m_filter_output_buffer = output;
+            }
+            void setNoteSelectControl(float* note_select_buffer){
+                m_note_select = note_select_buffer;
+            }
+            void setHarmonicSelectControl(float* harmonic_select_buffer){
+                m_harmonic_select = harmonic_select_buffer;
+            }
+#endif
 
 
     };

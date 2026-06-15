@@ -165,11 +165,42 @@ void FilterBank::process(int nsamples)
             s2_1 = b2_1 * y0 - a2_1 * y1;
 
             out[n+m_current_buffer_offset] = std::fabs(y1);
+            // output the audio for the selected filter and note/harmonic if audio output is enabled. if selected harmonic is 4, output the sum of all filters
+#ifdef WITH_AUDIO_OUTPUT
+
+            int currentnote =f/NUM_HARMONICS;// floor(((float)f) / ((float)NUM_HARMONICS));
+            int currentharmonic = f % NUM_HARMONICS; 
+            int selectednote = (int)(*m_note_select);
+            int selectedharmonic = (int)(*m_harmonic_select);
+            if (selectedharmonic < 4)
+            {
+                if (currentnote == selectednote && currentharmonic == selectedharmonic)
+                {
+                    m_filter_output_buffer[n + m_current_buffer_offset] = y1;
+                }
+            }
+            else
+            {
+                if (currentnote == selectednote)
+                {
+                    if (currentharmonic == 0)
+                    {
+                        m_filter_output_buffer[n + m_current_buffer_offset] = y1;
+                    }
+                    else
+                    {
+                        m_filter_output_buffer[n + m_current_buffer_offset] +=y1;
+                    }
+                }
+            }
+#endif
         }
 
         m_s1[f][0] = s1_0;  m_s2[f][0] = s2_0;
         m_s1[f][1] = s1_1;  m_s2[f][1] = s2_1;
     }
+
+    
     m_current_buffer_offset += nsamples;
     if(m_current_buffer_offset>=BUFFER_SIZE){
         m_current_buffer_offset=0;
