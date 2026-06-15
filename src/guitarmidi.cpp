@@ -174,22 +174,19 @@ activate(LV2_Handle instance)
 	// FretBoard *notecl = (FretBoard *)instance;
 }
 
-/** Define a macro for converting a gain in dB to a coefficient. */
-#define DB_CO(g) ((g) > -90.0f ? powf(10.0f, (g) * 0.05f) : 0.0f)
+
 
 static void
 run(LV2_Handle instance, uint32_t n_samples)
 {
-	// if(n_samples!=256)	
-	// 	{
-	// 		lv2_log_error(&g_logger,"plugin only supports 256 samples at 48khz");
-	// 		return;
-	// 	}
+
+#ifdef WITH_TRACING_INFO
 	timespec start = timer_start();
+#endif
 	FretBoard *notecl = (FretBoard *)instance;
 	notecl->process(n_samples);
-	auto delay = timer_end(start);
 #ifdef WITH_TRACING_INFO
+	auto delay = timer_end(start);
 	lv2_log_trace(&g_logger, "processing in %ld\n", delay);
 #endif
 }

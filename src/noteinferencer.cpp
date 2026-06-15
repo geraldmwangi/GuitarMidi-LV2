@@ -86,7 +86,7 @@ namespace GuitarMidi
                         #ifdef WITH_AUDIO_OUTPUT
                         // visualize the detected notes in the audio output buffer by adding a sine wave at the corresponding note frequency
                         float frequency = 440.0f * pow(2.0f, (i - 9) / 12.0f); // calculate the frequency of the note
-                        for (int w = 0; w < BUFFER_SIZE; w++)
+                        for (int w = 0; w < nsamples; w++)
                         {
                             audio_output[ w] = 0.1f * sin(2 * M_PI * frequency * (m_frames + w) / 48000.0f); // add a sine wave to the audio output buffer for visualization
                         }

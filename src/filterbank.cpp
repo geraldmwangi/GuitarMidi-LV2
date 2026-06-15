@@ -176,7 +176,7 @@ void FilterBank::process(int nsamples)
             {
                 if (currentnote == selectednote && currentharmonic == selectedharmonic)
                 {
-                    m_filter_output_buffer[n + m_current_buffer_offset] = y1;
+                    m_filter_output_buffer[n] = y1;
                 }
             }
             else
@@ -185,11 +185,11 @@ void FilterBank::process(int nsamples)
                 {
                     if (currentharmonic == 0)
                     {
-                        m_filter_output_buffer[n + m_current_buffer_offset] = y1;
+                        m_filter_output_buffer[n] = y1;
                     }
                     else
                     {
-                        m_filter_output_buffer[n + m_current_buffer_offset] +=y1;
+                        m_filter_output_buffer[n] +=y1;
                     }
                 }
             }
