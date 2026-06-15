@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <lv2/core/lv2.h>
 #include <lv2/options/options.h>
+#include <lv2/buf-size/buf-size.h>
 #include <lv2/urid/urid.h>
 #include <fretboard.hpp>
 
@@ -53,7 +54,8 @@ instantiate(const LV2_Descriptor *descriptor,
 {
 
 	LV2_URID_Map *map = NULL;
-	LV2_Log_Log *log = NULL;
+	LV2_Log_Log *log = NULL; 
+	LV2_Options_Option *options = NULL;
 	printf("Loading plugin\n");
 	for (int i = 0; features[i]; ++i)
 	{
@@ -65,6 +67,10 @@ instantiate(const LV2_Descriptor *descriptor,
 		{
 			log = (LV2_Log_Log *)features[i]->data;
 		}
+		else if (!strcmp(features[i]->URI, LV2_OPTIONS__options))
+		{
+			options = (LV2_Options_Option *)features[i]->data;
+		}
 	}
 	lv2_log_logger_init(&g_logger, map, log);
 	if (!map)
@@ -73,8 +79,26 @@ instantiate(const LV2_Descriptor *descriptor,
 		return NULL;
 	}
 
+	// map the options to get the sample rate and buffer size
+	GuitarMidiURIDs urids;
+	map_options(map, &urids);
+	auto buffer_size = BUFFER_SIZE;
+	// get the sample rate and buffer size from the host options
+	if (options){
+		for(int o=0;o<options[o].key;o++){
+			if(options[o].key==urids.samplerate){
+				rate=*((double*)options[o].value);
+				lv2_log_note(&g_logger,"Sample rate: %f\n",rate);
+			}
+			else if (options[o].key==urids.buffersize){
+				buffer_size=*((uint32_t*)options[o].value);
+				lv2_log_note(&g_logger,"Buffer size: %d\n",buffer_size);
+			}
+
+		}}
+	
 	FretBoard *fretboard = new FretBoard(map, rate);
-	if (!fretboard->initialize(std::string(bundle_path),rate,BUFFER_SIZE))
+	if (!fretboard->initialize(std::string(bundle_path),rate,buffer_size))
 	{
 		lv2_log_error(&g_logger, "Failed to initialize FretBoard\n");
 		delete fretboard;

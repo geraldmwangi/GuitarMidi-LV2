@@ -111,9 +111,9 @@ static void design_butterworth_bandpass_N2(
 // Design and process a 4th-order Butterworth bandpass filter using Transposed Direct Form II.
 
 void FilterBank::setup(std::map<unsigned, FilterRepresentation> filterreps,
-                       int samplerate)
+                       int samplerate,int hostbuffer_size)
 {
-    
+    m_hostbuffer_size=hostbuffer_size;
 
     for (auto& kv : filterreps) {
         const int    fid = kv.second.filter_id;
@@ -164,11 +164,15 @@ void FilterBank::process(int nsamples)
             s1_1 = b1_1 * y0 - a1_1 * y1 + s2_1;
             s2_1 = b2_1 * y0 - a2_1 * y1;
 
-            out[n] = std::fabs(y1);
+            out[n+m_current_buffer_offset] = std::fabs(y1);
         }
 
         m_s1[f][0] = s1_0;  m_s2[f][0] = s2_0;
         m_s1[f][1] = s1_1;  m_s2[f][1] = s2_1;
+    }
+    m_current_buffer_offset += nsamples;
+    if(m_current_buffer_offset>=BUFFER_SIZE){
+        m_current_buffer_offset=0;
     }
 }
 

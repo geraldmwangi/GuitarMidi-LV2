@@ -54,19 +54,22 @@ namespace GuitarMidi{
             float m_s2[NUM_FILTERS][NUM_SECTIONS];
             float *m_input;
             float *m_gain_db;
+            int m_hostbuffer_size;
+            int m_current_buffer_offset;
             public:
             FilterBank(){
                 // Allocate the 2D audio buffer (num_filters x window_size)
                 m_filterbankbuffer.num_filters = NUM_FILTERS;
                 m_filterbankbuffer.window_size = BUFFER_SIZE;
                 m_filterbankbuffer.audio_buffer_2D = new float[NUM_FILTERS * m_filterbankbuffer.window_size];
+                m_current_buffer_offset = 0;
             };
             ~FilterBank(){
                 // Free the 2D audio buffer
                 delete[] m_filterbankbuffer.audio_buffer_2D;
             };
 
-            void setup(map<uint,FilterRepresentation> filterreps,int samplerate);
+            void setup(map<uint,FilterRepresentation> filterreps,int samplerate,int hostbuffer_size);
             void setGain(float* gain_db){
                 m_gain_db = gain_db;
             }
