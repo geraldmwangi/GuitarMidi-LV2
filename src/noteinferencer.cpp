@@ -38,8 +38,34 @@ namespace GuitarMidi
         if (m_model.get_model_output(output_data, 1))
         {
             msg << "Output data:";
+            memcpy(m_confidences[m_current_confidence_index], output_data, sizeof(float) * NUM_NOTES);
+            
             for (int i = 0; i < NUM_NOTES; i++)
             {
+                //Get the per note median confidence over the last OUTWINDOW frames to reduce jitter in the output. This is a simple way to smooth the output without adding too much latency. More advanced smoothing techniques can be implemented in the future.
+
+                std::vector<float> onset_confidences;
+                int max_onset_index = *m_smoothing*OUTWINDOW; 
+                max_onset_index = max(1, max_onset_index);
+                for (int j = 0; j < max_onset_index; j++)
+                {
+                    int m=max(0, m_current_confidence_index - j);
+                    onset_confidences.push_back(m_confidences[m][i]);
+                }
+                std::sort(onset_confidences.begin(), onset_confidences.end());
+                float onset_confidence_median = onset_confidences[max_onset_index / 2];
+
+                std::vector<float> offset_confidences;
+                int max_offset_index = *m_smoothing_offset*OUTWINDOW; 
+                max_offset_index = max(1, max_offset_index);
+                for (int j = 0; j < max_offset_index; j++)
+                {
+                    int m=max(0, m_current_confidence_index - j);
+                    offset_confidences.push_back(m_confidences[m][i]);
+                }
+                std::sort(offset_confidences.begin(), offset_confidences.end());
+                float offset_confidence_median = offset_confidences[max_offset_index / 2];
+
                 // check if all harmonics of the note are active before sending note on message
                 float note_energy = 0;
                 int h = 1; // for (int h = 1; h <= NUM_HARMONICS; h++)
@@ -55,12 +81,12 @@ namespace GuitarMidi
                         note_energy += harmonicenergy;
                     }
                 }
-                smoothed_onsetoutput[i] = *m_smoothing * smoothed_onsetoutput[i] + (1 - *m_smoothing) * output_data[i]; // simple low pass filter to smooth the output and reduce jitter
-                smoothed_offsetoutput[i] = *m_smoothing_offset * smoothed_offsetoutput[i] + (1 - *m_smoothing_offset) * output_data[i];
+                // smoothed_onsetoutput[i] = *m_smoothing * smoothed_onsetoutput[i] + (1 - *m_smoothing) *onset_confidence_median; // simple low pass filter to smooth the output and reduce jitter
+                // smoothed_offsetoutput[i] =  *m_smoothing_offset * smoothed_offsetoutput[i] + (1 - *m_smoothing_offset) * onset_confidence_median;
 
-                smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
-                smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy * smoothed_offsetoutput[i];
-                if (smoothed_onsetoutput[i] > *m_onset_threshold)
+                smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy * onset_confidence_median; // smooth the note energy to avoid jitter
+                smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy * offset_confidence_median;
+                if (onset_confidence_median > *m_onset_threshold)
                 {
 
                     if (!m_note_on[i] && i != (NUM_NOTES - 1))
@@ -77,7 +103,7 @@ namespace GuitarMidi
                             #endif
                             continue;
                         }
-                        msg << " " << i << "(" << smoothed_onsetoutput[i] << ")" << " energy:" << smoothed_noteenergies[i];
+                        msg << " " << i << "(" << onset_confidence_median << ")" << " energy:" << smoothed_noteenergies[i];
                         uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x7f};
                         #ifdef WITH_TRACING_INFO
                         lv2_log_note(&g_logger, "Notes: %s\n", msg.str().c_str());
@@ -109,7 +135,7 @@ namespace GuitarMidi
                         continue;
                     }
                     // lv2_log_note(&g_logger, "Note %d OFF with confidence %f\n", i, output_data[i]);
-                    if (m_note_on[i] && smoothed_offsetoutput[i] < *m_offset_threshold && i != (NUM_NOTES - 1))
+                    if (m_note_on[i] && offset_confidence_median < *m_offset_threshold && i != (NUM_NOTES - 1))
                     {
                         uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x00};
                         m_midioutput.sendMidiMessage(midinote, m_frames);
@@ -117,6 +143,7 @@ namespace GuitarMidi
                     }
                 }
             }
+            m_current_confidence_index = (m_current_confidence_index + 1) % OUTWINDOW;
         }
 
         m_frames += nsamples;
