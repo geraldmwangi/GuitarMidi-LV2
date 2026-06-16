@@ -34,7 +34,6 @@
 #include <modelinferencer.hpp>
 using namespace std;
 using namespace tflite;
-#define OUTWINDOW 64
 namespace GuitarMidi{
     class NoteInferencer{
        ModelInferencer m_model;
@@ -48,15 +47,13 @@ namespace GuitarMidi{
         float* m_offset_energy_threshold;
         float* m_smoothing;
         float* m_smoothing_offset;
-        // float smoothed_onsetoutput[NUM_NOTES]={0};
-        // float smoothed_offsetoutput[NUM_NOTES]={0};
+        float smoothed_onsetoutput[NUM_NOTES]={0};
+        float smoothed_offsetoutput[NUM_NOTES]={0};
         float smoothed_noteenergies[NUM_NOTES]={0};
         float smoothed_offsetnoteenergies[NUM_NOTES]={0};
         // std::unique_ptr<tflite::FlatBufferModel> model;
         int64_t m_frames;
         bool m_note_on[NUM_NOTES]={false};
-        float m_confidences[OUTWINDOW][NUM_NOTES]={0};
-        int m_current_confidence_index=0;
         public:
         NoteInferencer(LV2_URID_Map *map);
 
