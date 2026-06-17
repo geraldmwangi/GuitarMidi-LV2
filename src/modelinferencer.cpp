@@ -3,6 +3,7 @@
 #include <tensorflow/lite/logger.h>
 #include <filesystem>
 #include <chrono>
+#include "tensorflow/lite/delegates/external/external_delegate.h"
 // TFlite C++ API reference: https://ai.google.dev/edge/api/tflite/cc?hl=en
 #define TFLITE_MINIMAL_CHECK(x)                                  \
     if (!(x))                                                    \
@@ -48,72 +49,74 @@ void GuitarMidi::ModelInferencer::inferencing_loop()
 
 bool GuitarMidi::ModelInferencer::initialize(const std::string &bundle_path)
 {
-    // Load model
+    // 1. Load model
     std::string tflite_path = bundle_path + "/guitarmidi.tflite";
     lv2_log_note(&g_logger, "Loading model from: %s\n", tflite_path.c_str());
-    // check if file exists
-    if (!std::filesystem::exists(tflite_path))
-    {
+    
+    if (!std::filesystem::exists(tflite_path)) {
         lv2_log_error(&g_logger, "Model file not found: %s\n", tflite_path.c_str());
         return false;
     }
+    
     m_model = FlatBufferModel::BuildFromFile(tflite_path.c_str());
     TFLITE_MINIMAL_CHECK(m_model != nullptr);
-    ops::builtin::BuiltinOpResolver resolver;
- #ifdef USE_TPU   
-    resolver.AddCustom(edgetpu::kCustomOp, edgetpu::RegisterCustomOp());
-    #endif
+
+    // 2. Build the interpreter (DO NOT ADD EDGETPU CUSTOM OP HERE)
+    ops::builtin::BuiltinOpResolverWithoutDefaultDelegates resolver;
+
     InterpreterBuilder builder(*m_model, resolver);
     builder.SetNumThreads(1);
-    builder(&m_interpreter);
+    
+    // Check status to prevent silent failures
+    if (builder(&m_interpreter) != kTfLiteOk || !m_interpreter) {
+        lv2_log_error(&g_logger, "Failed to build interpreter\n");
+        return false;
+    }
+
 #ifndef USE_TPU
-    TfLiteXNNPackDelegateOptions xnnpack_options =
-        TfLiteXNNPackDelegateOptionsDefault();
-    xnnpack_options.num_threads = NUM_INFERENCE_THREADS; // Set number of threads as appropriate for your
-                                                         // platform and application needs.
+    TfLiteXNNPackDelegateOptions xnnpack_options = TfLiteXNNPackDelegateOptionsDefault();
+    xnnpack_options.num_threads = NUM_INFERENCE_THREADS;
     xnnpack_options.weight_cache_file_path = TfLiteXNNPackDelegateInMemoryFilePath();
-    // xnnpack_options.logging_level = TFLITE_XNNPACK_LOGGING_LEVEL_ERROR;
 
     auto delegate = TfLiteXNNPackDelegateCreate(&xnnpack_options);
-    if (m_interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk)
-    {
-        // Handle error, but usually optional
+    if (m_interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk) {
         lv2_log_error(&g_logger, "Failed to apply XNNPack delegate\n");
         return false;
     }
 #else
-auto* manager = edgetpu::EdgeTpuManager::GetSingleton();
-auto devices = manager->EnumerateEdgeTpu();
-
-lv2_log_note(&g_logger, "Found %zu Edge TPU device(s)\n", devices.size());
-for (const auto& d : devices) {
-    lv2_log_note(&g_logger, "  Type: %s, Path: %s\n",
-        d.type == edgetpu::DeviceType::kApexPci ? "PCIe" : "USB",
-        d.path.c_str());
-}
-lv2_log_note(&g_logger, "libedgetpu version: %s\n", manager->Version().c_str());
-
-    m_edgetpu_ctx =manager->OpenDevice();
-       
-    if (m_edgetpu_ctx == nullptr)
-    {
-        lv2_log_error(&g_logger, "Failed to open tpu device\n");
+    // 3. Modern Edge TPU Initialization via External Delegate
+    lv2_log_note(&g_logger, "Loading Edge TPU Delegate via modern external API...\n");
+    
+    // Loads the shared library directly. (Use "libedgetpu.so.1" on Linux)
+    TfLiteExternalDelegateOptions options = TfLiteExternalDelegateOptionsDefault("/usr/lib/x86_64-linux-gnu/libedgetpu.so");
+    
+    // Create the delegate
+    TfLiteDelegate* delegate = TfLiteExternalDelegateCreate(&options);
+    if (!delegate) {
+        lv2_log_error(&g_logger, "Failed to create Edge TPU delegate! Make sure libedgetpu.so.1 is installed.\n");
         return false;
     }
-    m_interpreter->SetExternalContext(kTfLiteEdgeTpuContext, m_edgetpu_ctx.get());
 
-    lv2_log_note(&g_logger, "Initialized TPU device\n");
+    // Apply the delegate (This replaces the unknown custom op automatically)
+    if (m_interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk) {
+        lv2_log_error(&g_logger, "Failed to apply Edge TPU delegate to the graph\n");
+        return false;
+    }
+    lv2_log_note(&g_logger, "Initialized TPU device and applied delegate\n");
 #endif
 
-    // Allocate tensor buffers.
-    TFLITE_MINIMAL_CHECK(m_interpreter->AllocateTensors() == kTfLiteOk);
+    // 4. Allocate tensor buffers ONLY AFTER the delegate is applied
+    if (m_interpreter->AllocateTensors() != kTfLiteOk) {
+        lv2_log_error(&g_logger, "Failed to allocate tensors\n");
+        return false;
+    }
+
     printf("=== Pre-invoke Interpreter State ===\n");
-    // tflite::PrintInterpreterState(m_interpreter.get());
     tflite::LoggerOptions::SetMinimumLogSeverity(tflite::TFLITE_LOG_ERROR);
     lv2_log_note(&g_logger, "Model loaded and interpreter initialized successfully.\n");
-    // log the ring buffer and inference thread info
     lv2_log_note(&g_logger, "Inference thread count: %d\n", NUM_INFERENCE_THREADS);
     lv2_log_note(&g_logger, "Ring buffer size: %d frames\n", RING_BUFFER_SIZE);
+    
     return true;
 }
 
