@@ -51,7 +51,7 @@
         lv2:index 3 ;
         lv2:symbol "onsetsmoothing" ;
         lv2:name "Onset Smoothing" ;
-        lv2:default 0.5 ;
+        lv2:default 0.8 ;
         lv2:minimum 0.0 ;
         lv2:maximum 0.9 ;
 	],[
@@ -59,7 +59,7 @@
         lv2:index 4 ;
         lv2:symbol "offsetsmoothing" ;
         lv2:name "Offset Smoothing" ;
-        lv2:default 0.5 ;
+        lv2:default 0.1 ;
         lv2:minimum 0.0 ;
         lv2:maximum 0.9 ;
 	],[
@@ -83,7 +83,7 @@
         lv2:index 7 ;
         lv2:symbol "onsetenthr" ;
         lv2:name "Onset Energy Threshold (dB)" ;
-        lv2:default 0.80 ;
+        lv2:default 0.70 ;
         lv2:minimum -20.00 ;
         lv2:maximum 3.00 ;
 	],[
@@ -91,7 +91,7 @@
         lv2:index 8 ;
         lv2:symbol "offsetenthr" ;
         lv2:name "Offset Energy Threshold (dB)" ;
-        lv2:default -15.00 ;
+        lv2:default -18.00 ;
         lv2:minimum -20.00 ;
         lv2:maximum 3.00 ;
 	], [
