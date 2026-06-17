@@ -44,7 +44,7 @@ namespace GuitarMidi {
         LV2_Atom_Forge_Frame m_frame;
         LV2_URID m_midiEvent;
         LV2_Atom_Sequence *m_midioutput;
-        int64_t m_frames;
+      
 
         bool forge_midimessage(
             const uint8_t *const buffer,
@@ -54,6 +54,7 @@ namespace GuitarMidi {
         MidiOutput(LV2_URID_Map *map);
         void setMidiOutput(LV2_Atom_Sequence *output);
         void initializeSequence();
+        void finalizeSequence();
         void sendMidiMessage(uint8_t midinote[3], int64_t frames);
     };
 }

@@ -12,13 +12,15 @@ namespace GuitarMidi
         exit(1);                                                 \
     }
 
-    NoteInferencer::NoteInferencer(LV2_URID_Map *map) : m_frames(0), m_midioutput(map)
+    NoteInferencer::NoteInferencer(LV2_URID_Map *map) :  m_midioutput(map)
     {
     }
     bool NoteInferencer::initialize(const std::string &bundle_path)
     {
         m_midioutput.initializeSequence();
+        #ifdef WITH_AUDIO_OUTPUT
         m_frames = 0;
+        #endif
         return m_model.initialize(bundle_path);
     }
     void NoteInferencer::setMidiOutput(LV2_Atom_Sequence *output)
@@ -91,7 +93,7 @@ namespace GuitarMidi
                             audio_output[ w] = 0.1f * sin(2 * M_PI * frequency * (m_frames + w) / 48000.0f); // add a sine wave to the audio output buffer for visualization
                         }
                         #endif
-                        m_midioutput.sendMidiMessage(midinote, m_frames);
+                        m_midioutput.sendMidiMessage(midinote, 0);
                         m_note_on[i] = true;
                     }
                 }
@@ -112,13 +114,15 @@ namespace GuitarMidi
                     if (m_note_on[i] && smoothed_offsetoutput[i] < *m_offset_threshold && i != (NUM_NOTES - 1))
                     {
                         uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x00};
-                        m_midioutput.sendMidiMessage(midinote, m_frames);
+                        m_midioutput.sendMidiMessage(midinote, 0);
                         m_note_on[i] = false;
                     }
                 }
             }
         }
+        #ifdef WITH_AUDIO_OUTPUT
 
         m_frames += nsamples;
+        #endif
     }
 }

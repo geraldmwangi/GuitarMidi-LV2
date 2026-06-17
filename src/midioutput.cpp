@@ -24,7 +24,7 @@ MidiOutput::MidiOutput(LV2_URID_Map *map)
     {
         lv2_atom_forge_init(&m_forge, map);
         m_midiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
-        m_frames = 0;
+       
     }
     m_midioutput=0;
 }
@@ -78,18 +78,23 @@ void MidiOutput::initializeSequence()
         const uint32_t out_capacity = m_midioutput->atom.size;
         lv2_atom_forge_set_buffer(&m_forge, (uint8_t *)m_midioutput, out_capacity);
         lv2_atom_forge_sequence_head(&m_forge, &m_frame, 0);
-        m_frames = 0;
+      
     }
 }
-
+void MidiOutput::finalizeSequence()
+{
+    if (m_midioutput)
+    {
+        lv2_atom_forge_pop(&m_forge, &m_frame);
+    }
+}
 void MidiOutput::sendMidiMessage(uint8_t midinote[3], int64_t frames)
 {
 
     bool messagesent = false;
     for (int i = 0; i < 1 && !messagesent; i++)
-        messagesent = forge_midimessage(midinote, 3, m_frames);
+        messagesent = forge_midimessage(midinote, 3, frames);
     if (!messagesent)
         printf("Failed to send midinote (%d,%d,%d)\n", midinote[0], midinote[1], midinote[2]);
-    //  m_frames+=frames;
-    m_frames++;
+    
 }
