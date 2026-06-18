@@ -172,7 +172,7 @@ void FilterBank::process(int nsamples)
             {
                 if (currentnote == selectednote && currentharmonic == selectedharmonic)
                 {
-                    m_filter_output_buffer[n] = y1;
+                    m_filter_output_buffer[n] =  x;//y1;
                 }
             }
             else

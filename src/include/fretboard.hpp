@@ -63,7 +63,7 @@ private:
     int m_samplerate=48000;
     Resampler m_resampler;
     float* m_input_buffer=nullptr;
-    int m_input_buffer_size=0;
+    int m_resample_buffer_size=0;
     float* m_resampled_buffer=nullptr;
 
     void process_resampled(int nsamples);
@@ -76,11 +76,9 @@ public:
      * @param map 
      * @param samplerate 
      */
-    FretBoard(LV2_URID_Map *map, float samplerate);
+    FretBoard(LV2_URID_Map *map);
     ~FretBoard(){
-        if(m_input_buffer){
-            delete[] m_input_buffer;
-        }
+
         if(m_resampled_buffer){
             delete[] m_resampled_buffer;
         }
@@ -154,7 +152,7 @@ public:
      * @brief initialize the filterbank
      * 
      */
-    bool initialize(const std::string& bundle_path,float samplerate,int buffer_size);
+    bool initialize(const std::string& bundle_path,int samplerate,int buffer_size);
 
     /**
      * @brief finalize all filters and release allocated resources

@@ -33,7 +33,7 @@ namespace GuitarMidi
     }
     void NoteInferencer::process(int nsamples)
     {
-        m_midioutput.initializeSequence();
+        
         stringstream msg;
         m_model.add_audio_input(m_audiobuffer.audio_buffer_2D, 1);
         float output_data[NUM_NOTES];

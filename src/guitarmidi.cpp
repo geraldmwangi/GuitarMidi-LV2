@@ -97,7 +97,7 @@ instantiate(const LV2_Descriptor *descriptor,
 
 		}}
 	
-	FretBoard *fretboard = new FretBoard(map, rate);
+	FretBoard *fretboard = new FretBoard(map);
 	if (!fretboard->initialize(std::string(bundle_path),rate,buffer_size))
 	{
 		lv2_log_error(&g_logger, "Failed to initialize FretBoard\n");
@@ -170,7 +170,7 @@ connect_port(LV2_Handle instance,
 static void
 activate(LV2_Handle instance)
 {
-	// lv2_log_note(&g_logger, "Activating GuitarMidi-LV2 Plugin\n");
+	lv2_log_note(&g_logger, "Activating GuitarMidi-LV2 Plugin\n");
 	// FretBoard *notecl = (FretBoard *)instance;
 }
 
@@ -194,6 +194,7 @@ run(LV2_Handle instance, uint32_t n_samples)
 static void
 deactivate(LV2_Handle instance)
 {
+	lv2_log_note(&g_logger, "Deactivating GuitarMidi-LV2 Plugin\n");
 	FretBoard *notecl = (FretBoard *)instance;
 	notecl->finalize();
 }
@@ -201,6 +202,7 @@ deactivate(LV2_Handle instance)
 static void
 cleanup(LV2_Handle instance)
 {
+	lv2_log_note(&g_logger, "Cleaning up GuitarMidi-LV2 Plugin\n");
 	FretBoard *notecl = (FretBoard *)instance;
 	delete notecl;
 }
@@ -208,7 +210,8 @@ cleanup(LV2_Handle instance)
 static const void *
 extension_data(const char *uri)
 {
-	return NULL;
+	lv2_log_note(&g_logger, "Extension data requested for URI: %s\n", uri);
+                      	return NULL;
 }
 
 static const LV2_Descriptor descriptor = {

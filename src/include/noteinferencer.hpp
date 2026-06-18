@@ -86,6 +86,14 @@ namespace GuitarMidi{
         void setOffsetEnergyThreshold(float* threshold){
             m_offset_energy_threshold=threshold;
         }
+
+        void preprocess(){
+            m_midioutput.initializeSequence();
+        }
+
+        void postprocess(){
+            m_midioutput.finalizeSequence();
+        }
         void process(int nsamples);
 
 #ifdef WITH_AUDIO_OUTPUT

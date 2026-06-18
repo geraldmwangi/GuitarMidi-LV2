@@ -21,16 +21,17 @@
 
 using namespace GuitarMidi;
 
-FretBoard::FretBoard(LV2_URID_Map *map, float samplerate) : m_noteinferencer(map)
+FretBoard::FretBoard(LV2_URID_Map *map) : m_noteinferencer(map)
 {
 
-    m_samplerate = samplerate;
+
 }
 
 void FretBoard::setAudioInput(const float *input)
 {
     if (m_samplerate != SAMPLERATE)
     {
+        m_input_buffer = const_cast<float *>(input);
         m_filterbank.setInput(m_resampled_buffer);
     }
     else
@@ -53,16 +54,15 @@ void FretBoard::setMidiOutput(LV2_Atom_Sequence *output)
     //     // }
     // }
 }
-bool FretBoard::initialize(const std::string &bundle_path, float samplerate, int buffer_size)
+bool FretBoard::initialize(const std::string &bundle_path, int samplerate, int buffer_size)
 {
-
+    lv2_log_note(&g_logger, "Initializing FretBoard with samplerate %d and buffer size %d ", samplerate, buffer_size);
     if (samplerate != SAMPLERATE)
     {
-        lv2_log_note(&g_logger, "Host samplerate %f is different from plugin samplerate %d, resampling will be performed", samplerate, SAMPLERATE);
-        m_input_buffer_size = buffer_size;
-        m_input_buffer = new float[m_input_buffer_size];
-        m_resampled_buffer = new float[m_input_buffer_size];
-        if (m_resampler.setup(samplerate, SAMPLERATE, 1, buffer_size))
+        lv2_log_note(&g_logger, "Host samplerate %d is different from plugin samplerate %d, resampling will be performed", samplerate, SAMPLERATE);
+        m_resample_buffer_size = buffer_size;
+        m_resampled_buffer = new float[m_resample_buffer_size];
+        if (m_resampler.setup(samplerate, SAMPLERATE, 1, 96))
         {
             lv2_log_error(&g_logger, "Failed to setup resampler");
             return false;
@@ -150,19 +150,26 @@ void FretBoard::process(int nsamples)
 
 void FretBoard::process_resampled(int nsamples)
 {
+    m_noteinferencer.preprocess();
     m_resampler.inp_data=m_input_buffer;
     m_resampler.inp_count=nsamples;
     while(m_resampler.inp_count){
         m_resampler.process();
         if(m_resampler.out_count==0){
-            process_direct(m_input_buffer_size);
+            m_filterbank.process(m_resample_buffer_size);
+            m_noteinferencer.process(nsamples);
             m_resampler.out_data=m_resampled_buffer;
-            m_resampler.out_count=m_input_buffer_size;
+            m_resampler.out_count=m_resample_buffer_size;
         }
     }
+    m_noteinferencer.postprocess();
+
 }
 void FretBoard::process_direct(int nsamples)
 {
     m_filterbank.process(nsamples);
+
+    m_noteinferencer.preprocess();
     m_noteinferencer.process(nsamples);
+    m_noteinferencer.postprocess();
 }
