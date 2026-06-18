@@ -25,6 +25,7 @@
 #include <map>
 #include <noteinferencer.hpp>
 #include <config.hpp>
+#include <zita-resampler/resampler.h>
 typedef enum
 {
     FRETBOARD_INPUT = 0,
@@ -59,6 +60,14 @@ private:
 
     FilterBank m_filterbank;
     NoteInferencer m_noteinferencer;
+    int m_samplerate=48000;
+    Resampler m_resampler;
+    float* m_input_buffer=nullptr;
+    int m_input_buffer_size=0;
+    float* m_resampled_buffer=nullptr;
+
+    void process_resampled(int nsamples);
+    void process_direct(int nsamples);
 
 public:
     /**
@@ -68,6 +77,14 @@ public:
      * @param samplerate 
      */
     FretBoard(LV2_URID_Map *map, float samplerate);
+    ~FretBoard(){
+        if(m_input_buffer){
+            delete[] m_input_buffer;
+        }
+        if(m_resampled_buffer){
+            delete[] m_resampled_buffer;
+        }
+    };
 
 
     /**

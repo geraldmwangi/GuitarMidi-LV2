@@ -6,7 +6,8 @@ include_directories(/usr/include)
 include_directories(include)
 include_directories(${PROJECT_SOURCE_DIR}/src/include)
 find_package(PkgConfig REQUIRED)
-
+find_library(ZITA_RESAMPLER_LIB zita-resampler)
+message("Found zita-resampler library: ${ZITA_RESAMPLER_LIB}")
 #find_package(OpenMP REQUIRED)
 # pkg_check_modules(Pango REQUIRED pango)
 
@@ -64,7 +65,7 @@ set(SRC guitarmidi.cpp  midioutput.cpp fretboard.cpp fretboardrepresentation.cpp
 add_library(guitarmidi SHARED ${SRC})
 
 
-target_link_libraries(guitarmidi PUBLIC tensorflow-lite  )
+target_link_libraries(guitarmidi PUBLIC tensorflow-lite  ${ZITA_RESAMPLER_LIB} )
 
 
 
