@@ -1,0 +1,24 @@
+Edge TPU Compiler version 16.0.384591198
+Input: guitarmidi-cpu.tflite
+Output: guitarmidi-cpu_edgetpu.tflite
+
+Operator                       Count      Status
+
+STRIDED_SLICE                  18         Mapped to Edge TPU
+MINIMUM                        1          Mapped to Edge TPU
+ADD                            10         Mapped to Edge TPU
+QUANTIZE                       6          Mapped to Edge TPU
+QUANTIZE                       1          Operation is otherwise supported, but not mapped due to some unspecified limitation
+DEPTHWISE_CONV_2D              6          Mapped to Edge TPU
+FULLY_CONNECTED                6          Mapped to Edge TPU
+CONV_2D                        38         Mapped to Edge TPU
+CONCATENATION                  5          Operation is working on an unsupported data type
+CONCATENATION                  3          Mapped to Edge TPU
+SOFTMAX                        6          Mapped to Edge TPU
+RELU                           1          Mapped to Edge TPU
+DEQUANTIZE                     1          Operation is working on an unsupported data type
+REDUCE_MAX                     1          Mapped to Edge TPU
+MUL                            7          Mapped to Edge TPU
+SUB                            1          Mapped to Edge TPU
+AVERAGE_POOL_2D                1          Mapped to Edge TPU
+RESHAPE                        15         Mapped to Edge TPU
