@@ -20,7 +20,7 @@
 #include <logging.hpp>
 
 #define BUFFER_SIZE 256
-#define SAMPLERATE 48000
+#define NATIVE_SAMPLERATE 48000
 #define NOTE_OFFSET 40
 #define NUM_HARMONICS 4
 #define NUM_NOTES 37

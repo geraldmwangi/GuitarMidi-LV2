@@ -23,6 +23,10 @@ namespace GuitarMidi
         #endif
         return m_model.initialize(bundle_path);
     }
+    void NoteInferencer::finalize()
+    { 
+        m_midioutput.finalizeSequence();
+    }
     void NoteInferencer::setMidiOutput(LV2_Atom_Sequence *output)
     {
         m_midioutput.setMidiOutput(output);

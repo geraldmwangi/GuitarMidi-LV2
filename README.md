@@ -9,7 +9,7 @@ It deploys a bank of butterworth bandpass filters to separate the polyphonic aud
 Packages for Debian/Ubuntu are available at https://github.com/geraldmwangi/GuitarMidi-LV2/releases
 
 # Usage
-Currently your Host must be running with 256 samples per period at 48KHz (that will change soon). 
+The plugin works with any combos of samplerate and buffersize
 Your guitarsignal should be clean, no distortion of sort. 
 * Tune the guitar to the standard E A D g b e tuning
 * Activate the bridge pickup
@@ -72,10 +72,8 @@ In essence, it's a sophisticated pattern-matching system that learns to recogniz
 * Velocity is not extracted from the audio. All midi notes have max velocity (=127)
 * Only notes upto e5 (12th fret on the e-string) are detected. This is due to the current nvme shortage, I only have enough nvme to store 19000 songs with 37 notes
 * The plugin detects mostly major and minor chords since those are dominant in the training data
-* there is no midi panic control
-* ~~latency is higher then theoretically possible. Due to an issue in the DSPFilter library I can only setup 1st order filters, although 2nd order filters
-    should be possible~~ Higher order filters are working, latency is reduced but still perceivable
-* Since a guitar string vibrates with many partial frequencies, it may trigger 2-3 harmonic notes 
+* there is no midi panic control, this is left to the host
+* Since a guitar string vibrates with many partial frequencies, it may trigger 2-3 harmonic notes . This will be improved but will always occur then and there
 
 
 

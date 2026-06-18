@@ -46,7 +46,11 @@ using namespace std;
 using namespace GuitarMidi;
 /**
  * @brief FretBoard holds a filterbank and a noteinferencer. It is responsible for setting up the filterbank based on the fretboard representation and processing the audio input
- * in polyphonic audio. The parameters of the noteinferencer are: smoothing, smoothing offset, onset threshold and offset threshold are set in the fretboard class and can be controlled by the user. The output of the noteinferencer is sent to the midi output buffer.
+ * in polyphonic audio. The parameters of the noteinferencer are: smoothing, smoothing offset, onset threshold, offset threshold, onset energy threshold and offset energy threshold. The gain of the filters in the filterbank can also be controlled from the host.
+ *  The audio output of the filters in the filterbank can be sent to the host for visualization or debugging purposes. 
+ * The note select and harmonic select controls can be used to select which notes and harmonics are active in the filterbank output for visualization or debugging purposes.
+ * When the samplerate of the host is different from the native samplerate of the plugin, the audio input is resampled to the native samplerate before being processed by the filterbank and noteinferencer. 
+ * The resampled audio is stored in a separate buffer and processed by the plugin. 
  * 
  */
 class FretBoard
@@ -161,7 +165,9 @@ public:
     void finalize();
 
     /**
-     * @brief process audio with all NoteClassifiers
+     * @brief process audio with the filterbank and noteinferencer. The audio is processed in blocks of the size of the host buffer size. 
+     * If the samplerate of the host is different from the native samplerate of the plugin, the audio is resampled before being processed by the filterbank and noteinferencer. 
+     * The output of the noteinferencer is sent to the midi output buffer as MIDI messages. 
      * 
      * @param nsamples 
      */
