@@ -22,12 +22,14 @@ Your guitarsignal should be clean, no distortion of sort.
 # Plugin Parameters
 The plugin exposes several LV2 control ports to tune detection behavior:
 
-* **Onset Smoothing** — [0.0, 0.9], default `0.5`. Smooths the detected note onset signal. Higher values reduce false triggers but may make note starts feel less responsive.
-* **Offset Smoothing** — [0.0, 0.9], default `0.5`. Smooths note release detection. Higher values keep notes held longer and reduce chatter on note endings.
+* **Input Gain (dB)** — [-20.0, 20.0], default `0.0`. Amplifies or attenuates the input signal. Use this to normalize the input level from your guitar interface.
+* **Expressivity Range (dB)** — [-3.0, 20.0], default `7.0`. Controls the dynamic range of the velocity output. Higher values expand the range of note velocities; lower values compress them.
+* **Onset Smoothing** — [0.0, 0.9], default `0.8`. Smooths the detected note onset signal. Higher values reduce false triggers but may make note starts feel less responsive.
+* **Offset Smoothing** — [0.0, 0.9], default `0.3`. Smooths note release detection. Higher values keep notes held longer and reduce chatter on note endings.
 * **Onset Confidence Threshold** — [0.00, 0.99], default `0.80`. Controls how confident the detector must be before sending a note-on event. Increase to reduce spurious onsets.
 * **Offset Confidence Threshold** — [0.00, 0.99], default `0.10`. Controls how confident the detector must be before sending a note-off event. Increase to make notes release sooner.
-* **Onset Energy Threshold (dB)** — [-20.0, 3.0], default `0.80`. Minimum volume required for an onset to be accepted. Increase to reduce spurious onsets of lower notes.  
-* **Offset Energy Threshold (dB)** — [-20.0, 3.0], default `-15.0`. Minimum volume required to keep a note alive before releasing it.
+* **Onset Energy Threshold (dB)** — [-20.0, 3.0], default `0.70`. Minimum volume required for an onset to be accepted. Increase to reduce spurious onsets of lower notes.  
+* **Offset Energy Threshold (dB)** — [-20.0, 3.0], default `-18.0`. Minimum volume required to keep a note alive before releasing it.
 
 These controls let you balance sensitivity and stability for your guitar signal and playing style.
 
