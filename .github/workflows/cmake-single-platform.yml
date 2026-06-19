@@ -11,29 +11,35 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # Specify the OS to run the job on
+    strategy:
+      matrix:
+        ubuntu-version: [ubuntu-24.04, ubuntu-26.04]
+    runs-on: ${{ matrix.ubuntu-version }}
 
     steps:
     # Step 1: Checkout the repository code
     - name: Checkout code
       uses: actions/checkout@v3  # Use the checkout action to clone the repository
 
-    # # Step 2: Set up CMake
-    # - name: Set up CMake
-    #   uses: threeal/cmake-action@main
-
-    # Step 3: Install dependencies
+    # Step 2: Install dependencies
     - name: Install dependencies
       run: |
-        sudo apt-get update  
-        sudo apt-get install -y cmake pango1.0-tools libpango1.0-dev pkg-config libomp-dev  
+        sudo apt-get update
+        sudo apt-get install -y cmake build-essential pkg-config lv2-dev libzita-resampler-dev fakeroot
 
-    # Step 4: Configure the project using CMake
+    # Step 3: Configure the project using CMake
     - name: Configure CMake
       run: cmake -B build -S .  # Configure the project, specifying the build directory
 
-    # Step 5: Build the project
+    # Step 4: Build the project
     - name: Build
       run: cmake --build build -- -j$(nproc)  # Build the project using all available processors
 
+    # Step 5: Package DEB
+    - name: Build Debian package
+      run: cmake --build build --target package
+
+    # Step 6: List generated packages
+    - name: List generated Debian packages
+      run: find build -name '*.deb' -print
 
