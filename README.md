@@ -18,6 +18,8 @@ Your guitarsignal should be clean, no distortion of sort.
 * connect the midi out of guitarmidi to a synth plugin 
 * first play single notes, adjust the input gain to improve tracking
 * successively play more strings/chords
+* experiment with the input gain to improve detection
+* adjust the Expressivity Range (dB) to your liking: low values make all notes have loud uniform midi velocity. High values increase the dynamic range of the midi notes
 The plugin works with any combos of samplerate and buffersizes, though audio with samplerates other than the plugins native 48khz gets resampled with minimal cpu load
 # Plugin Parameters
 The plugin exposes several LV2 control ports to tune detection behavior:
