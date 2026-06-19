@@ -130,6 +130,9 @@ connect_port(LV2_Handle instance,
 	case FRETBOARD_INPUT_GAIN:
 		fretboard->setGain((float *)data);
 		break;
+	case FRETBOARD_EXPRESSIVITY:
+		fretboard->setExpressivity((float *)data);
+		break;
 	case FRETBOARD_SMOOTHING:
 		fretboard->setSmoothing((float *)data);
 		break;

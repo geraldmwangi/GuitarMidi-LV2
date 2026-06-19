@@ -40,7 +40,8 @@ namespace GuitarMidi{
        
         GuitarMidi::MidiOutput m_midioutput;
         AudioBuffer2D m_audiobuffer;
-
+        float* m_gain_db;
+        float* m_expressivity_db;
         float* m_onset_threshold;
         float* m_offset_threshold;
         float* m_onset_energy_threshold;
@@ -65,6 +66,12 @@ namespace GuitarMidi{
 
         void setAudioInputBuffer(AudioBuffer2D input);
 
+        void setGain(float* gain){
+            m_gain_db=gain;
+        }
+        void setExpressivity(float* expressivity){
+            m_expressivity_db=expressivity;
+        }
         void setOnsetThreshold(float* threshold){
             m_onset_threshold=threshold;
         }

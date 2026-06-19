@@ -64,7 +64,7 @@ bool FretBoard::initialize(const std::string &bundle_path, int samplerate, int b
         lv2_log_note(&g_logger, "Host samplerate %d is different from plugin samplerate %d, resampling will be performed", samplerate, NATIVE_SAMPLERATE);
         m_resample_buffer_size = buffer_size;
         m_resampled_buffer = new float[m_resample_buffer_size];
-        if (m_resampler.setup(samplerate, NATIVE_SAMPLERATE, 1, 96))
+        if (m_resampler.setup(samplerate, NATIVE_SAMPLERATE, 1, 16))
         {
             lv2_log_error(&g_logger, "Failed to setup resampler");
             return false;
