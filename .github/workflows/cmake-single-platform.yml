@@ -31,11 +31,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake build-essential pkg-config lv2-dev libzita-resampler-dev fakeroot
+        sudo apt-get install -y cmake build-essential pkg-config lv2-dev libzita-resampler-dev fakeroot dpkg-dev debhelper
 
     # Step 3: Configure the project using CMake
     - name: Configure CMake
-      run: cmake -B build -S .  # Configure the project, specifying the build directory
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_DEB=ON  # Configure the project, specifying the build directory
 
     # Step 4: Build the project
     - name: Build
@@ -43,9 +43,46 @@ jobs:
 
     # Step 5: Package DEB
     - name: Build Debian package
-      run: cmake --build build --target package
+      run: |
+        set -o pipefail
+        echo "CPack version: $(cpack --version 2>/dev/null || true)"
+        # try the package target; if it fails, run cpack directly for DEB
+        if cmake --build build --target package; then
+          echo "package target succeeded"
+        else
+          echo "package target failed, trying cpack directly"
+          (cd build && cpack -G DEB -C Release) || (echo "cpack failed" && exit 1)
+        fi
 
-    # Step 6: List generated packages
-    - name: List generated Debian packages
-      run: find build -name '*.deb' -print
+    # Step 6: Tag and list generated .deb files with Ubuntu release
+    - name: Tag and list generated Debian packages
+      run: |
+        UBUNTU_TAG_RAW="${{ matrix.ubuntu-version }}"
+        UBUNTU_TAG=$(echo "$UBUNTU_TAG_RAW" | sed -E 's/ubuntu-([0-9]+)\.([0-9]+)/ubuntu\1\2/')
+        echo "Ubuntu tag: $UBUNTU_TAG"
+        set -e
+        for f in $(find build -name '*.deb'); do
+          dir=$(dirname "$f")
+          base=$(basename "$f" .deb)
+          if [[ "$base" =~ _([^_]+)$ ]]; then
+            arch_suffix="_${BASH_REMATCH[1]}"
+            name_prefix=${base%${arch_suffix}}
+            newname="${name_prefix}_${UBUNTU_TAG}${arch_suffix}.deb"
+            echo "Renaming $f -> $dir/$newname"
+            mv "$f" "$dir/$newname"
+          else
+            echo "No arch suffix detected for $f, skipping rename"
+          fi
+        done
+        echo "Final .deb files:"
+        find build -name '*.deb' -print
+
+    # Step 7: Create Release and upload .deb assets (only for tag pushes)
+    - name: Create GitHub Release and upload .deb assets
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/**/*.deb
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
