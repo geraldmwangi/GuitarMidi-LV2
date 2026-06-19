@@ -9,7 +9,7 @@ It deploys a bank of butterworth bandpass filters to separate the polyphonic aud
 Packages for Debian/Ubuntu are available at https://github.com/geraldmwangi/GuitarMidi-LV2/releases
 
 # Usage
-The plugin works with any combos of samplerate and buffersize
+
 Your guitarsignal should be clean, no distortion of sort. 
 * Tune the guitar to the standard E A D g b e tuning
 * Activate the bridge pickup
@@ -18,7 +18,7 @@ Your guitarsignal should be clean, no distortion of sort.
 * connect the midi out of guitarmidi to a synth plugin 
 * first play single notes, adjust the input gain to improve tracking
 * successively play more strings/chords
-
+The plugin works with any combos of samplerate and buffersizes, though audio with samplerates other than the plugins native 48khz gets resampled with minimal cpu load
 # Plugin Parameters
 The plugin exposes several LV2 control ports to tune detection behavior:
 
