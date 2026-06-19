@@ -5,9 +5,12 @@ on:
   push:
     branches:
       - master  # Trigger on pushes to the main branch
+    tags:
+      - 'v*'    # Trigger on version tag pushes (e.g., v1.2.3)
   pull_request:
     branches:
       - master  # Trigger on pull requests to the main branch
+  workflow_dispatch: {}
 
 jobs:
   build:
@@ -19,7 +22,10 @@ jobs:
     steps:
     # Step 1: Checkout the repository code
     - name: Checkout code
-      uses: actions/checkout@v3  # Use the checkout action to clone the repository
+      uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0  # fetch full history so submodules can be checked out reliably
 
     # Step 2: Install dependencies
     - name: Install dependencies
