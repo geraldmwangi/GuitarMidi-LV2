@@ -22,9 +22,29 @@
 #include <math.h>
 #include <stdlib.h>
 #include <lv2/core/lv2.h>
+#include <lv2/options/options.h>
+#include <lv2/buf-size/buf-size.h>
+#include <lv2/urid/urid.h>
 #include <fretboard.hpp>
 
-#define AMP_URI "http://github.com/geraldmwangi/GuitarMidi-LV2"
+#define GUITARMIDI_URI "http://github.com/geraldmwangi/GuitarMidi-LV2"
+
+// define URIDS options to get the buffer size and sample rate from the host
+typedef struct {
+	LV2_URID_Map *map;
+	LV2_URID samplerate;
+	LV2_URID buffersize;
+} GuitarMidiURIDs;
+
+
+static void map_options(LV2_URID_Map *map, GuitarMidiURIDs *urids)
+{
+	urids->map = map;
+	urids->samplerate = map->map(map->handle, LV2_CORE__sampleRate);
+	urids->buffersize = map->map(map->handle, 	LV2_BUF_SIZE__maxBlockLength);
+}
+
+
 
 static LV2_Handle
 instantiate(const LV2_Descriptor *descriptor,
@@ -34,7 +54,8 @@ instantiate(const LV2_Descriptor *descriptor,
 {
 
 	LV2_URID_Map *map = NULL;
-	LV2_Log_Log *log = NULL;
+	LV2_Log_Log *log = NULL; 
+	LV2_Options_Option *options = NULL;
 	printf("Loading plugin\n");
 	for (int i = 0; features[i]; ++i)
 	{
@@ -46,6 +67,10 @@ instantiate(const LV2_Descriptor *descriptor,
 		{
 			log = (LV2_Log_Log *)features[i]->data;
 		}
+		else if (!strcmp(features[i]->URI, LV2_OPTIONS__options))
+		{
+			options = (LV2_Options_Option *)features[i]->data;
+		}
 	}
 	lv2_log_logger_init(&g_logger, map, log);
 	if (!map)
@@ -54,8 +79,26 @@ instantiate(const LV2_Descriptor *descriptor,
 		return NULL;
 	}
 
-	FretBoard *fretboard = new FretBoard(map, rate);
-	if (!fretboard->initialize(std::string(bundle_path)))
+	// map the options to get the sample rate and buffer size
+	GuitarMidiURIDs urids;
+	map_options(map, &urids);
+	auto buffer_size = BUFFER_SIZE;
+	// get the sample rate and buffer size from the host options
+	if (options){
+		for(int o=0;o<options[o].key;o++){
+			if(options[o].key==urids.samplerate){
+				rate=*((double*)options[o].value);
+				lv2_log_note(&g_logger,"Sample rate: %f\n",rate);
+			}
+			else if (options[o].key==urids.buffersize){
+				buffer_size=*((uint32_t*)options[o].value);
+				lv2_log_note(&g_logger,"Buffer size: %d\n",buffer_size);
+			}
+
+		}}
+	
+	FretBoard *fretboard = new FretBoard(map);
+	if (!fretboard->initialize(std::string(bundle_path),rate,buffer_size))
 	{
 		lv2_log_error(&g_logger, "Failed to initialize FretBoard\n");
 		delete fretboard;
@@ -84,7 +127,12 @@ connect_port(LV2_Handle instance,
 		fretboard->setMidiOutput((LV2_Atom_Sequence *)data);
 		break;
 
-
+	case FRETBOARD_INPUT_GAIN:
+		fretboard->setGain((float *)data);
+		break;
+	case FRETBOARD_EXPRESSIVITY:
+		fretboard->setExpressivity((float *)data);
+		break;
 	case FRETBOARD_SMOOTHING:
 		fretboard->setSmoothing((float *)data);
 		break;
@@ -107,6 +155,15 @@ connect_port(LV2_Handle instance,
 	case FRETBOARD_AUDIO_OUTPUT:
 		fretboard->setAudioOutputBuffer((float *)data);
 		break;
+	case FRETBOARD_FILTER_OUTPUT:
+		fretboard->setFilterOutputBuffer((float *)data);
+		break;
+	case FRETBOARD_NOTE_SELECT:
+		fretboard->setNoteSelectControl((float*)data);
+		break;
+	case FRETBOARD_HARMONIC_SELECT:
+		fretboard->setHarmonicSelectControl((float*)data);
+		break;
 #endif
 	default:
 		break;
@@ -116,26 +173,23 @@ connect_port(LV2_Handle instance,
 static void
 activate(LV2_Handle instance)
 {
-	// lv2_log_note(&g_logger, "Activating GuitarMidi-LV2 Plugin\n");
+	lv2_log_note(&g_logger, "Activating GuitarMidi-LV2 Plugin\n");
 	// FretBoard *notecl = (FretBoard *)instance;
 }
 
-/** Define a macro for converting a gain in dB to a coefficient. */
-#define DB_CO(g) ((g) > -90.0f ? powf(10.0f, (g) * 0.05f) : 0.0f)
+
 
 static void
 run(LV2_Handle instance, uint32_t n_samples)
 {
-	if(n_samples!=256)	
-		{
-			lv2_log_error(&g_logger,"plugin only supports 256 samples at 48khz");
-			return;
-		}
+
+#ifdef WITH_TRACING_INFO
 	timespec start = timer_start();
+#endif
 	FretBoard *notecl = (FretBoard *)instance;
 	notecl->process(n_samples);
-	auto delay = timer_end(start);
 #ifdef WITH_TRACING_INFO
+	auto delay = timer_end(start);
 	lv2_log_trace(&g_logger, "processing in %ld\n", delay);
 #endif
 }
@@ -143,6 +197,7 @@ run(LV2_Handle instance, uint32_t n_samples)
 static void
 deactivate(LV2_Handle instance)
 {
+	lv2_log_note(&g_logger, "Deactivating GuitarMidi-LV2 Plugin\n");
 	FretBoard *notecl = (FretBoard *)instance;
 	notecl->finalize();
 }
@@ -150,6 +205,7 @@ deactivate(LV2_Handle instance)
 static void
 cleanup(LV2_Handle instance)
 {
+	lv2_log_note(&g_logger, "Cleaning up GuitarMidi-LV2 Plugin\n");
 	FretBoard *notecl = (FretBoard *)instance;
 	delete notecl;
 }
@@ -157,11 +213,12 @@ cleanup(LV2_Handle instance)
 static const void *
 extension_data(const char *uri)
 {
-	return NULL;
+	lv2_log_note(&g_logger, "Extension data requested for URI: %s\n", uri);
+                      	return NULL;
 }
 
 static const LV2_Descriptor descriptor = {
-	AMP_URI,
+	GUITARMIDI_URI,
 	instantiate,
 	connect_port,
 	activate,

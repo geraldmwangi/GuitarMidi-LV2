@@ -6,6 +6,8 @@ include_directories(/usr/include)
 include_directories(include)
 include_directories(${PROJECT_SOURCE_DIR}/src/include)
 find_package(PkgConfig REQUIRED)
+find_library(ZITA_RESAMPLER_LIB zita-resampler)
+message("Found zita-resampler library: ${ZITA_RESAMPLER_LIB}")
 # find_library(EDGETPU_LIB NAMES edgetpu)
 set(EDGETPU_LIB "")
 message("Found edgetpu lib: ${EDGETPU_LIB}")
@@ -66,7 +68,7 @@ set(SRC guitarmidi.cpp  midioutput.cpp fretboard.cpp fretboardrepresentation.cpp
 add_library(guitarmidi SHARED ${SRC})
 
 
-target_link_libraries(guitarmidi PUBLIC tensorflow-lite ${EDGETPU_LIB} )
+target_link_libraries(guitarmidi PUBLIC tensorflow-lite ${EDGETPU_LIB}  ${ZITA_RESAMPLER_LIB} )
 
 
 
@@ -78,6 +80,7 @@ install(TARGETS guitarmidi
 
 if(WITH_AUDIO_OUTPUT)
 #rename ../guitarmidi-audiooutput.ttl to /tmp/guitarmidi.ttl then copy to the install directory, this is a workaround to avoid having to maintain two separate ttl files with only minor differences 
+file(REMOVE  /tmp/guitarmidi.ttl)
 file(COPY_FILE ../guitarmidi-audiooutput.ttl /tmp/guitarmidi.ttl)
 
 install(FILES ../manifest.ttl /tmp/guitarmidi.ttl ../python/neuralnetmodelling/guitarmidi.tflite

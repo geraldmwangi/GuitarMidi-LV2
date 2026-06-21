@@ -53,20 +53,31 @@ namespace GuitarMidi{
             float m_s1[NUM_FILTERS][NUM_SECTIONS];
             float m_s2[NUM_FILTERS][NUM_SECTIONS];
             float *m_input;
+            float *m_gain_db;
+            int m_hostbuffer_size;
+            int m_current_buffer_offset;
+            #ifdef WITH_AUDIO_OUTPUT
+            float *m_filter_output_buffer;  
+            float* m_note_select;
+            float* m_harmonic_select;
+            #endif
             public:
             FilterBank(){
                 // Allocate the 2D audio buffer (num_filters x window_size)
                 m_filterbankbuffer.num_filters = NUM_FILTERS;
                 m_filterbankbuffer.window_size = BUFFER_SIZE;
                 m_filterbankbuffer.audio_buffer_2D = new float[NUM_FILTERS * m_filterbankbuffer.window_size];
+                m_current_buffer_offset = 0;
             };
             ~FilterBank(){
                 // Free the 2D audio buffer
                 delete[] m_filterbankbuffer.audio_buffer_2D;
             };
 
-            void setup(map<uint,FilterRepresentation> filterreps,int samplerate);
-
+            void setup(map<uint,FilterRepresentation> filterreps,int samplerate,int hostbuffer_size);
+            void setGain(float* gain_db){
+                m_gain_db = gain_db;
+            }
             void setInput(const float *input)
             {
                 m_input = const_cast<float *>(input);
@@ -83,7 +94,18 @@ namespace GuitarMidi{
             }
 
             void reset();
-
+#ifdef WITH_AUDIO_OUTPUT
+            void setAudioOutputBuffer(float *output)
+            {
+                m_filter_output_buffer = output;
+            }
+            void setNoteSelectControl(float* note_select_buffer){
+                m_note_select = note_select_buffer;
+            }
+            void setHarmonicSelectControl(float* harmonic_select_buffer){
+                m_harmonic_select = harmonic_select_buffer;
+            }
+#endif
 
 
     };

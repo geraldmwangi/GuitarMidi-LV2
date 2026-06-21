@@ -25,23 +25,33 @@
 #include <map>
 #include <noteinferencer.hpp>
 #include <config.hpp>
+#include <zita-resampler/resampler.h>
 typedef enum
 {
     FRETBOARD_INPUT = 0,
     FRETBOARD_MIDIOUTPUT=1,
-    FRETBOARD_SMOOTHING=2,
-    FRETBOARD_SMOOTHING_OFFSET=3,
-    FRETBOARD_ONSET_THRESHOLD=4,
-    FRETBOARD_OFFSET_THRESHOLD=5,
-    FRETBOARD_ONSET_ENERGY_THRESHOLD=6,
-    FRETBOARD_OFFSET_ENERGY_THRESHOLD=7,
-    FRETBOARD_AUDIO_OUTPUT=8
+    FRETBOARD_INPUT_GAIN=2,
+    FRETBOARD_EXPRESSIVITY=3,
+    FRETBOARD_SMOOTHING=4,
+    FRETBOARD_SMOOTHING_OFFSET=5,
+    FRETBOARD_ONSET_THRESHOLD=6,
+    FRETBOARD_OFFSET_THRESHOLD=7,
+    FRETBOARD_ONSET_ENERGY_THRESHOLD=8,
+    FRETBOARD_OFFSET_ENERGY_THRESHOLD=9,
+    FRETBOARD_AUDIO_OUTPUT=10,
+    FRETBOARD_NOTE_SELECT=11,
+    FRETBOARD_HARMONIC_SELECT=12,
+    FRETBOARD_FILTER_OUTPUT=13
 } PortIndex;
 using namespace std;
 using namespace GuitarMidi;
 /**
  * @brief FretBoard holds a filterbank and a noteinferencer. It is responsible for setting up the filterbank based on the fretboard representation and processing the audio input
- * in polyphonic audio. The parameters of the noteinferencer are: smoothing, smoothing offset, onset threshold and offset threshold are set in the fretboard class and can be controlled by the user. The output of the noteinferencer is sent to the midi output buffer.
+ * in polyphonic audio. The parameters of the noteinferencer are: smoothing, smoothing offset, onset threshold, offset threshold, onset energy threshold and offset energy threshold. The gain of the filters in the filterbank can also be controlled from the host.
+ *  The audio output of the filters in the filterbank can be sent to the host for visualization or debugging purposes. 
+ * The note select and harmonic select controls can be used to select which notes and harmonics are active in the filterbank output for visualization or debugging purposes.
+ * When the samplerate of the host is different from the native samplerate of the plugin, the audio input is resampled to the native samplerate before being processed by the filterbank and noteinferencer. 
+ * The resampled audio is stored in a separate buffer and processed by the plugin. 
  * 
  */
 class FretBoard
@@ -55,6 +65,14 @@ private:
 
     FilterBank m_filterbank;
     NoteInferencer m_noteinferencer;
+    int m_samplerate=48000;
+    Resampler m_resampler;
+    float* m_input_buffer=nullptr;
+    int m_resample_buffer_size=0;
+    float* m_resampled_buffer=nullptr;
+
+    void process_resampled(int nsamples);
+    void process_direct(int nsamples);
 
 public:
     /**
@@ -63,7 +81,13 @@ public:
      * @param map 
      * @param samplerate 
      */
-    FretBoard(LV2_URID_Map *map, float samplerate);
+    FretBoard(LV2_URID_Map *map);
+    ~FretBoard(){
+
+        if(m_resampled_buffer){
+            delete[] m_resampled_buffer;
+        }
+    };
 
 
     /**
@@ -107,11 +131,29 @@ public:
     }
     void setOffsetEnergyThreshold(float* threshold){
         m_noteinferencer.setOffsetEnergyThreshold(threshold);
+    }  
+    void setGain(float* gain_db){
+        m_filterbank.setGain(gain_db);
+        m_noteinferencer.setGain(gain_db);
+    }
+    void setExpressivity(float* expressivity_db){
+        m_noteinferencer.setExpressivity(expressivity_db);
     }
 #ifdef WITH_AUDIO_OUTPUT
     void setAudioOutputBuffer(float *output)
     {
         m_noteinferencer.setAudioOutputBuffer(output);
+    }
+
+    void setFilterOutputBuffer(float *output)
+    {
+        m_filterbank.setAudioOutputBuffer(output);
+    }
+    void setNoteSelectControl(float* note_select_buffer){
+        m_filterbank.setNoteSelectControl(note_select_buffer);
+    }
+    void setHarmonicSelectControl(float* harmonic_select_buffer){
+        m_filterbank.setHarmonicSelectControl(harmonic_select_buffer);
     }
 #endif
 
@@ -119,7 +161,7 @@ public:
      * @brief initialize the filterbank
      * 
      */
-    bool initialize(const std::string& bundle_path);
+    bool initialize(const std::string& bundle_path,int samplerate,int buffer_size);
 
     /**
      * @brief finalize all filters and release allocated resources
@@ -128,7 +170,9 @@ public:
     void finalize();
 
     /**
-     * @brief process audio with all NoteClassifiers
+     * @brief process audio with the filterbank and noteinferencer. The audio is processed in blocks of the size of the host buffer size. 
+     * If the samplerate of the host is different from the native samplerate of the plugin, the audio is resampled before being processed by the filterbank and noteinferencer. 
+     * The output of the noteinferencer is sent to the midi output buffer as MIDI messages. 
      * 
      * @param nsamples 
      */

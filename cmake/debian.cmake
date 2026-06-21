@@ -26,6 +26,9 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Gerald Mwangi")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 
+# Runtime dependencies for the Debian package
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libzita-resampler1")
+
 # package name for deb. If set, then instead of some-application-0.9.2-Linux.deb
 # you'll get some-application_0.9.2_amd64.deb (note the underscores too)
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)

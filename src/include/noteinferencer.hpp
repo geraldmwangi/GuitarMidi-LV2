@@ -40,7 +40,8 @@ namespace GuitarMidi{
        
         GuitarMidi::MidiOutput m_midioutput;
         AudioBuffer2D m_audiobuffer;
-
+        float* m_gain_db;
+        float* m_expressivity_db;
         float* m_onset_threshold;
         float* m_offset_threshold;
         float* m_onset_energy_threshold;
@@ -52,16 +53,25 @@ namespace GuitarMidi{
         float smoothed_noteenergies[NUM_NOTES]={0};
         float smoothed_offsetnoteenergies[NUM_NOTES]={0};
         // std::unique_ptr<tflite::FlatBufferModel> model;
-        int64_t m_frames;
+        #ifdef WITH_AUDIO_OUTPUT
+        int64_t m_frames=0;
+        #endif
         bool m_note_on[NUM_NOTES]={false};
         public:
         NoteInferencer(LV2_URID_Map *map);
 
         bool initialize(const std::string& bundle_path);
+        void finalize();
         void setMidiOutput(LV2_Atom_Sequence *output);
 
         void setAudioInputBuffer(AudioBuffer2D input);
 
+        void setGain(float* gain){
+            m_gain_db=gain;
+        }
+        void setExpressivity(float* expressivity){
+            m_expressivity_db=expressivity;
+        }
         void setOnsetThreshold(float* threshold){
             m_onset_threshold=threshold;
         }
@@ -83,6 +93,14 @@ namespace GuitarMidi{
         }
         void setOffsetEnergyThreshold(float* threshold){
             m_offset_energy_threshold=threshold;
+        }
+
+        void preprocess(){
+            m_midioutput.initializeSequence();
+        }
+
+        void postprocess(){
+            m_midioutput.finalizeSequence();
         }
         void process(int nsamples);
 

@@ -2,7 +2,16 @@
 
 
 all:
+	
 	mkdir -p build
-	cd build && cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/.lv2 ..
-	cd build && cmake --build .
+	cd build && cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/.lv2 ..
+	cd build && cmake --build . -j$(shell nproc || echo 4) 
+
+install: all
 	cd build && cmake --install .
+
+debian: all
+	cd build && cpack -G DEB .
+
+clean:
+	rm -rf build
