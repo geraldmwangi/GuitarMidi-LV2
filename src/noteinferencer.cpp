@@ -60,7 +60,7 @@ namespace GuitarMidi
                         {
                             harmonicenergy += m_audiobuffer.audio_buffer_2D[harmonic_index * BUFFER_SIZE + w];
                         }
-                        note_energy +=harmonicenergy;
+                        note_energy += harmonicenergy;
                     }
                 }
                 smoothed_onsetoutput[i] = *m_smoothing * smoothed_onsetoutput[i] + (1 - *m_smoothing) * output_data[i]; // simple low pass filter to smooth the output and reduce jitter
@@ -85,10 +85,9 @@ namespace GuitarMidi
                             #endif
                             continue;
                         }
-                        float normalized_energy=(smoothed_noteenergies[i]/gain-threshold)/(expressivity-threshold);
-                        int velocity=(int)(normalized_energy * 127);
+                        
+                        int velocity=(int)(smoothed_noteenergies[i]/(gain*expressivity) * 127);
                         velocity = std::min(velocity, 127); // cap the velocity at 127
-                        velocity = std::max(velocity, 0); 
                         msg << " " << i << "(" << smoothed_onsetoutput[i] << ")" << " energy:" << smoothed_noteenergies[i]<< " velocity:" << velocity;
                         uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, (uint8_t)velocity};
                         #ifdef WITH_TRACING_INFO
