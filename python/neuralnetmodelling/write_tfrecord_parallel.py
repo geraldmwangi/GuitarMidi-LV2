@@ -181,7 +181,7 @@ def write_tfrecord_parallel(
             processes=num_workers,
             initializer=_worker_init,
         ) as pool:
-            for protos in pool.imap_unordered(
+            for protos in pool.imap(
                 process_sample,args_iter,chunksize=chunksize
             ):
                 write_queue.put(protos)
