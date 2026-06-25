@@ -147,49 +147,56 @@ def _writer_thread_func(write_queue: queue.Queue, output_prefix: str, records_pe
             writer.close()
         print(f"[Writer]  closed {file_index} shards", flush=True)
 
+from itertools import islice
+
+def _chunked_iter(iterator, size):
+    """Yield lists of up to `size` items from iterator."""
+    while True:
+        block = list(islice(iterator, size))
+        if not block:
+            return
+        yield block
+
 def write_tfrecord_parallel(
         dataset: tf.data.Dataset,
         output_prefix: str,
         records_per_file: int=1000,
         num_workers: int=0,
-        queue_depth: int=512,
+        queue_depth: int=128,        # ← lowered from 512
         augment: bool=True,
-        chunksize: int=8
+        chunksize: int=8,         
+        window_size: int=0,          # ← NEW: max in-flight inputs
 )->None:
-    # Make the parent dir
-    Path(output_prefix).parent.mkdir(parents=True,exist_ok=True)
+    Path(output_prefix).parent.mkdir(parents=True, exist_ok=True)
 
     if num_workers<=0:
-        num_workers=max(1,os.cpu_count()-2)
-    print(f"Write parallel using {num_workers} workers", flush=True)
+        num_workers=max(1, os.cpu_count()-2)
+    if window_size<=0:
+        window_size=num_workers * chunksize * 64
+    print(f"Write parallel using {num_workers} workers, window={window_size}", flush=True)
 
     write_queue=queue.Queue(maxsize=queue_depth)
-
     writer_thread=threading.Thread(
         target=_writer_thread_func,
-        args=(write_queue,output_prefix,records_per_file),daemon=True
+        args=(write_queue, output_prefix, records_per_file), daemon=True
     )
-
     writer_thread.start()
 
-    args_iter=_sample_generator(dataset,augment)
-
+    args_iter=_sample_generator(dataset, augment)
     total=0
 
     try:
-        with Pool(
-            processes=num_workers,
-            initializer=_worker_init,
-        ) as pool:
-            for protos in pool.imap(
-                process_sample,args_iter,chunksize=chunksize
-            ):
-                write_queue.put(protos)
-                total+=len(protos)
-                if total%5000==0:
-                    print(f"{total} protos queued ...", flush=True)
+        with Pool(processes=num_workers, initializer=_worker_init) as pool:
+            # Process one bounded window at a time
+            for block in _chunked_iter(args_iter, window_size):
+                # imap preserves order WITHIN the block; block is bounded → buffer bounded
+                for protos in pool.imap(process_sample, block, chunksize=chunksize):
+                    write_queue.put(protos)
+                    total+=len(protos)
+                    if total % 5000==0:
+                        print(f"{total} protos queued ...", flush=True)
     finally:
         write_queue.put(_WRITER_SENTINEL)
         writer_thread.join()
         print("End")
-    print(f"Writting tfrecords done -- {total} protos written", flush=True)
+    print(f"Writing tfrecords done -- {total} protos written", flush=True)
