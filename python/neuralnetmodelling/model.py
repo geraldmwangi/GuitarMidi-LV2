@@ -264,8 +264,59 @@ def dilated_freq_block(x, filters, dilations, dropout_rate=0.1, name_prefix="fre
         
     return x
 
+def recurrrent_block(c1, name_prefix="recurrrent_block"):
+    """
+    c1: Input tensor of shape (batch, 6, 13, 64)
+    """
+    gru_units = 6 * 13  # 78 (one unit per fret on one string)
+    
+    # 1. Spatial context via Depthwise Conv
+    g = layers.DepthwiseConv2D(
+        kernel_size=(3, 3),
+        padding="same",
+        use_bias=False,
+        name=f"{name_prefix}_dw_conv"
+    )(c1)                                                      # Shape: (batch, 6, 13, 64)
 
-def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(3,4), name_prefix="chord"):
+    # 2. Channel-wise (Depth-wise) Max Pooling
+    g = layers.Lambda(
+        lambda x: tf.reduce_max(x, axis=-1, keepdims=True),
+        name=f"{name_prefix}_depthmax"
+    )(g)                                                       # Shape: (batch, 6, 13, 1)
+    
+    # 3. Flatten spatial dimensions for the GRU
+    g = layers.Reshape((1, gru_units), 
+                       name=f"{name_prefix}_reshape_in")(g)    # Shape: (batch, 1, 78)
+    
+    # 4. GRU Layer (Temporal/Sequence modeling)
+    # Using return_sequences=True to easily reshape back to (batch, 1, 78)
+    g = layers.GRU(
+        gru_units,
+        stateful=True,
+        name=f"{name_prefix}_gru"
+    )(g)                                                       # Shape: (batch, 1, 78)
+    
+    # 5. Reshape back to spatial dimensions
+    g = layers.Reshape((6, 13, 1), 
+                       name=f"{name_prefix}_reshape_out")(g)   # Shape: (batch, 6, 13, 1)
+    
+    # 6. Replicate back to 64 channels (broadcast along feature dimension)
+    g = layers.Lambda(
+        lambda x: tf.tile(x, multiples=[1, 1, 1, 64]),
+        name=f"{name_prefix}_broadcast"
+    )(g)                                                       # Shape: (batch, 6, 13, 64)
+    
+    # 7. Residual Connection (Add the original block input)
+    g = layers.Add(name=f"{name_prefix}_residual")([c1, g])    # Shape: (batch, 6, 13, 64)
+    
+    # 8. Layer Normalization
+    out = layers.LayerNormalization(
+        name=f"{name_prefix}_layernorm"
+    )(g)                                                       # Shape: (batch, 6, 13, 64)
+    
+    return out
+
+def chord_conv_block(string_features, filters,output_dim,training,with_gru, kernel_size=(3,4), name_prefix="chord"):
     # store the original string features for later as residuals
     
 
@@ -284,8 +335,8 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
     c1=layers.Conv2D(filters, kernel_size, padding='same', name=f"{name_prefix}_conv1",kernel_regularizer=reg2d)(stacked)
     c1=layers.BatchNormalization(name=f"{name_prefix}_bn1")(c1)
     c1 = layers.ELU(name=f"{name_prefix}_act1")(c1)
-
-
+    if with_gru:
+        c1=recurrrent_block(c1)
     c2=layers.Conv2D(2*filters, kernel_size, padding='same', name=f"{name_prefix}_conv2",kernel_regularizer=reg2d)(c1)
     c2=layers.BatchNormalization(name=f"{name_prefix}_bn2")(c2)
     c2=layers.LeakyReLU(name=f"{name_prefix}_act2")(c2)
@@ -321,7 +372,7 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
     return processed_strings
 
 
-def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width),
+def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), with_gru=False,
                        output_dim=OUTPUT_DIM_NOTES, training=True):
     print("Image height: ", image_height)
     inputs = layers.Input(batch_shape=(batch_sz, *input_shape), name="input_spectrogram")
@@ -394,7 +445,7 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width),
 
 
     # --- Stage 5: Chord reasoning (Conv1D across strings) ---
-    processed_strings = chord_conv_block(string_features,output_dim=N_FRETS,training=training, filters=64, kernel_size=(3,4), name_prefix="chord_block")
+    processed_strings = chord_conv_block(string_features,output_dim=N_FRETS,training=training,with_gru=with_gru, filters=64, kernel_size=(3,4), name_prefix="chord_block")
 
     combined = layers.Concatenate(name="string_combined")(processed_strings)
 

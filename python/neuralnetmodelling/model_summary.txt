@@ -486,7 +486,31 @@ Model: "guitar_note_detector"
 │ chord_block_act1    │ (256, 6, 13, 64)  │          0 │ chord_block_bn1[… │
 │ (ELU)               │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_conv2   │ (256, 6, 13, 128) │     98,432 │ chord_block_act1… │
+│ recurrrent_block_d… │ (256, 6, 13, 64)  │        576 │ chord_block_act1… │
+│ (DepthwiseConv2D)   │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ recurrrent_block_d… │ (256, 6, 13, 1)   │          0 │ recurrrent_block… │
+│ (Lambda)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ recurrrent_block_r… │ (256, 1, 78)      │          0 │ recurrrent_block… │
+│ (Reshape)           │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ recurrrent_block_g… │ (256, 78)         │     36,972 │ recurrrent_block… │
+│ (GRU)               │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ recurrrent_block_r… │ (256, 6, 13, 1)   │          0 │ recurrrent_block… │
+│ (Reshape)           │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ recurrrent_block_b… │ (256, 6, 13, 64)  │          0 │ recurrrent_block… │
+│ (Lambda)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ recurrrent_block_r… │ (256, 6, 13, 64)  │          0 │ chord_block_act1… │
+│ (Add)               │                   │            │ recurrrent_block… │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ recurrrent_block_l… │ (256, 6, 13, 64)  │        128 │ recurrrent_block… │
+│ (LayerNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ chord_block_conv2   │ (256, 6, 13, 128) │     98,432 │ recurrrent_block… │
 │ (Conv2D)            │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_bn2     │ (256, 6, 13, 128) │        512 │ chord_block_conv… │
@@ -672,6 +696,6 @@ Model: "guitar_note_detector"
 │ sparse_guitar_outp… │ (256, 37)         │          0 │ reshape[0][0]     │
 │ (SparseGuitarOutpu… │                   │            │                   │
 └─────────────────────┴───────────────────┴────────────┴───────────────────┘
- Total params: 527,406 (2.01 MB)
- Trainable params: 520,606 (1.99 MB)
+ Total params: 565,082 (2.16 MB)
+ Trainable params: 558,282 (2.13 MB)
  Non-trainable params: 6,800 (26.56 KB)
