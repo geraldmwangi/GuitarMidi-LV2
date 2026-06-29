@@ -268,41 +268,36 @@ def recurrrent_block(c1, name_prefix="recurrrent_block"):
     """
     c1: Input tensor of shape (batch, 6, 13, 64)
     """
-    gru_units = 6 * 13  # 78 (one unit per fret on one string)
-    
-    # 1. Spatial context via Depthwise Conv
-    g = layers.DepthwiseConv2D(
-        kernel_size=(3, 3),
-        padding="same",
-        use_bias=False,
-        name=f"{name_prefix}_dw_conv"
-    )(c1)                                                      # Shape: (batch, 6, 13, 64)
+    gru_units = 6 * 13
 
-    # 2. Channel-wise (Depth-wise) Max Pooling
-    g = layers.Lambda(
-        lambda x: tf.reduce_max(x, axis=-1, keepdims=True),
-        name=f"{name_prefix}_depthmax"
-    )(g)                                                       # Shape: (batch, 6, 13, 1)
-    
-    # 3. Flatten spatial dimensions for the GRU
-    g = layers.Reshape((1, gru_units), 
-                       name=f"{name_prefix}_reshape_in")(g)    # Shape: (batch, 1, 78)
-    
-    # 4. GRU Layer (Temporal/Sequence modeling)
-    # Using return_sequences=True to easily reshape back to (batch, 1, 78)
+    # 1. Depth-wise Max Pooling -> (batch, 6, 13, 1)
+    g = layers.Lambda(lambda x: tf.reduce_max(x, axis=-1, keepdims=True))(c1)
+
+    # 2. Flatten -> (batch, 78)
+    g = layers.Reshape((gru_units,))(g)
+
+    # 3. The Trick: Push batch into time -> (1, batch, 78)
+    g = layers.Lambda(lambda x: tf.expand_dims(x, axis=0))(g)
+
+    # 4. Stateful GRU
+    # It will process `batch` number of frames sequentially, 
+    # and hold the final state in memory for the next call.
     g = layers.GRU(
-        gru_units,
-        stateful=True,
+        gru_units, 
+        return_sequences=True, 
+        stateful=True,          # <-- MUST BE TRUE
         name=f"{name_prefix}_gru"
-    )(g)                                                       # Shape: (batch, 1, 78)
-    
-    # 5. Reshape back to spatial dimensions
-    g = layers.Reshape((6, 13, 1), 
-                       name=f"{name_prefix}_reshape_out")(g)   # Shape: (batch, 6, 13, 1)
+    )(g)
+
+    # 5. Undo the trick -> (batch, 78)
+    g = layers.Lambda(lambda x: tf.squeeze(x, axis=0))(g)
+
+    # 6. Reshape back -> (batch, 6, 13, 1)
+    g = layers.Reshape((6, 13, 1))(g)
     
     # 6. Replicate back to 64 channels (broadcast along feature dimension)
     g = layers.Lambda(
-        lambda x: tf.tile(x, multiples=[1, 1, 1, 64]),
+        lambda x: tf.tile(x, multiples=[1, 1, 1, c1.shape[3]]),
         name=f"{name_prefix}_broadcast"
     )(g)                                                       # Shape: (batch, 6, 13, 64)
     
@@ -335,12 +330,15 @@ def chord_conv_block(string_features, filters,output_dim,training,with_gru, kern
     c1=layers.Conv2D(filters, kernel_size, padding='same', name=f"{name_prefix}_conv1",kernel_regularizer=reg2d)(stacked)
     c1=layers.BatchNormalization(name=f"{name_prefix}_bn1")(c1)
     c1 = layers.ELU(name=f"{name_prefix}_act1")(c1)
-    if with_gru:
-        c1=recurrrent_block(c1)
+
     c2=layers.Conv2D(2*filters, kernel_size, padding='same', name=f"{name_prefix}_conv2",kernel_regularizer=reg2d)(c1)
     c2=layers.BatchNormalization(name=f"{name_prefix}_bn2")(c2)
     c2=layers.LeakyReLU(name=f"{name_prefix}_act2")(c2)
-    chord=c2#layers.Add(name=f"{name_prefix}_res_c1_c2")([c2, c1])
+    
+    if with_gru:
+        chord=recurrrent_block(c2)
+    else :
+        chord=c2#layers.Add(name=f"{name_prefix}_res_c1_c2")([c2, c1])
     chord=layers.SpatialDropout2D(0.2, name=f"{name_prefix}_drop1")(chord)
     # Split the chord features back into per-string tensors
     split_chords = [layers.Lambda(lambda t, i=i: t[:, i, :, :], name=f"{name_prefix}_slice_str{i}")(chord) for i in range(len(string_features))]
