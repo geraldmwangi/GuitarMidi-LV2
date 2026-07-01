@@ -91,11 +91,34 @@ for s, f, n in scatter_indices:
 mask_tensor = tf.constant(mask)  # (78, 37)
 # Instead of Lambda for hollow suppression, use a proper layer:
 class HollowSuppression(tf.keras.layers.Layer):
+    def build(self, input_shape):
+        channels = input_shape[-1]
+        kernel = np.zeros((3, 1, channels, 1), dtype=np.float32)
+        kernel[0, 0, :, 0] = -0.5
+        kernel[1, 0, :, 0] =  1.0
+        kernel[2, 0, :, 0] = -0.5
+        self.kernel = self.add_weight(
+            name="hollow_kernel",
+            shape=(3, 1, channels, 1),
+            initializer=tf.constant_initializer(kernel),
+            trainable=False,
+            dtype=self.dtype  # ← matches layer/model dtype
+        )
+
     def call(self, y):
-        y_padded = tf.pad(y, [[0,0],[1,1],[0,0]])
-        left  = y_padded[:, :-2, :]
-        right = y_padded[:, 2:,  :]
-        return y - (left + right) / 2.0
+        # y has shape (B, F, C). We want to apply a depthwise conv with the hollow suppression kernel across the frequency dimension.
+        # add a dummy spatial dimension so we can use depthwise_conv2d: (B,F,C)->(B, F,1, C)
+        y4d = tf.expand_dims(y, 2)  # (B, F,1, C)
+        # the input to depthwise_conv2d has the form (B, F,1, C)
+        out = tf.nn.depthwise_conv2d(
+            y4d,
+            tf.cast(self.kernel, y.dtype), 
+            strides=[1, 1, 1, 1],
+            padding='SAME'
+        )
+        return tf.squeeze(out, 2)
+
+
 
 # Same for append_silence and strip_silence
 class AppendSilence(tf.keras.layers.Layer):
@@ -209,7 +232,86 @@ def transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, nam
     # 3. Add to x1 WITHOUT normalizing the result (Clear highway!)
     return layers.Add(name=f"{name_prefix}_ffn_add")([x1, ffn])
 
-def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(3,4), name_prefix="chord"):
+def dilated_freq_block(x, filters, dilations, dropout_rate=0.1, name_prefix="freq_ctx"):
+    x = layers.Conv1D(64, 1, padding='same', kernel_initializer='he_normal',
+                      kernel_regularizer=reg, name="context_squeeze")(x)
+    x = layers.BatchNormalization(name="context_squeeze_bn")(x)
+    x = layers.LeakyReLU(name="context_squeeze_act")(x)
+    # 1. Project input to the desired number of filters (if shapes don't match)
+    if x.shape[-1] != filters:
+        x = layers.Conv1D(filters, 1, padding='same', kernel_initializer='he_normal', 
+                          kernel_regularizer=reg, name=f"{name_prefix}_proj")(x)
+        x = layers.BatchNormalization(name=f"{name_prefix}_proj_bn")(x)
+        x = layers.LeakyReLU(name=f"{name_prefix}_proj_act")(x)
+
+    # 2. Cascade of dilated convolutions across FREQUENCY
+    for i, d in enumerate(dilations):
+        residual = x
+        
+        # Convolves along the 148 frequency bins. 
+        # Dilation expands the reach to grab distant upper harmonics.
+        x = layers.Conv1D(filters, kernel_size=3, padding='same', dilation_rate=d,
+                          kernel_initializer='he_normal', kernel_regularizer=reg,
+                          name=f"{name_prefix}_conv_d{d}")(x)
+        x = layers.BatchNormalization(name=f"{name_prefix}_bn_d{d}")(x)
+        x = layers.LeakyReLU(name=f"{name_prefix}_act_d{d}")(x)
+        
+        if dropout_rate > 0:
+            x = layers.SpatialDropout1D(dropout_rate, name=f"{name_prefix}_drop_d{d}")(x)
+        
+        # Residual connection
+        x = layers.Add(name=f"{name_prefix}_add_d{d}")([residual, x])
+        
+    return x
+
+def recurrrent_block(c1, name_prefix="recurrrent_block"):
+    """
+    c1: Input tensor of shape (batch, 6, 13, 64)
+    """
+    gru_units = 6 * 13
+
+    # 1. Depth-wise Max Pooling -> (batch, 6, 13, 1)
+    g = layers.Lambda(lambda x: tf.reduce_max(x, axis=-1, keepdims=True))(c1)
+
+    # 2. Flatten -> (batch, 78)
+    g = layers.Reshape((gru_units,))(g)
+
+    # 3. The Trick: Push batch into time -> (1, batch, 78)
+    g = layers.Lambda(lambda x: tf.expand_dims(x, axis=0))(g)
+
+    # 4. Stateful GRU
+    # It will process `batch` number of frames sequentially, 
+    # and hold the final state in memory for the next call.
+    g = layers.GRU(
+        gru_units, 
+        return_sequences=True, 
+        stateful=True,          # <-- MUST BE TRUE
+        name=f"{name_prefix}_gru"
+    )(g)
+
+    # 5. Undo the trick -> (batch, 78)
+    g = layers.Lambda(lambda x: tf.squeeze(x, axis=0))(g)
+
+    # 6. Reshape back -> (batch, 6, 13, 1)
+    g = layers.Reshape((6, 13, 1))(g)
+    
+    # 6. Replicate back to 64 channels (broadcast along feature dimension)
+    g = layers.Lambda(
+        lambda x: tf.tile(x, multiples=[1, 1, 1, c1.shape[3]]),
+        name=f"{name_prefix}_broadcast"
+    )(g)                                                       # Shape: (batch, 6, 13, 64)
+    
+    # 7. Residual Connection (Add the original block input)
+    g = layers.Add(name=f"{name_prefix}_residual")([c1, g])    # Shape: (batch, 6, 13, 64)
+    
+    # 8. Layer Normalization
+    out = layers.LayerNormalization(
+        name=f"{name_prefix}_layernorm"
+    )(g)                                                       # Shape: (batch, 6, 13, 64)
+    
+    return out
+
+def chord_conv_block(string_features, filters,output_dim,training,with_gru, kernel_size=(3,4), name_prefix="chord"):
     # store the original string features for later as residuals
     
 
@@ -229,11 +331,14 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
     c1=layers.BatchNormalization(name=f"{name_prefix}_bn1")(c1)
     c1 = layers.ELU(name=f"{name_prefix}_act1")(c1)
 
-
     c2=layers.Conv2D(2*filters, kernel_size, padding='same', name=f"{name_prefix}_conv2",kernel_regularizer=reg2d)(c1)
     c2=layers.BatchNormalization(name=f"{name_prefix}_bn2")(c2)
     c2=layers.LeakyReLU(name=f"{name_prefix}_act2")(c2)
-    chord=c2#layers.Add(name=f"{name_prefix}_res_c1_c2")([c2, c1])
+    
+    if with_gru:
+        chord=recurrrent_block(c2)
+    else :
+        chord=c2#layers.Add(name=f"{name_prefix}_res_c1_c2")([c2, c1])
     chord=layers.SpatialDropout2D(0.2, name=f"{name_prefix}_drop1")(chord)
     # Split the chord features back into per-string tensors
     split_chords = [layers.Lambda(lambda t, i=i: t[:, i, :, :], name=f"{name_prefix}_slice_str{i}")(chord) for i in range(len(string_features))]
@@ -244,7 +349,8 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
     for i, s in enumerate(split_chords):
         # Add residual connection from original string features
         #s = layers.Add(name=f"{name_prefix}_res_str{i}")([s, string_residuals[i]])
-        s = layers.LayerNormalization(name=f"{name_prefix}_ln_str{i}")(s) 
+        s = layers.BatchNormalization(name=f"{name_prefix}_bn_str{i}")(s)
+
         s = layers.LeakyReLU(name=f"{name_prefix}_act_str{i}")(s)
         s=layers.Dropout(0.1, name=f"{name_prefix}_drop_str{i}")(s)   
         s=layers.Dense(1,bias_initializer=tf.initializers.Constant(-4),name=f"{name_prefix}_fretlogits_str{i}", kernel_regularizer=reg)(s)   
@@ -264,7 +370,7 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
     return processed_strings
 
 
-def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width),
+def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), with_gru=False,
                        output_dim=OUTPUT_DIM_NOTES, training=True):
     print("Image height: ", image_height)
     inputs = layers.Input(batch_shape=(batch_sz, *input_shape), name="input_spectrogram")
@@ -302,7 +408,14 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width),
     #x = layers.MaxPooling1D(2, name="backbone_pool")(x)
     # x = layers.SpatialDropout1D(0.2, name="backbone_drop")(x)
     # --- Stage 3: Transformer ---
-    x = transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, name_prefix="tfm_block1")
+   # x = transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, name_prefix="tfm_block1")
+    x = dilated_freq_block(
+            x, 
+            filters=64, 
+            dilations=[1,2, 4, 8], 
+            dropout_rate=0.1, 
+            name_prefix="harmonic_ctx"
+        )
 
     num_pool_layers = 0
     max_x = image_height / (num_pool_layers + 1)
@@ -330,7 +443,7 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width),
 
 
     # --- Stage 5: Chord reasoning (Conv1D across strings) ---
-    processed_strings = chord_conv_block(string_features,output_dim=N_FRETS,training=training, filters=64, kernel_size=(3,4), name_prefix="chord_block")
+    processed_strings = chord_conv_block(string_features,output_dim=N_FRETS,training=training,with_gru=with_gru, filters=64, kernel_size=(3,4), name_prefix="chord_block")
 
     combined = layers.Concatenate(name="string_combined")(processed_strings)
 
