@@ -408,14 +408,7 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), wit
     #x = layers.MaxPooling1D(2, name="backbone_pool")(x)
     # x = layers.SpatialDropout1D(0.2, name="backbone_drop")(x)
     # --- Stage 3: Transformer ---
-   # x = transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, name_prefix="tfm_block1")
-    x = dilated_freq_block(
-            x, 
-            filters=64, 
-            dilations=[1,2, 4, 8], 
-            dropout_rate=0.1, 
-            name_prefix="harmonic_ctx"
-        )
+    x = transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, name_prefix="tfm_block1")
 
     num_pool_layers = 0
     max_x = image_height / (num_pool_layers + 1)
