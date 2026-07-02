@@ -87,7 +87,7 @@ namespace GuitarMidi
                         }
                         
                         int velocity=(int)(smoothed_noteenergies[i]/(gain*expressivity) * 127);
-                        velocity = std::min(velocity, 127); // cap the velocity at 127
+                        velocity = (expressivity<=0) ? 127 : std::min(velocity, 127); // cap the velocity at 127
                         msg << " " << i << "(" << smoothed_onsetoutput[i] << ")" << " energy:" << smoothed_noteenergies[i]<< " velocity:" << velocity;
                         uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, (uint8_t)velocity};
                         #ifdef WITH_TRACING_INFO
