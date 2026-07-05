@@ -53,9 +53,9 @@ namespace GuitarMidi{
         float smoothed_noteenergies[NUM_NOTES]={0};
         float smoothed_offsetnoteenergies[NUM_NOTES]={0};
         // std::unique_ptr<tflite::FlatBufferModel> model;
-        #ifdef WITH_AUDIO_OUTPUT
+        //#ifdef WITH_AUDIO_OUTPUT
         int64_t m_frames=0;
-        #endif
+        //#endif
         bool m_note_on[NUM_NOTES]={false};
         public:
         NoteInferencer(LV2_URID_Map *map);
