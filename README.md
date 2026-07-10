@@ -93,7 +93,10 @@ or my paypal
 
 # Build
 If your distro is not supported by any package at  https://github.com/geraldmwangi/GuitarMidi-LV2/releases:
-You will need cmake, lv2-dev.
+You will need git, cmake, lv2-dev and zita-resampler and the compiler toolkit
+```bash
+sudo apt install git cmake build-essential libzita-resampler-dev lv2-dev
+```
 * clone this repo to /path/to/GuitarMidi-LV2
 * run cmake, make, make install:
 ```bash
