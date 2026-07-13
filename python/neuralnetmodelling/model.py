@@ -264,11 +264,14 @@ def dilated_freq_block(x, filters, dilations, dropout_rate=0.1, name_prefix="fre
         
     return x
 
-def recurrrent_block(c1, name_prefix="recurrrent_block"):
+def recurrrent_block(c1,gru_state,gru_units, name_prefix="recurrrent_block"):
     """
     c1: Input tensor of shape (batch, 6, 13, 64)
+    gru_state: Initial state for the GRU layer
     """
-    gru_units = 6 * 13
+    n_strings = c1.shape[1]
+    seq_len   = c1.shape[2]
+    channels  = c1.shape[3]
 
     # 1. Depth-wise Max Pooling -> (batch, 6, 13, 1)
     g = layers.Lambda(lambda x: tf.reduce_max(x, axis=-1, keepdims=True))(c1)
@@ -277,45 +280,50 @@ def recurrrent_block(c1, name_prefix="recurrrent_block"):
     g = layers.Reshape((gru_units,))(g)
 
     # 3. The Trick: Push batch into time -> (1, batch, 78)
-    g = layers.Lambda(lambda x: tf.expand_dims(x, axis=0))(g)
-
+    #g = layers.Lambda(lambda x: tf.expand_dims(x, axis=0))(g)
+    # 3. Add true sequence-length-1 axis -> (batch, 1, 78)
+    g = layers.Reshape((1, gru_units), name=f"{name_prefix}_add_seq_dim")(g)
     # 4. Stateful GRU
     # It will process `batch` number of frames sequentially, 
     # and hold the final state in memory for the next call.
-    g = layers.GRU(
+    g,gru_state_out = layers.GRU(
         gru_units, 
         return_sequences=True, 
-        stateful=True,          # <-- MUST BE TRUE
+        stateful=False,  # Set to True if you want to maintain state across batches
+        return_state=True,
         name=f"{name_prefix}_gru"
-    )(g)
+    )(g, initial_state=gru_state)
 
     # 5. Undo the trick -> (batch, 78)
-    g = layers.Lambda(lambda x: tf.squeeze(x, axis=0))(g)
+    #g = layers.Lambda(lambda x: tf.squeeze(x, axis=0))(g)
+    # 5. Drop the sequence-length-1 axis -> (batch, 78)
+    g = layers.Reshape((gru_units,), name=f"{name_prefix}_drop_seq_dim")(g)
 
     # 6. Reshape back -> (batch, 6, 13, 1)
-    g = layers.Reshape((6, 13, 1))(g)
+    g = layers.Reshape((n_strings, seq_len, 1))(g)   # was hardcoded (6, 13, 1)
     
-    # 6. Replicate back to 64 channels (broadcast along feature dimension)
+    # 7. Replicate back to 64 channels (broadcast along feature dimension)
     g = layers.Lambda(
-        lambda x: tf.tile(x, multiples=[1, 1, 1, c1.shape[3]]),
+        lambda x: tf.tile(x, multiples=[1, 1, 1, channels]),
         name=f"{name_prefix}_broadcast"
     )(g)                                                       # Shape: (batch, 6, 13, 64)
     
-    # 7. Residual Connection (Add the original block input)
+    # 8. Residual Connection (Add the original block input)
     g = layers.Add(name=f"{name_prefix}_residual")([c1, g])    # Shape: (batch, 6, 13, 64)
     
-    # 8. Layer Normalization
+    # 9. Layer Normalization
     out = layers.LayerNormalization(
         name=f"{name_prefix}_layernorm"
     )(g)                                                       # Shape: (batch, 6, 13, 64)
     
-    return out
+    return out,gru_state_out
 
-def chord_conv_block(string_features, filters,output_dim,training,with_gru, kernel_size=(3,4), name_prefix="chord"):
+def chord_conv_block(string_features, filters, output_dim, training, gru_state=None, gru_units=6 * 13, kernel_size=(3,4), name_prefix="chord"):
     # store the original string features for later as residuals
     
 
     max_len = max(s.shape[1] for s in string_features)
+
     padded = []
     for i, s in enumerate(string_features):
         diff = max_len - s.shape[1]
@@ -335,10 +343,11 @@ def chord_conv_block(string_features, filters,output_dim,training,with_gru, kern
     c2=layers.BatchNormalization(name=f"{name_prefix}_bn2")(c2)
     c2=layers.LeakyReLU(name=f"{name_prefix}_act2")(c2)
     
-    if with_gru:
-        chord=recurrrent_block(c2)
+    if gru_state is not None:
+        chord,gru_state_out = recurrrent_block(c2, gru_state, gru_units)
     else :
         chord=c2#layers.Add(name=f"{name_prefix}_res_c1_c2")([c2, c1])
+        gru_state_out = None
     chord=layers.SpatialDropout2D(0.2, name=f"{name_prefix}_drop1")(chord)
     # Split the chord features back into per-string tensors
     split_chords = [layers.Lambda(lambda t, i=i: t[:, i, :, :], name=f"{name_prefix}_slice_str{i}")(chord) for i in range(len(string_features))]
@@ -367,13 +376,15 @@ def chord_conv_block(string_features, filters,output_dim,training,with_gru, kern
         #                 bias_initializer=tf.initializers.Constant(-4),
         #                 dtype='float32', name=f"{name_prefix}_output_str{i}")(s)
         processed_strings.append(s)
-    return processed_strings
+    return processed_strings,gru_state_out
 
 
-def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), with_gru=False,
+def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), with_gru=True,
                        output_dim=OUTPUT_DIM_NOTES, training=True):
     print("Image height: ", image_height)
     inputs = layers.Input(batch_shape=(batch_sz, *input_shape), name="input_spectrogram")
+    #gru_units = N_STRINGS * N_FRETS  # 78
+
     local_mean = layers.AveragePooling2D(pool_size=(5, 1), strides=(1, 1), padding='same', name="local_mean")(inputs)
     x = layers.Subtract(name="local_contrast")([inputs, local_mean])
     # x=inputs
@@ -432,11 +443,17 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), wit
         for i, (s, e) in enumerate(ranges)
     ]
     print("After string split: ", [s.shape for s in string_features])
-
-
+    max_len = max(s.shape[1] for s in string_features)
+    n_strings = len(string_features)
+    gru_units = n_strings * max_len   # ← derive here, correctly, instead of trusting caller's constant
+    if with_gru:
+        gru_state = layers.Input(batch_shape=(batch_sz, gru_units), name="gru_state_in")
+        extra_inputs = [gru_state]
+    else:
+        gru_state = None
 
     # --- Stage 5: Chord reasoning (Conv1D across strings) ---
-    processed_strings = chord_conv_block(string_features,output_dim=N_FRETS,training=training,with_gru=with_gru, filters=64, kernel_size=(3,4), name_prefix="chord_block")
+    processed_strings, gru_state_out = chord_conv_block(string_features,output_dim=N_FRETS,training=training,gru_state=gru_state  , gru_units=gru_units, filters=64, kernel_size=(3,4), name_prefix="chord_block")
 
     combined = layers.Concatenate(name="string_combined")(processed_strings)
 
@@ -448,6 +465,9 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width), wit
     string_outputs = tf.keras.layers.Reshape((N_STRINGS, N_FRETS))(combined)
     outputs = SparseGuitarOutput(mask)(string_outputs)
 
-    return models.Model(inputs, outputs, name="guitar_note_detector")
+    if with_gru:
+        return models.Model([inputs] + extra_inputs, [outputs, gru_state_out], name="guitar_note_detector")
+    else:
+        return models.Model(inputs, outputs, name="guitar_note_detector")
 
 
