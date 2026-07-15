@@ -14,32 +14,35 @@ NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 # ============================================================
 CHORD_FORMULAS = {
     # Most common guitar chords first (helps tie-breaking)
-    'major':                [0, 4, 7],
-    'minor':                [0, 3, 7],
-    'sus4':                 [0, 5, 7],
-    'sus2':                 [0, 2, 7],
-    'power_chord':          [0, 7],          # very common on guitar (no 3rd)
+    '13':                   [0, 4, 7, 10, 14, 21],
+
+    '9':                    [0, 4, 7, 10, 14],
+    'major9':               [0, 4, 7, 11, 14],
+    'minor9':               [0, 3, 7, 10, 14],  
+    '7#9':                  [0, 4, 7, 10, 15],  # "Hendrix chord"
+    '7b9':                  [0, 4, 7, 10, 13],
     'major7':               [0, 4, 7, 11],
     'dominant7':            [0, 4, 7, 10],
     'minor7':               [0, 3, 7, 10],
     'add9':                 [0, 4, 7, 14],
     'minorAdd9':            [0, 3, 7, 14],
     'major6':               [0, 4, 7, 9],
-    'minor6':               [0, 3, 7, 9],
-    'diminished':           [0, 3, 6],
+    'minor6':               [0, 3, 7, 9],  
     'diminished7':          [0, 3, 6, 9],
-    'minor7b5':             [0, 3, 6, 10],
-    'augmented':            [0, 4, 8],
+    'minor7b5':             [0, 3, 6, 10],  
     'minorMajor7':          [0, 3, 7, 11],
     'sus4_7':               [0, 5, 7, 10],
     'sus2_7':               [0, 2, 7, 10],
-    '9':                    [0, 4, 7, 10, 14],
-    'major9':               [0, 4, 7, 11, 14],
-    'minor9':               [0, 3, 7, 10, 14],
-    '13':                   [0, 4, 7, 10, 14, 21],
-    '7#9':                  [0, 4, 7, 10, 15],  # "Hendrix chord"
-    '7b9':                  [0, 4, 7, 10, 13],
+
+    'augmented':            [0, 4, 8],
+    'diminished':           [0, 3, 6],
     'no3_add4':             [0, 5, 7],  # ambiguous sus4/no-3rd voicing
+    'major':                [0, 4, 7],
+    'minor':                [0, 3, 7],
+   # 'sus4':                 [0, 5, 7],
+    'sus2':                 [0, 2, 7],
+
+    'power_chord':          [0, 7],          # very common on guitar (no 3rd)
 }
 
 # Common guitar tunings (low to high string), used for open-note context

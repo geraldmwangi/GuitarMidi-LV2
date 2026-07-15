@@ -78,20 +78,20 @@ def labels_to_pc_mask(labels):
     note_idx = tf.range(OUTPUT_DIM_NOTES, dtype=tf.int32)
     pc_idx = note_idx % 12 # pitch class index
     pc_onehot = tf.one_hot(pc_idx, depth=12, dtype=tf.int32)     # [OUTPUT_DIM_NOTES, 12]
-    active = labels[..., :, None] * pc_onehot[None, ...]         # [..., OUTPUT_DIM_NOTES, 12]: 
-    pc_present = tf.reduce_max(active, axis=-2)                  # [..., 12]
-    bit_weights = tf.constant([1 << i for i in range(12)], dtype=tf.int32)
-    return tf.reduce_sum(pc_present * bit_weights, axis=-1)
+    active = labels[..., :, None] * pc_onehot[None, ...]         # [..., OUTPUT_DIM_NOTES, 12]: after this multiple notes in the same pitch class will be in one section of the tensor: active[batch,frame,:,pc] = 1 if any note in that pitch class is active, regardless of the octave. This is what we want for the pitch-class bitmask.
+    pc_present = tf.reduce_max(active, axis=-2)                  # [..., 12] collapse the note dimension, leaving only the pitch class dimension. pc_present[batch,frame,pc] = 1 if any note in that pitch class is active
+    bit_weights = tf.constant([1 << i for i in range(12)], dtype=tf.int32)# weights for each pitch class bit in the bitmask. bit_weights[pc] = 1 << pc
+    return tf.reduce_sum(pc_present * bit_weights, axis=-1)#convert the 12 dim pitch class per frame to a single integer bitmask. pc_mask[batch,frame] = sum(1 << pc for each active pitch class in that frame). this gives a unique number for all the pitch class notes in the frame
 
 # ============================================================
-# get the bass pitch class from the labels
+# get the bass pitch class from the labels which is the pitch class of the lowest active note
 # ============================================================
 def bass_pc_from_labels(labels):
     labels = tf.cast(labels, tf.int32)
     note_idx = tf.range(OUTPUT_DIM_NOTES, dtype=tf.int32)
     masked_idx = tf.where(labels > 0, note_idx, tf.fill(tf.shape(labels), 999))
     lowest_note = tf.reduce_min(masked_idx, axis=-1)
-    return lowest_note % 12
+    return lowest_note % 12 # project to pitch class
 
 
 def get_chord_suffix_idx_batch(labels):
@@ -101,31 +101,38 @@ def get_chord_suffix_idx_batch(labels):
 
     labels: [B, OUTPUT_DIM_NOTES] binary tensor. Frames with 0 or 1 active notes will
     naturally resolve to UNRECOGNIZED_IDX (no formula matches <2 notes).
+
+    Exact pitch-class-set matches only — no subset/partial fallback. This avoids
+    silently collapsing extended/altered chords (e.g. dominant7, add9, 9, 13) into
+    their bare-triad subsets (major/minor) purely due to dict tiebreaking, which is
+    exactly the corruption that inflated 'major' in the ground-truth histogram.
+
+    the labels are first reduced to a pitch-class bitmask and bass pitch class, to disregard the octave information, then compared against the precomputed ROOT_CHORD_MASKS_TF table to find the best match.
     """
     labels = tf.cast(labels, tf.int32)
     B = tf.shape(labels)[0]
 
-    #get the pitch-class bitmask and bass pitch class for each frame
+    # get the pitch-class bitmask and bass pitch class for each frame
     pc_mask = labels_to_pc_mask(labels)
     bass_pc = bass_pc_from_labels(labels)
 
-    # get the chord suffix index for each frame by comparing the pitch-class bitmask and bass pitch class to the precomputed chord masks
+    # get the chord suffix index for each frame by comparing the pitch-class
+    # bitmask and bass pitch class to the precomputed chord masks
     all_masks = ROOT_CHORD_MASKS_TF[None, :, :]                  # [1, 12, NUM_CHORDS]
     pc_mask_bbb = pc_mask[:, None, None]                          # [B, 1, 1]
 
-    exact_any = tf.equal(pc_mask_bbb, all_masks)                 # [B, 12, NUM_CHORDS]
-    subset_any = tf.equal(
-        tf.bitwise.bitwise_and(pc_mask_bbb, tf.bitwise.invert(all_masks)), 0
-    )
+    exact_any = tf.equal(pc_mask_bbb, all_masks)                  # [B, 12, NUM_CHORDS]
 
     roots_range = tf.range(12, dtype=tf.int32)
     is_root_position = tf.equal(roots_range[None, :], bass_pc[:, None])  # [B, 12]
     is_root_position_b = is_root_position[:, :, None]
 
+    # priority: 0 = exact + root position, 1 = exact but not root position (slash),
+    # 2 = no match at all -> UNRECOGNIZED
     match_priority = tf.where(
         exact_any,
         tf.where(is_root_position_b, 0, 1),
-        tf.where(subset_any, tf.where(is_root_position_b, 2, 3), 4)
+        2
     )
     match_priority = tf.cast(match_priority, tf.int32)
 
@@ -139,7 +146,7 @@ def get_chord_suffix_idx_batch(labels):
     )
     best_chord_idx = best_flat_idx % NUM_CHORDS
 
-    suffix_idx = tf.where(best_priority < 4, best_chord_idx, tf.fill([B], UNRECOGNIZED_IDX))
+    suffix_idx = tf.where(best_priority < 2, best_chord_idx, tf.fill([B], UNRECOGNIZED_IDX))
     return tf.cast(suffix_idx, tf.int32)
 
 
@@ -149,26 +156,10 @@ def get_chord_suffix_idx_batch(labels):
 
 def create_balanced_dataset_chords(dataset, max_labels, batch_size=256,
                                     max_active_notes=6, num_midi_notes=OUTPUT_DIM_NOTES,
-                                    drop_unrecognized=False):
-    """
-    Caps per-chord-suffix counts using a fully vectorized (tf-graph, no
-    py_function) reimplementation of GuitarChordAnalyzer's suffix logic.
-
-    Args:
-        dataset:            tf.data.Dataset yielding (audio, frame_nr, labels),
-                             BATCHED (this function expects already-batched
-                             input so suffix computation can run vectorized;
-                             it unbatches internally for the per-frame scan).
-        max_labels:          cap on frames kept per chord-suffix bucket
-        batch_size:          output batch size
-        max_active_notes:    polyphony guard (silence bit excluded)
-        num_midi_notes:      number of MIDI note classes (labels[:num_midi_notes])
-        drop_unrecognized:   if True, frames with no chord match are dropped
-                              entirely rather than capped/kept like other buckets
-    """
+                                    drop_unrecognized=False,
+                                    pre_shuffle_buffer=200_000):
     dataset = dataset.unbatch()
 
-    # 1. Polyphony prefilter
     def prefilter(audio, frame_nr, labels):
         labels_int = tf.cast(labels, tf.int32)
         num_active_silent = tf.reduce_sum(labels_int)
@@ -176,16 +167,18 @@ def create_balanced_dataset_chords(dataset, max_labels, batch_size=256,
 
     dataset = dataset.filter(prefilter)
 
-    # 2. Re-batch purely to run the vectorized suffix lookup efficiently,
-    #    then unbatch back to per-frame elements for the scan/filter below.
-    #    This batch size is just a compute-chunking factor, independent of
-    #    the final output batch_size.
+    # >>> KEY FIX: shuffle BEFORE the capping scan, with a large buffer, so
+    # long runs of a sustained chord get broken up across the stream and
+    # don't instantly saturate that suffix's counter from one song alone. <<<
+    dataset = dataset.shuffle(buffer_size=pre_shuffle_buffer, reshuffle_each_iteration=True)
+
     VECTORIZE_CHUNK = 1024
 
     def attach_suffix_batch(audio, frame_nr, labels):
         note_labels = labels[:, :num_midi_notes]
         suffix_idx = get_chord_suffix_idx_batch(note_labels)
         return audio, frame_nr, labels, suffix_idx
+    
 
     dataset = (
         dataset
@@ -197,25 +190,20 @@ def create_balanced_dataset_chords(dataset, max_labels, batch_size=256,
     if drop_unrecognized:
         dataset = dataset.filter(lambda a, fnr, l, idx: idx != UNRECOGNIZED_IDX)
 
-    # 3. Stateful scan — caps count per chord-suffix bucket
     initial_state = tf.zeros((NUM_SUFFIXES,), dtype=tf.int32)
 
     def scan_fn(suffix_hist, element):
         audio, frame_nr, labels, suffix_idx = element
         current_count = tf.gather(suffix_hist, suffix_idx)
         can_keep = current_count < max_labels
-
         update = tf.one_hot(suffix_idx, depth=NUM_SUFFIXES, dtype=tf.int32)
-        new_suffix_hist = tf.cond(
-            can_keep,
-            lambda: suffix_hist + update,
-            lambda: suffix_hist
-        )
+        new_suffix_hist = tf.cond(can_keep, lambda: suffix_hist + update, lambda: suffix_hist)
         return new_suffix_hist, (audio, frame_nr, labels, can_keep)
 
     dataset = dataset.scan(initial_state=initial_state, scan_func=scan_fn)
 
-    # 4. Filter kept frames, shuffle, batch
+    # A final, smaller re-shuffle is still fine/useful for batch composition,
+    # but the heavy lifting against autocorrelation now happens up front.
     dataset = (
         dataset
         .filter(lambda a, fnr, l, keep: keep)
