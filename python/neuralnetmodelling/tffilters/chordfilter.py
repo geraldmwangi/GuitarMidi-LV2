@@ -45,6 +45,9 @@ SUFFIX_VOCAB = CHORD_NAMES + ['UNRECOGNIZED']
 SUFFIX_TO_IDX = {name: i for i, name in enumerate(SUFFIX_VOCAB)}
 assert SUFFIX_TO_IDX['UNRECOGNIZED'] == UNRECOGNIZED_IDX  # sanity check
 
+# ============================================================
+# convert chord intervals to pitch-class bitmask and rotate by root
+# ============================================================
 def _formula_to_mask(formula):
     mask = 0
     for i in formula:
@@ -65,18 +68,24 @@ _CHORD_DICT_ORDER = np.arange(NUM_CHORDS, dtype=np.int32)
 ROOT_CHORD_MASKS_TF = tf.constant(_ROOT_CHORD_MASKS, dtype=tf.int32)
 CHORD_DICT_ORDER_TF = tf.constant(_CHORD_DICT_ORDER, dtype=tf.int32)
 
-
+# ============================================================
+# convert label vectors to pitch-class bitmasks and bass pitch class
+# the pitch-class bitmask is a 12-bit integer where each bit represents the presence of a pitch class (C, C#, D, ..., B)
+# the bass pitch class is the pitch class of the lowest active note
+# ============================================================
 def labels_to_pc_mask(labels):
     labels = tf.cast(labels, tf.int32)
     note_idx = tf.range(OUTPUT_DIM_NOTES, dtype=tf.int32)
-    pc_idx = note_idx % 12
+    pc_idx = note_idx % 12 # pitch class index
     pc_onehot = tf.one_hot(pc_idx, depth=12, dtype=tf.int32)     # [OUTPUT_DIM_NOTES, 12]
-    active = labels[..., :, None] * pc_onehot[None, ...]         # [..., OUTPUT_DIM_NOTES, 12]
+    active = labels[..., :, None] * pc_onehot[None, ...]         # [..., OUTPUT_DIM_NOTES, 12]: 
     pc_present = tf.reduce_max(active, axis=-2)                  # [..., 12]
     bit_weights = tf.constant([1 << i for i in range(12)], dtype=tf.int32)
     return tf.reduce_sum(pc_present * bit_weights, axis=-1)
 
-
+# ============================================================
+# get the bass pitch class from the labels
+# ============================================================
 def bass_pc_from_labels(labels):
     labels = tf.cast(labels, tf.int32)
     note_idx = tf.range(OUTPUT_DIM_NOTES, dtype=tf.int32)
@@ -96,9 +105,11 @@ def get_chord_suffix_idx_batch(labels):
     labels = tf.cast(labels, tf.int32)
     B = tf.shape(labels)[0]
 
+    #get the pitch-class bitmask and bass pitch class for each frame
     pc_mask = labels_to_pc_mask(labels)
     bass_pc = bass_pc_from_labels(labels)
 
+    # get the chord suffix index for each frame by comparing the pitch-class bitmask and bass pitch class to the precomputed chord masks
     all_masks = ROOT_CHORD_MASKS_TF[None, :, :]                  # [1, 12, NUM_CHORDS]
     pc_mask_bbb = pc_mask[:, None, None]                          # [B, 1, 1]
 
