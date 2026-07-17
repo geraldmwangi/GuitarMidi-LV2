@@ -230,9 +230,17 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
     c1 = layers.ELU(name=f"{name_prefix}_act1")(c1)
 
 
-    c2=layers.Conv2D(2*filters, kernel_size, padding='same', name=f"{name_prefix}_conv2",kernel_regularizer=reg2d)(c1)
+    c2=layers.Conv2D(filters, kernel_size, padding='same', name=f"{name_prefix}_conv2",kernel_regularizer=reg2d)(c1)
     c2=layers.BatchNormalization(name=f"{name_prefix}_bn2")(c2)
     c2=layers.LeakyReLU(name=f"{name_prefix}_act2")(c2)
+
+    c2=layers.Conv2D(2*filters, kernel_size, padding='same', name=f"{name_prefix}_conv3",kernel_regularizer=reg2d)(c2)
+    c2=layers.BatchNormalization(name=f"{name_prefix}_bn3")(c2)
+    c2=layers.LeakyReLU(name=f"{name_prefix}_act3")(c2)
+
+    # c2=layers.Conv2D(2*filters, kernel_size, padding='same', name=f"{name_prefix}_conv4",kernel_regularizer=reg2d)(c2)
+    # c2=layers.BatchNormalization(name=f"{name_prefix}_bn4")(c2)
+    # c2=layers.LeakyReLU(name=f"{name_prefix}_act4")(c2)
     chord=c2#layers.Add(name=f"{name_prefix}_res_c1_c2")([c2, c1])
     chord=layers.SpatialDropout2D(0.2, name=f"{name_prefix}_drop1")(chord)
     # Split the chord features back into per-string tensors
