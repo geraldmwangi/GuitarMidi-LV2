@@ -255,7 +255,7 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
         s = layers.LayerNormalization(name=f"{name_prefix}_ln_str{i}")(s) 
         s = layers.LeakyReLU(name=f"{name_prefix}_act_str{i}")(s)
         s=layers.Dropout(0.1, name=f"{name_prefix}_drop_str{i}")(s)   
-        s=layers.Dense(1,bias_initializer=tf.initializers.Constant(-4),name=f"{name_prefix}_fretlogits_str{i}", kernel_regularizer=reg)(s)   
+        s=layers.Dense(1,bias_initializer=tf.initializers.Constant(-1),name=f"{name_prefix}_fretlogits_str{i}", kernel_regularizer=reg)(s)   
         s=layers.Flatten(name=f"{name_prefix}_flatten_str{i}")(s)
         s = AppendSilence(name=f"{name_prefix}_append_silence_str{i}")(s)
         s=layers.Softmax(name=f"{name_prefix}_softmax_str{i}")(s)
