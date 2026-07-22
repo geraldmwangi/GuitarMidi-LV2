@@ -82,10 +82,12 @@ if [ "$FILE_COUNT" -gt 0 ]; then
     # Note: --files-from preserves paths by default. We cd into SOURCE_DIR 
     # and strip the SOURCE_DIR prefix from the list to copy them flat.
     sed "s|^$SOURCE_DIR/*||" "$TMP_SELECTED" > "${TMP_SELECTED}_relative"
+    # TOTAL_BYTES=$(du -cb --files-from="${TMP_SELECTED}_relative" "$SOURCE_DIR" 2>/dev/null | tail -1 | cut -f1)
+    # echo "Total size to transfer: $(numfmt --to=iec $TOTAL_BYTES)"
     if [ "$REMOVE_SOURCE_FILES" = true ]; then
-        rsync -a --remove-source-files --info=progress2 --files-from="${TMP_SELECTED}_relative" "$SOURCE_DIR" "$TARGET_DIR/"
+        rsync -a --remove-source-files --info=progress2 --no-i-r --files-from="${TMP_SELECTED}_relative" "$SOURCE_DIR" "$TARGET_DIR/"
     else
-        rsync -a --info=progress2  --files-from="${TMP_SELECTED}_relative" "$SOURCE_DIR" "$TARGET_DIR/"
+        rsync -a --info=progress2 --no-i-r --files-from="${TMP_SELECTED}_relative" "$SOURCE_DIR" "$TARGET_DIR/"
     fi
     
     # Append all successfully copied files to used records in one operation
