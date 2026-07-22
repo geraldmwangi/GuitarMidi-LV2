@@ -6,7 +6,7 @@ from itertools import combinations
 # ================= CONFIG =================
 NUM_MIDI_NOTES = 128
 SILENCE_IDX = 128          # last index = silence flag
-MIN_NOTES = 2
+MIN_NOTES = 1
 MAX_NOTES = 6
 CHORD_STYLE = "short"      # 'short' or 'long', passed to get_chord_suffix
 USE_RAW_NAME = True        # True -> group by 'raw_name' (stable internal key, e.g. "minor7")
@@ -61,7 +61,51 @@ def build_suffix_table(analyzer_cls, style=CHORD_STYLE, use_raw_name=USE_RAW_NAM
 
     return table
 
-
+def build_suffix_table_pcs_only(analyzer_cls, style=CHORD_STYLE, use_raw_name=USE_RAW_NAME):
+    """Match chords by pitch class set ONLY, not by octave voicing."""
+    from guitarchordanalyzer import CHORD_FORMULAS
+    
+    table = {}
+    
+    for n in range(MIN_NOTES, MAX_NOTES + 1):
+        for combo in combinations(range(12), n):
+            for bass_pc in combo:
+                pcs = set(combo)
+                candidate_roots = [bass_pc] + [pc for pc in combo if pc != bass_pc]
+                
+                best_match = None
+                
+                for root in candidate_roots:
+                    intervals = sorted((pc - root) % 12 for pc in pcs)
+                    interval_set = set(intervals)
+                    
+                    # Find exact match first
+                    for chord_name, formula in CHORD_FORMULAS.items():
+                        if chord_name in ('single_note', 'silent', 'power_chord'):
+                            continue
+                        
+                        formula_set = set(i % 12 for i in formula)
+                        
+                        if interval_set == formula_set:
+                            best_match = chord_name
+                            break
+                    
+                    if best_match:
+                        break
+                    
+                    # Then partial match
+                    for chord_name, formula in CHORD_FORMULAS.items():
+                        formula_set = set(i % 12 for i in formula)
+                        if interval_set.issubset(formula_set) and not interval_set == formula_set:
+                            best_match = chord_name
+                            break
+                    
+                    if best_match:
+                        break
+                
+                table[(frozenset(combo), bass_pc)] = best_match
+    
+    return table
 def midi_notes_to_pcs_and_bass(midi_notes: list[int]):
     sorted_notes = sorted(midi_notes)
     bass_pc = sorted_notes[0] % 12
@@ -77,7 +121,7 @@ def build_chord_suffix_histogram_fast(
     max_batches=None,
 ):
     print("Building pitch-class -> suffix lookup table (one-time cost)...")
-    suffix_table = build_suffix_table(analyzer_cls, style=style, use_raw_name=use_raw_name)
+    suffix_table = build_suffix_table_pcs_only(analyzer_cls, style=style, use_raw_name=use_raw_name)
     print(f"Lookup table built: {len(suffix_table)} entries.")
 
     histogram = Counter()

@@ -2,7 +2,7 @@
 Guitar-Optimized MIDI Chord and Scale Analyzer
 Handles guitar-specific realities: bass note detection, doubled notes,
 omitted intervals (no 5th, no 3rd), open-string drones, and common
-alternate tunings.
+alternate tunings. NOW INCLUDES SILENCE as a valid chord class.
 """
 
 from collections import Counter
@@ -14,8 +14,7 @@ NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 # ============================================================
 CHORD_FORMULAS = {
     # Most common guitar chords first (helps tie-breaking)
-    '13':                   [0, 4, 7, 10, 14, 21],
-
+   # '13':                   [0, 4, 7, 10, 14, 21],
     '9':                    [0, 4, 7, 10, 14],
     'major9':               [0, 4, 7, 11, 14],
     'minor9':               [0, 3, 7, 10, 14],  
@@ -33,16 +32,15 @@ CHORD_FORMULAS = {
     'minorMajor7':          [0, 3, 7, 11],
     'sus4_7':               [0, 5, 7, 10],
     'sus2_7':               [0, 2, 7, 10],
-
     'augmented':            [0, 4, 8],
     'diminished':           [0, 3, 6],
     'no3_add4':             [0, 5, 7],  # ambiguous sus4/no-3rd voicing
     'major':                [0, 4, 7],
     'minor':                [0, 3, 7],
-   # 'sus4':                 [0, 5, 7],
     'sus2':                 [0, 2, 7],
-
     'power_chord':          [0, 7],          # very common on guitar (no 3rd)
+    'single_note':          [0],             # 1 MIDI note
+    'silent':               [],              # 0 MIDI notes (silence)
 }
 
 # Common guitar tunings (low to high string), used for open-note context
@@ -73,17 +71,30 @@ SCALE_FORMULAS = {
 
 
 class GuitarChordAnalyzer:
-    def __init__(self, midi_notes, tuning='standard', assume_lowest_is_bass=True):
+    def __init__(self, midi_notes=None, tuning='standard', assume_lowest_is_bass=True):
         """
         Args:
             midi_notes: list of MIDI note numbers, e.g. [40, 47, 52, 56, 59, 64]
-                        (as would come from a guitar's actual played strings)
+                        (as would come from a guitar's actual played strings).
+                        If None or empty, represents silence.
             tuning: name of tuning used, for open-string awareness (optional)
             assume_lowest_is_bass: guitarists almost always play the bass note
                         lowest, so we prioritize that as the root/inversion bass
         """
-        if not (2 <= len(midi_notes) <= 6):
-            raise ValueError("Please provide between 2 and 6 MIDI notes.")
+        # Handle silence (empty/None input)
+        if midi_notes is None or len(midi_notes) == 0:
+            self.midi_notes = []
+            self.tuning = TUNINGS.get(tuning, TUNINGS['standard'])
+            self.assume_lowest_is_bass = assume_lowest_is_bass
+            self.pc_counts = Counter()
+            self.pitch_classes = []
+            self.bass_note = None
+            self.bass_pc = None
+            self._is_silent = True
+            return
+
+        if not (1 <= len(midi_notes) <= 6):
+            raise ValueError("Please provide between 1 and 6 MIDI notes.")
 
         self.midi_notes = sorted(midi_notes)
         self.tuning = TUNINGS.get(tuning, TUNINGS['standard'])
@@ -95,6 +106,7 @@ class GuitarChordAnalyzer:
         self.pitch_classes = sorted(self.pc_counts.keys())
         self.bass_note = self.midi_notes[0]
         self.bass_pc = self.bass_note % 12
+        self._is_silent = False
 
     @staticmethod
     def note_name(pc):
@@ -110,16 +122,53 @@ class GuitarChordAnalyzer:
     def identify_chords(self):
         """
         Guitar-specific logic:
-        1. Try the bass note (lowest played pitch) as root FIRST — this is how
+        1. Handle silence first (0 MIDI notes).
+        2. Handle single note (1 MIDI note).
+        3. Handle octave unison (1 pitch class, 2+ MIDI notes).
+        4. Try the bass note (lowest played pitch) as root FIRST — this is how
            guitarists think ("that's a G chord") even in inversions.
-        2. Also scan all other pitch classes as potential roots for slash-chord
+        5. Also scan all other pitch classes as potential roots for slash-chord
            detection (e.g. C/E, D/F#).
-        3. Weight/prefer common open-chord shapes (major, minor, sus2/4, power).
         """
+        # --- SILENCE ---
+        if self._is_silent or len(self.midi_notes) == 0:
+            return [{
+                'root': None,
+                'chord': 'silent',
+                'bass': None,
+                'is_root_position': True,
+                'match': 'exact',
+                'label': 'silence',
+            }]
+
+        # --- SINGLE NOTE ---
+        if len(self.midi_notes) == 1:
+            root = self.pitch_classes[0]
+            return [{
+                'root': self.note_name(root),
+                'chord': 'single_note',
+                'bass': self.note_name(root),
+                'is_root_position': True,
+                'match': 'exact',
+                'label': self.midi_to_name(self.midi_notes[0]),
+            }]
+
+        # --- OCTAVE UNISON (1 pitch class, 2+ notes) ---
+        n_distinct = len(self.pitch_classes)
+        if n_distinct == 1:
+            root = self.pitch_classes[0]
+            return [{
+                'root': self.note_name(root),
+                'chord': 'power_chord',
+                'bass': self.note_name(self.bass_pc),
+                'is_root_position': True,
+                'match': 'exact',
+                'label': self._format_label(root, 'power_chord', True),
+            }]
+
+        # --- POLYPHONIC CHORD MATCHING ---
         results = []
         pcs = set(self.pitch_classes)
-        n_distinct = len(pcs)
-
         candidate_roots = [self.bass_pc] + [pc for pc in self.pitch_classes if pc != self.bass_pc]
 
         for root in candidate_roots:
@@ -127,6 +176,10 @@ class GuitarChordAnalyzer:
             interval_set = set(intervals)
 
             for chord_name, formula in CHORD_FORMULAS.items():
+                # Skip single_note/silent/power_chord here; they're handled above
+                if chord_name in ('single_note', 'silent', 'power_chord'):
+                    continue
+
                 formula_set = set(i % 12 for i in formula)
 
                 if interval_set == formula_set:
@@ -178,11 +231,12 @@ class GuitarChordAnalyzer:
             'diminished7': 'dim7', 'minor7b5': 'm7b5', 'augmented': 'aug',
             'minorMajor7': 'm(maj7)', 'sus4_7': '7sus4', 'sus2_7': '7sus2',
             '9': '9', 'major9': 'maj9', 'minor9': 'm9', '13': '13',
-            '7#9': '7#9', '7b9': '7b9', 'no3_add4': '(no3)add4'
+            '7#9': '7#9', '7b9': '7b9', 'no3_add4': '(no3)add4',
+            'single_note': '', 'silent': ''
         }.get(chord_name, chord_name)
 
-        label = f"{root_name}{suffix}"
-        if not is_root_position:
+        label = f"{root_name}{suffix}" if root_name else chord_name
+        if not is_root_position and root_name:
             label += f"/{self.note_name(self.bass_pc)}"
         return label
 
@@ -190,6 +244,12 @@ class GuitarChordAnalyzer:
     # SCALE DETECTION
     # -----------------------------------------------------
     def identify_scales(self, top_n=8):
+        """
+        Identify compatible scales. Returns empty list for silence/single note.
+        """
+        if self._is_silent or len(self.midi_notes) <= 1:
+            return []
+
         results = []
         pcs = set(self.pitch_classes)
 
@@ -216,8 +276,8 @@ class GuitarChordAnalyzer:
         best_chord = chords[0] if chords else None
 
         report = {
-            'input_notes': [self.midi_to_name(n) for n in self.midi_notes],
-            'bass_note': self.midi_to_name(self.bass_note),
+            'input_notes': [self.midi_to_name(n) for n in self.midi_notes] if self.midi_notes else [],
+            'bass_note': self.midi_to_name(self.bass_note) if self.bass_note is not None else None,
             'best_guess': best_chord['label'] if best_chord else 'Unknown',
             'chords': chords,
             'scales': scales,
@@ -230,8 +290,9 @@ class GuitarChordAnalyzer:
 
     def _print_report(self, report):
         print("=" * 60)
-        print(f"NOTES PLAYED: {', '.join(report['input_notes'])}")
-        print(f"BASS NOTE (lowest string): {report['bass_note']}")
+        print(f"NOTES PLAYED: {', '.join(report['input_notes']) if report['input_notes'] else '(silence)'}")
+        if report['bass_note']:
+            print(f"BASS NOTE (lowest string): {report['bass_note']}")
         print(f"BEST GUESS: {report['best_guess']}")
         print("=" * 60)
 
@@ -250,18 +311,21 @@ class GuitarChordAnalyzer:
             for c in partial[:5]:
                 print(f"  {c['label']:12s} [{c['match']}]")
 
-        print("\n--- COMPATIBLE SCALES ---")
-        for s in report['scales']:
-            print(f"  {s['root']} {s['scale']} ({s['scale_size']} notes)")
+        if report['scales']:
+            print("\n--- COMPATIBLE SCALES ---")
+            for s in report['scales']:
+                print(f"  {s['root']} {s['scale']} ({s['scale_size']} notes)")
 
         print("=" * 60)
 
     # -----------------------------------------------------
-    # CHORD QUALITY WITHOUT ROOT
+    # CHORD QUALITY WITHOUT ROOT (for TensorFlow dataset labeling)
     # -----------------------------------------------------
     def get_chord_suffix(self, prefer_root_position=True, style='short'):
         """
         Returns the chord quality/suffix only, stripped of the root note name.
+        Suitable for creating balanced datasets where all chord types (silent,
+        single_note, power_chord, major, etc.) are treated as separate classes.
 
         Args:
             prefer_root_position: if True, only considers matches where the
@@ -273,9 +337,9 @@ class GuitarChordAnalyzer:
 
         Returns:
             dict with:
-                'suffix': str, e.g. "m7" or "minor7" depending on style
-                'raw_name': the internal formula key, e.g. "minor7"
-                'root': the root note name this suffix is relative to
+                'suffix': str, e.g. "m7", "minor7", "power_chord", "single_note", "silent"
+                'raw_name': the internal formula key, e.g. "minor7", "power_chord"
+                'root': the root note name (None for silence/single_note if no clear root)
                 'is_slash_chord': bool
                 'full_label': the complete chord label, for reference
         """
@@ -289,14 +353,7 @@ class GuitarChordAnalyzer:
                 'full_label': 'Unknown'
             }
 
-        exact = [c for c in chords if c['match'] == 'exact']
-        pool = exact if exact else chords
-
-        if prefer_root_position:
-            root_position_matches = [c for c in pool if c['is_root_position']]
-            chosen = root_position_matches[0] if root_position_matches else pool[0]
-        else:
-            chosen = pool[0]
+        chosen = chords[0]  # identify_chords() already ranks by exact + root position
 
         # Short-form (standard chord chart shorthand)
         suffix_map_short = {
@@ -307,7 +364,8 @@ class GuitarChordAnalyzer:
             'diminished7': 'dim7', 'minor7b5': 'm7b5', 'augmented': 'aug',
             'minorMajor7': 'm(maj7)', 'sus4_7': '7sus4', 'sus2_7': '7sus2',
             '9': '9', 'major9': 'maj9', 'minor9': 'm9', '13': '13',
-            '7#9': '7#9', '7b9': '7b9', 'no3_add4': '(no3)add4'
+            '7#9': '7#9', '7b9': '7b9', 'no3_add4': '(no3)add4',
+            'single_note': 'single_note', 'silent': 'silent'
         }
 
         # Long-form (explicit, human-readable words)
@@ -323,7 +381,8 @@ class GuitarChordAnalyzer:
             'sus4_7': 'dominant 7 sus4', 'sus2_7': 'dominant 7 sus2',
             '9': 'dominant 9th', 'major9': 'major 9th', 'minor9': 'minor 9th',
             '13': '13th', '7#9': 'dominant 7 sharp 9', '7b9': 'dominant 7 flat 9',
-            'no3_add4': 'no 3rd, added 4th'
+            'no3_add4': 'no 3rd, added 4th',
+            'single_note': 'single note', 'silent': 'silence'
         }
 
         raw_name = chosen['chord']
