@@ -18,9 +18,9 @@ namespace GuitarMidi
     bool NoteInferencer::initialize(const std::string &bundle_path)
     {
         m_midioutput.initializeSequence();
-        #ifdef WITH_AUDIO_OUTPUT
+       // #ifdef WITH_AUDIO_OUTPUT
         m_frames = 0;
-        #endif
+        //#endif
         return m_model.initialize(bundle_path);
     }
     void NoteInferencer::finalize()
@@ -37,7 +37,12 @@ namespace GuitarMidi
     }
     void NoteInferencer::process(int nsamples)
     {
-        
+        if(m_frames<BUFFER_SIZE){
+            m_frames += nsamples;
+            return; // only process when we have a full buffer of audio samples
+        }
+
+        m_frames=0;
         stringstream msg;
         float gain = powf(10.0f, *m_gain_db * 0.05f);
         float expressivity = powf(10.0f, *m_expressivity_db * 0.05f);
@@ -129,9 +134,9 @@ namespace GuitarMidi
                 }
             }
         }
-        #ifdef WITH_AUDIO_OUTPUT
+        //#ifdef WITH_AUDIO_OUTPUT
 
-        m_frames += nsamples;
-        #endif
+        
+        //#endif
     }
 }
