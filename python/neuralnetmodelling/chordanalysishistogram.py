@@ -121,7 +121,7 @@ def build_chord_suffix_histogram_fast(
     max_batches=None,
 ):
     print("Building pitch-class -> suffix lookup table (one-time cost)...")
-    suffix_table = build_suffix_table_pcs_only(analyzer_cls, style=style, use_raw_name=use_raw_name)
+    suffix_table = build_suffix_table(analyzer_cls, style=style, use_raw_name=use_raw_name)
     print(f"Lookup table built: {len(suffix_table)} entries.")
 
     histogram = Counter()

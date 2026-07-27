@@ -7,15 +7,27 @@ from common import OUTPUT_DIM_NOTES
 # ============================================================
 
 CHORD_FORMULAS = {
-   # '13':                   [0, 4, 7, 10, 14, 21],
-    '9':                    [0, 4, 7, 10, 14],
-    'major9':               [0, 4, 7, 11, 14],
-    'minor9':               [0, 3, 7, 10, 14],
-    '7#9':                  [0, 4, 7, 10, 15],
-    '7b9':                  [0, 4, 7, 10, 13],
+
+
+
+
+
+    'silent':               [],  # Silence: 129th label = 1, all notes = 0
+    'single_note':          [0],
+
+    'power_chord':          [0, 7],
+    'major':                [0, 4, 7],
+    'minor':                [0, 3, 7],
+    'sus4':                 [0, 5, 7],
+    'sus2':                 [0, 2, 7],
+    'diminished':           [0, 3, 6],
+    'augmented':            [0, 4, 8],
+    'no3_add4':             [0, 5, 7],
+
     'major7':               [0, 4, 7, 11],
-    'dominant7':            [0, 4, 7, 10],
     'minor7':               [0, 3, 7, 10],
+    'dominant7':            [0, 4, 7, 10],
+
     'add9':                 [0, 4, 7, 14],
     'minorAdd9':            [0, 3, 7, 14],
     'major6':               [0, 4, 7, 9],
@@ -25,16 +37,12 @@ CHORD_FORMULAS = {
     'minorMajor7':          [0, 3, 7, 11],
     'sus4_7':               [0, 5, 7, 10],
     'sus2_7':               [0, 2, 7, 10],
-    'minor':                [0, 3, 7],
-    'sus4':                 [0, 5, 7],
-    'sus2':                 [0, 2, 7],
-    'diminished':           [0, 3, 6],
-    'augmented':            [0, 4, 8],
-    'no3_add4':             [0, 5, 7],
-    'major':                [0, 4, 7],
-    'power_chord':          [0, 7],
-    'single_note':          [0],
-    'silent':               [],  # Silence: 129th label = 1, all notes = 0
+   # '13':                   [0, 4, 7, 10, 14, 21],
+    '9':                    [0, 4, 7, 10, 14],
+    'major9':               [0, 4, 7, 11, 14],
+    'minor9':               [0, 3, 7, 10, 14],
+    '7#9':                  [0, 4, 7, 10, 15],
+    '7b9':                  [0, 4, 7, 10, 13],
 }
 
 CHORD_NAMES = list(CHORD_FORMULAS.keys())
