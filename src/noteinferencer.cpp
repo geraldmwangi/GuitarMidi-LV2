@@ -50,7 +50,8 @@ namespace GuitarMidi
             {
                 // check if all harmonics of the note are active before sending note on message
                 float note_energy = 0;
-                int h = 1; // for (int h = 1; h <= NUM_HARMONICS; h++)
+                int h = 1; // 
+                //for (int h = 1; h <= NUM_HARMONICS; h++)
                 {
                     int harmonic_index = i * NUM_HARMONICS + h - 1;
                     if (harmonic_index < NUM_HARMONICS * NUM_NOTES)
@@ -120,7 +121,7 @@ namespace GuitarMidi
                         continue;
                     }
                     // lv2_log_note(&g_logger, "Note %d OFF with confidence %f\n", i, output_data[i]);
-                    if (m_note_on[i] && smoothed_offsetoutput[i] < *m_offset_threshold && i != (NUM_NOTES - 1))
+                    if (m_note_on[i] && (smoothed_offsetoutput[i] < *m_offset_threshold) && (i != (NUM_NOTES - 1)))
                     {
                         uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x00};
                         m_midioutput.sendMidiMessage(midinote, 0);
