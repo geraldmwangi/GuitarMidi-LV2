@@ -15,3 +15,9 @@ debian: all
 
 clean:
 	rm -rf build
+
+debug: 
+	mkdir -p build
+	cd build && cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=~/.lv2 ..
+	cd build && cmake --build . -j$(shell nproc || echo 4) 
+	cd build && cmake --install .
