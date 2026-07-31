@@ -441,25 +441,16 @@ Model: "guitar_note_detector"
 │ chord_block_act1    │ (256, 6, 13, 64)  │          0 │ chord_block_bn1[… │
 │ (ELU)               │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_conv2   │ (256, 6, 13, 64)  │     49,216 │ chord_block_act1… │
+│ chord_block_conv2   │ (256, 6, 13, 128) │     98,432 │ chord_block_act1… │
 │ (Conv2D)            │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_bn2     │ (256, 6, 13, 64)  │        256 │ chord_block_conv… │
+│ chord_block_bn2     │ (256, 6, 13, 128) │        512 │ chord_block_conv… │
 │ (BatchNormalizatio… │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_act2    │ (256, 6, 13, 64)  │          0 │ chord_block_bn2[… │
+│ chord_block_act2    │ (256, 6, 13, 128) │          0 │ chord_block_bn2[… │
 │ (LeakyReLU)         │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_conv3   │ (256, 6, 13, 128) │     98,432 │ chord_block_act2… │
-│ (Conv2D)            │                   │            │                   │
-├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_bn3     │ (256, 6, 13, 128) │        512 │ chord_block_conv… │
-│ (BatchNormalizatio… │                   │            │                   │
-├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_act3    │ (256, 6, 13, 128) │          0 │ chord_block_bn3[… │
-│ (LeakyReLU)         │                   │            │                   │
-├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_drop1   │ (256, 6, 13, 128) │          0 │ chord_block_act3… │
+│ chord_block_drop1   │ (256, 6, 13, 128) │          0 │ chord_block_act2… │
 │ (SpatialDropout2D)  │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_slice_… │ (256, 13, 128)    │          0 │ chord_block_drop… │
@@ -636,6 +627,6 @@ Model: "guitar_note_detector"
 │ sparse_guitar_outp… │ (256, 37)         │          0 │ reshape[0][0]     │
 │ (SparseGuitarOutpu… │                   │            │                   │
 └─────────────────────┴───────────────────┴────────────┴───────────────────┘
- Total params: 842,222 (3.21 MB)
- Trainable params: 838,622 (3.20 MB)
- Non-trainable params: 3,600 (14.06 KB)
+ Total params: 792,750 (3.02 MB)
+ Trainable params: 789,278 (3.01 MB)
+ Non-trainable params: 3,472 (13.56 KB)
