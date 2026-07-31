@@ -18,9 +18,9 @@ namespace GuitarMidi
     bool NoteInferencer::initialize(const std::string &bundle_path)
     {
         m_midioutput.initializeSequence();
-        #ifdef WITH_AUDIO_OUTPUT
+       // #ifdef WITH_AUDIO_OUTPUT
         m_frames = 0;
-        #endif
+        //#endif
         return m_model.initialize(bundle_path);
     }
     void NoteInferencer::finalize()
@@ -37,10 +37,16 @@ namespace GuitarMidi
     }
     void NoteInferencer::process(int nsamples)
     {
-        
+        if(m_frames<BUFFER_SIZE){
+            m_frames += nsamples;
+            return; // only process when we have a full buffer of audio samples
+        }
+
+        m_frames=0;
         stringstream msg;
         float gain = powf(10.0f, *m_gain_db * 0.05f);
         float expressivity = powf(10.0f, *m_expressivity_db * 0.05f);
+        float en_threshold = pow(10, *m_onset_energy_threshold / 20)*gain;
         m_model.add_audio_input(m_audiobuffer.audio_buffer_2D, 1);
         float output_data[NUM_NOTES];
         if (m_model.get_model_output(output_data, 1))
@@ -66,19 +72,19 @@ namespace GuitarMidi
                 smoothed_onsetoutput[i] = *m_smoothing * smoothed_onsetoutput[i] + (1 - *m_smoothing) * output_data[i]; // simple low pass filter to smooth the output and reduce jitter
                 smoothed_offsetoutput[i] = *m_smoothing_offset * smoothed_offsetoutput[i] + (1 - *m_smoothing_offset) * output_data[i];
 
-                smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
-                smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy * smoothed_offsetoutput[i];
-                if (smoothed_onsetoutput[i] > *m_onset_threshold)
+                smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy; // * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
+                smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy; // * smoothed_offsetoutput[i];
+                if (!m_note_on[i])
                 {
 
-                    if (!m_note_on[i] && i != (NUM_NOTES - 1))
+                    if (smoothed_onsetoutput[i] > *m_onset_threshold)
                     {
 
-                        // threshold in dB is converted to linear scale by 10^(threshold_db/20)
 
-                        float threshold = pow(10, *m_onset_energy_threshold / 20);
 
-                        if (smoothed_noteenergies[i] < threshold)
+                        
+
+                        if (smoothed_noteenergies[i] < en_threshold)
                         {
                             #ifdef WITH_TRACING_INFO
                            // lv2_log_note(&g_logger, "Note %d detected but energy %f is below threshold %f, not sending MIDI message\n", i, smoothed_noteenergies[i], threshold);
@@ -108,11 +114,11 @@ namespace GuitarMidi
                 }
                 else
                 {
-                    // threshold in dB is converted to linear scale by 10^(threshold_db/20)
+                    
 
-                    float threshold = pow(10, *m_offset_energy_threshold / 20);
 
-                    if (smoothed_offsetnoteenergies[i] > threshold)
+
+                    if (smoothed_offsetnoteenergies[i] > en_threshold)
                     {
                         #ifdef WITH_TRACING_INFO
                         //lv2_log_note(&g_logger, "Note %d detected but energy %f is below threshold %f, not sending MIDI message\n", i, smoothed_offsetnoteenergies[i], threshold);
@@ -129,9 +135,9 @@ namespace GuitarMidi
                 }
             }
         }
-        #ifdef WITH_AUDIO_OUTPUT
+        //#ifdef WITH_AUDIO_OUTPUT
 
-        m_frames += nsamples;
-        #endif
+        
+        //#endif
     }
 }
