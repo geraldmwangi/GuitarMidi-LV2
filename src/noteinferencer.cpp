@@ -133,6 +133,11 @@ namespace GuitarMidi
                         m_note_on[i] = false;
                     }
                 }
+                //                 smoothed_onsetoutput[i] = output_data[i]; // simple low pass filter to smooth the output and reduce jitter
+                // smoothed_offsetoutput[i] =  output_data[i];
+
+                // smoothed_noteenergies[i] =  note_energy; // * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
+                // smoothed_offsetnoteenergies[i] =  note_energy; // * smoothed_offsetoutput[i];
             }
         }
         //#ifdef WITH_AUDIO_OUTPUT
