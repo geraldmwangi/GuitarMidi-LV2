@@ -41,7 +41,11 @@ namespace GuitarMidi
             m_frames += nsamples;
             return; // only process when we have a full buffer of audio samples
         }
-
+                        int num_active_notes = 0;
+                for (int h = 0; h < NUM_NOTES; h++)
+                {
+                   num_active_notes+=m_note_on[h];
+                }
         m_frames=0;
         stringstream msg;
         float gain = powf(10.0f, *m_gain_db * 0.05f);
@@ -69,11 +73,17 @@ namespace GuitarMidi
                         note_energy += harmonicenergy;
                     }
                 }
+
+
                 smoothed_onsetoutput[i] = *m_smoothing * smoothed_onsetoutput[i] + (1 - *m_smoothing) * output_data[i]; // simple low pass filter to smooth the output and reduce jitter
                 smoothed_offsetoutput[i] = *m_smoothing_offset * smoothed_offsetoutput[i] + (1 - *m_smoothing_offset) * output_data[i];
-
-                smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy; // * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
+                if(num_active_notes==1){
+                smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
+                smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy * smoothed_offsetoutput[i];
+                }else
+{                smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy; // * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
                 smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy; // * smoothed_offsetoutput[i];
+                }
                 if (!m_note_on[i])
                 {
 
