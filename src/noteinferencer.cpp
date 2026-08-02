@@ -84,7 +84,7 @@ namespace GuitarMidi
 {                smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy; // * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
                 smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy; // * smoothed_offsetoutput[i];
                 }
-                if (!m_note_on[i])
+                if (!m_note_on[i]&& i != (NUM_NOTES - 1))
                 {
 
                     if (smoothed_onsetoutput[i] > *m_onset_threshold)
