@@ -51,6 +51,7 @@ namespace GuitarMidi
         float gain = powf(10.0f, *m_gain_db * 0.05f);
         float expressivity = powf(10.0f, *m_expressivity_db * 0.05f);
         float en_threshold = pow(10, *m_onset_energy_threshold / 20)*gain;
+        float en_threshold_offset = pow(10, *m_offset_energy_threshold / 20)*gain;
         m_model.add_audio_input(m_audiobuffer.audio_buffer_2D, 1);
         float output_data[NUM_NOTES];
         if (m_model.get_model_output(output_data, 1))
@@ -128,7 +129,7 @@ namespace GuitarMidi
 
 
 
-                    if (smoothed_offsetnoteenergies[i] > en_threshold)
+                    if (smoothed_offsetnoteenergies[i] > en_threshold_offset)
                     {
                         #ifdef WITH_TRACING_INFO
                         //lv2_log_note(&g_logger, "Note %d detected but energy %f is below threshold %f, not sending MIDI message\n", i, smoothed_offsetnoteenergies[i], threshold);
