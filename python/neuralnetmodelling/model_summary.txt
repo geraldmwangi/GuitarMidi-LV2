@@ -318,22 +318,22 @@ Model: "guitar_note_detector"
 │ (SpatialDropout1D)  │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str0_hollow_suppre… │ (256, 13, 64)     │          0 │ str0_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str1_hollow_suppre… │ (256, 13, 64)     │          0 │ str1_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str2_hollow_suppre… │ (256, 13, 64)     │          0 │ str2_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str3_hollow_suppre… │ (256, 13, 64)     │          0 │ str3_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str4_hollow_suppre… │ (256, 13, 64)     │          0 │ str4_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str5_hollow_suppre… │ (256, 13, 64)     │          0 │ str5_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str0_hollow_act     │ (256, 13, 64)     │          0 │ str0_hollow_supp… │
 │ (LeakyReLU)         │                   │            │                   │
@@ -432,115 +432,94 @@ Model: "guitar_note_detector"
 │                     │                   │            │ chord_block_expa… │
 │                     │                   │            │ chord_block_expa… │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_conv1   │ (256, 6, 13, 64)  │     49,216 │ chord_block_stac… │
-│ (Conv2D)            │                   │            │                   │
-├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_bn1     │ (256, 6, 13, 64)  │        256 │ chord_block_conv… │
-│ (BatchNormalizatio… │                   │            │                   │
-├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_act1    │ (256, 6, 13, 64)  │          0 │ chord_block_bn1[… │
-│ (ELU)               │                   │            │                   │
-├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_conv2   │ (256, 6, 13, 128) │     98,432 │ chord_block_act1… │
-│ (Conv2D)            │                   │            │                   │
-├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_bn2     │ (256, 6, 13, 128) │        512 │ chord_block_conv… │
-│ (BatchNormalizatio… │                   │            │                   │
-├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_act2    │ (256, 6, 13, 128) │          0 │ chord_block_bn2[… │
-│ (LeakyReLU)         │                   │            │                   │
-├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_drop1   │ (256, 6, 13, 128) │          0 │ chord_block_act2… │
-│ (SpatialDropout2D)  │                   │            │                   │
-├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_slice_… │ (256, 13, 128)    │          0 │ chord_block_drop… │
+│ chord_block_slice_… │ (256, 13, 64)     │          0 │ chord_block_stac… │
 │ (Lambda)            │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_slice_… │ (256, 13, 128)    │          0 │ chord_block_drop… │
+│ chord_block_slice_… │ (256, 13, 64)     │          0 │ chord_block_stac… │
 │ (Lambda)            │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_slice_… │ (256, 13, 128)    │          0 │ chord_block_drop… │
+│ chord_block_slice_… │ (256, 13, 64)     │          0 │ chord_block_stac… │
 │ (Lambda)            │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_slice_… │ (256, 13, 128)    │          0 │ chord_block_drop… │
+│ chord_block_slice_… │ (256, 13, 64)     │          0 │ chord_block_stac… │
 │ (Lambda)            │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_slice_… │ (256, 13, 128)    │          0 │ chord_block_drop… │
+│ chord_block_slice_… │ (256, 13, 64)     │          0 │ chord_block_stac… │
 │ (Lambda)            │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_slice_… │ (256, 13, 128)    │          0 │ chord_block_drop… │
+│ chord_block_slice_… │ (256, 13, 64)     │          0 │ chord_block_stac… │
 │ (Lambda)            │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_ln_str0 │ (256, 13, 128)    │        256 │ chord_block_slic… │
+│ chord_block_ln_str0 │ (256, 13, 64)     │        128 │ chord_block_slic… │
 │ (LayerNormalizatio… │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_ln_str1 │ (256, 13, 128)    │        256 │ chord_block_slic… │
+│ chord_block_ln_str1 │ (256, 13, 64)     │        128 │ chord_block_slic… │
 │ (LayerNormalizatio… │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_ln_str2 │ (256, 13, 128)    │        256 │ chord_block_slic… │
+│ chord_block_ln_str2 │ (256, 13, 64)     │        128 │ chord_block_slic… │
 │ (LayerNormalizatio… │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_ln_str3 │ (256, 13, 128)    │        256 │ chord_block_slic… │
+│ chord_block_ln_str3 │ (256, 13, 64)     │        128 │ chord_block_slic… │
 │ (LayerNormalizatio… │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_ln_str4 │ (256, 13, 128)    │        256 │ chord_block_slic… │
+│ chord_block_ln_str4 │ (256, 13, 64)     │        128 │ chord_block_slic… │
 │ (LayerNormalizatio… │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_ln_str5 │ (256, 13, 128)    │        256 │ chord_block_slic… │
+│ chord_block_ln_str5 │ (256, 13, 64)     │        128 │ chord_block_slic… │
 │ (LayerNormalizatio… │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_act_st… │ (256, 13, 128)    │          0 │ chord_block_ln_s… │
+│ chord_block_act_st… │ (256, 13, 64)     │          0 │ chord_block_ln_s… │
 │ (LeakyReLU)         │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_act_st… │ (256, 13, 128)    │          0 │ chord_block_ln_s… │
+│ chord_block_act_st… │ (256, 13, 64)     │          0 │ chord_block_ln_s… │
 │ (LeakyReLU)         │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_act_st… │ (256, 13, 128)    │          0 │ chord_block_ln_s… │
+│ chord_block_act_st… │ (256, 13, 64)     │          0 │ chord_block_ln_s… │
 │ (LeakyReLU)         │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_act_st… │ (256, 13, 128)    │          0 │ chord_block_ln_s… │
+│ chord_block_act_st… │ (256, 13, 64)     │          0 │ chord_block_ln_s… │
 │ (LeakyReLU)         │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_act_st… │ (256, 13, 128)    │          0 │ chord_block_ln_s… │
+│ chord_block_act_st… │ (256, 13, 64)     │          0 │ chord_block_ln_s… │
 │ (LeakyReLU)         │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_act_st… │ (256, 13, 128)    │          0 │ chord_block_ln_s… │
+│ chord_block_act_st… │ (256, 13, 64)     │          0 │ chord_block_ln_s… │
 │ (LeakyReLU)         │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_drop_s… │ (256, 13, 128)    │          0 │ chord_block_act_… │
+│ chord_block_drop_s… │ (256, 13, 64)     │          0 │ chord_block_act_… │
 │ (Dropout)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_drop_s… │ (256, 13, 128)    │          0 │ chord_block_act_… │
+│ chord_block_drop_s… │ (256, 13, 64)     │          0 │ chord_block_act_… │
 │ (Dropout)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_drop_s… │ (256, 13, 128)    │          0 │ chord_block_act_… │
+│ chord_block_drop_s… │ (256, 13, 64)     │          0 │ chord_block_act_… │
 │ (Dropout)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_drop_s… │ (256, 13, 128)    │          0 │ chord_block_act_… │
+│ chord_block_drop_s… │ (256, 13, 64)     │          0 │ chord_block_act_… │
 │ (Dropout)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_drop_s… │ (256, 13, 128)    │          0 │ chord_block_act_… │
+│ chord_block_drop_s… │ (256, 13, 64)     │          0 │ chord_block_act_… │
 │ (Dropout)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_drop_s… │ (256, 13, 128)    │          0 │ chord_block_act_… │
+│ chord_block_drop_s… │ (256, 13, 64)     │          0 │ chord_block_act_… │
 │ (Dropout)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_fretlo… │ (256, 13, 1)      │        129 │ chord_block_drop… │
+│ chord_block_fretlo… │ (256, 13, 1)      │         65 │ chord_block_drop… │
 │ (Dense)             │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_fretlo… │ (256, 13, 1)      │        129 │ chord_block_drop… │
+│ chord_block_fretlo… │ (256, 13, 1)      │         65 │ chord_block_drop… │
 │ (Dense)             │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_fretlo… │ (256, 13, 1)      │        129 │ chord_block_drop… │
+│ chord_block_fretlo… │ (256, 13, 1)      │         65 │ chord_block_drop… │
 │ (Dense)             │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_fretlo… │ (256, 13, 1)      │        129 │ chord_block_drop… │
+│ chord_block_fretlo… │ (256, 13, 1)      │         65 │ chord_block_drop… │
 │ (Dense)             │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_fretlo… │ (256, 13, 1)      │        129 │ chord_block_drop… │
+│ chord_block_fretlo… │ (256, 13, 1)      │         65 │ chord_block_drop… │
 │ (Dense)             │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_fretlo… │ (256, 13, 1)      │        129 │ chord_block_drop… │
+│ chord_block_fretlo… │ (256, 13, 1)      │         65 │ chord_block_drop… │
 │ (Dense)             │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_flatte… │ (256, 13)         │          0 │ chord_block_fret… │
@@ -562,22 +541,22 @@ Model: "guitar_note_detector"
 │ (Flatten)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_softma… │ (256, 14)         │          0 │ chord_block_appe… │
 │ (Softmax)           │                   │            │                   │
@@ -598,22 +577,22 @@ Model: "guitar_note_detector"
 │ (Softmax)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ string_combined     │ (256, 78)         │          0 │ chord_block_stri… │
 │ (Concatenate)       │                   │            │ chord_block_stri… │
@@ -622,11 +601,11 @@ Model: "guitar_note_detector"
 │                     │                   │            │ chord_block_stri… │
 │                     │                   │            │ chord_block_stri… │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ reshape (Reshape)   │ (256, 6, 13)      │          0 │ string_combined[… │
+│ reshape_1 (Reshape) │ (256, 6, 13)      │          0 │ string_combined[… │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ sparse_guitar_outp… │ (256, 37)         │          0 │ reshape[0][0]     │
+│ sparse_guitar_outp… │ (256, 37)         │          0 │ reshape_1[0][0]   │
 │ (SparseGuitarOutpu… │                   │            │                   │
 └─────────────────────┴───────────────────┴────────────┴───────────────────┘
- Total params: 792,750 (3.02 MB)
- Trainable params: 789,278 (3.01 MB)
- Non-trainable params: 3,472 (13.56 KB)
+ Total params: 643,182 (2.45 MB)
+ Trainable params: 640,094 (2.44 MB)
+ Non-trainable params: 3,088 (12.06 KB)
