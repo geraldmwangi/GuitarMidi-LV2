@@ -331,7 +331,7 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width),
 
 
     # --- Stage 5: Chord reasoning (Conv1D across strings) ---
-    processed_strings = chord_conv_block(string_features,output_dim=N_FRETS,training=training, filters=64, kernel_size=(1,4), name_prefix="chord_block")
+    processed_strings = chord_conv_block(string_features,output_dim=N_FRETS,training=training, filters=64, kernel_size=(2,4), name_prefix="chord_block")
 
     combined = layers.Concatenate(name="string_combined")(processed_strings)
 
