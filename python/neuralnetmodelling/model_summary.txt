@@ -432,7 +432,7 @@ Model: "guitar_note_detector"
 │                     │                   │            │ chord_block_expa… │
 │                     │                   │            │ chord_block_expa… │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_conv1   │ (256, 6, 13, 64)  │     32,832 │ chord_block_stac… │
+│ chord_block_conv1   │ (256, 6, 13, 64)  │     98,368 │ chord_block_stac… │
 │ (Conv2D)            │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_bn1     │ (256, 6, 13, 64)  │        256 │ chord_block_conv… │
@@ -441,7 +441,7 @@ Model: "guitar_note_detector"
 │ chord_block_act1    │ (256, 6, 13, 64)  │          0 │ chord_block_bn1[… │
 │ (ELU)               │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ chord_block_conv2   │ (256, 6, 13, 128) │     65,664 │ chord_block_act1… │
+│ chord_block_conv2   │ (256, 6, 13, 128) │    196,736 │ chord_block_act1… │
 │ (Conv2D)            │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_bn2     │ (256, 6, 13, 128) │        512 │ chord_block_conv… │
@@ -627,6 +627,6 @@ Model: "guitar_note_detector"
 │ sparse_guitar_outp… │ (256, 37)         │          0 │ reshape[0][0]     │
 │ (SparseGuitarOutpu… │                   │            │                   │
 └─────────────────────┴───────────────────┴────────────┴───────────────────┘
- Total params: 743,598 (2.84 MB)
- Trainable params: 740,126 (2.82 MB)
+ Total params: 940,206 (3.59 MB)
+ Trainable params: 936,734 (3.57 MB)
  Non-trainable params: 3,472 (13.56 KB)
