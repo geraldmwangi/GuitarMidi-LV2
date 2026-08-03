@@ -209,7 +209,7 @@ def transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, nam
     # 3. Add to x1 WITHOUT normalizing the result (Clear highway!)
     return layers.Add(name=f"{name_prefix}_ffn_add")([x1, ffn])
 
-def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(2,4), name_prefix="chord"):
+def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(3,4), name_prefix="chord"):
     # store the original string features for later as residuals
     
 
