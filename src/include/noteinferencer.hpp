@@ -32,6 +32,7 @@
 #include "tensorflow/lite/optional_debug_tools.h"
 #include "tensorflow/lite/delegates/xnnpack/xnnpack_delegate.h"
 #include <modelinferencer.hpp>
+#define MAX_MEDIAN_FILTER_SIZE 10
 using namespace std;
 using namespace tflite;
 namespace GuitarMidi{
@@ -48,6 +49,9 @@ namespace GuitarMidi{
         float* m_offset_energy_threshold;
         float* m_smoothing;
         float* m_smoothing_offset;
+
+        float m_confidences[NUM_NOTES][MAX_MEDIAN_FILTER_SIZE]={0};
+        float m_energies[NUM_NOTES][MAX_MEDIAN_FILTER_SIZE]={0};
         float smoothed_onsetoutput[NUM_NOTES]={0};
         float smoothed_offsetoutput[NUM_NOTES]={0};
         float smoothed_noteenergies[NUM_NOTES]={0};
@@ -57,6 +61,10 @@ namespace GuitarMidi{
         int64_t m_frames=0;
         //#endif
         bool m_note_on[NUM_NOTES]={false};
+
+        void add_confidence(int note_index, float confidence);
+        void add_energy(int note_index, float energy);
+        float median_filter(float* values, int size);
         public:
         NoteInferencer(LV2_URID_Map *map);
 
