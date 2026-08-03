@@ -209,7 +209,7 @@ def transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, nam
     # 3. Add to x1 WITHOUT normalizing the result (Clear highway!)
     return layers.Add(name=f"{name_prefix}_ffn_add")([x1, ffn])
 
-def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(3,4), name_prefix="chord"):
+def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(1,4), name_prefix="chord"):
     # store the original string features for later as residuals
     
 
@@ -225,17 +225,17 @@ def chord_conv_block(string_features, filters,output_dim,training, kernel_size=(
     stacked = layers.Concatenate(axis=1, name=f"{name_prefix}_stack_strings")(expanded)  # (B, 6, max_len, 64)
 
 
-    # c1=layers.Conv2D(filters, kernel_size, padding='same', name=f"{name_prefix}_conv1",kernel_regularizer=reg2d)(stacked)
-    # c1=layers.BatchNormalization(name=f"{name_prefix}_bn1")(c1)
-    # c1 = layers.ELU(name=f"{name_prefix}_act1")(c1)
+    c1=layers.Conv2D(filters, kernel_size, padding='same', name=f"{name_prefix}_conv1",kernel_regularizer=reg2d)(stacked)
+    c1=layers.BatchNormalization(name=f"{name_prefix}_bn1")(c1)
+    c1 = layers.ELU(name=f"{name_prefix}_act1")(c1)
 
 
-    # c2=layers.Conv2D(2*filters, kernel_size, padding='same', name=f"{name_prefix}_conv2",kernel_regularizer=reg2d)(c1)
-    # c2=layers.BatchNormalization(name=f"{name_prefix}_bn2")(c2)
-    # c2=layers.LeakyReLU(name=f"{name_prefix}_act2")(c2)
-    # chord=c2#layers.Add(name=f"{name_prefix}_res_c1_c2")([c2, c1])
-    # chord=layers.SpatialDropout2D(0.2, name=f"{name_prefix}_drop1")(chord)
-    chord=stacked
+    c2=layers.Conv2D(2*filters, kernel_size, padding='same', name=f"{name_prefix}_conv2",kernel_regularizer=reg2d)(c1)
+    c2=layers.BatchNormalization(name=f"{name_prefix}_bn2")(c2)
+    c2=layers.LeakyReLU(name=f"{name_prefix}_act2")(c2)
+    chord=c2#layers.Add(name=f"{name_prefix}_res_c1_c2")([c2, c1])
+    chord=layers.SpatialDropout2D(0.2, name=f"{name_prefix}_drop1")(chord)
+
     # Split the chord features back into per-string tensors
     split_chords = [layers.Lambda(lambda t, i=i: t[:, i, :, :], name=f"{name_prefix}_slice_str{i}")(chord) for i in range(len(string_features))]
     
