@@ -468,3 +468,38 @@ def show_raw_notes_for_13_frames(dataset, num_frames=20):
             if count >= num_frames:
                 break
 
+# this funtion  creates a histogram over all chord intervals in the dataset. It counts all interval patterns. The root is always the lowest note in the chord.
+# it first computes the pitch class mask for each frame, then finds the lowest note (bass) and rotates the mask to root position. It then counts the occurrences of each interval pattern.
+# the function is highly vectorized and uses tf.data.Dataset to process the data efficiently. It returns a dictionary mapping interval patterns (as tuples of pitch classes) to their counts.
+def compute_chord_interval_histogram(dataset):
+    """
+    Compute a histogram of chord interval patterns in the dataset.
+    The root is always the lowest note in the chord.
+    Returns a dictionary mapping interval patterns (as tuples of pitch classes) to counts.
+    """
+    import collections
+    
+    interval_histogram = collections.defaultdict(int)
+    
+    for audio, frame_nr, labels in dataset.unbatch().take(100000):
+        # Get active MIDI notes
+        note_labels = labels[:128].numpy()
+        active_notes = [i for i in range(128) if note_labels[i] > 0]
+        
+        if len(active_notes) < 2:
+            continue  # Skip single notes and silence
+        
+        # Find the lowest note (root)
+        root_note = min(active_notes)
+        root_pc = root_note % 12
+        
+        # Compute pitch classes relative to root
+        pcs_relative = sorted((n - root_note) % 12 for n in active_notes)
+        
+        # Convert to tuple for dictionary key
+        interval_pattern = tuple(pcs_relative)
+        
+        # Increment count
+        interval_histogram[interval_pattern] += 1
+    
+    return dict(interval_histogram)
