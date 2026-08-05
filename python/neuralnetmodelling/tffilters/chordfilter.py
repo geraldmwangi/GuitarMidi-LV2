@@ -469,37 +469,205 @@ def show_raw_notes_for_13_frames(dataset, num_frames=20):
                 break
 
 # this funtion  creates a histogram over all chord intervals in the dataset. It counts all interval patterns. The root is always the lowest note in the chord.
-# it first computes the pitch class mask for each frame, then finds the lowest note (bass) and rotates the mask to root position. It then counts the occurrences of each interval pattern.
+# it first finds the lowest note (bass) and rotates the mask to root position. It then counts the occurrences of each interval pattern.
 # the function is highly vectorized and uses tf.data.Dataset to process the data efficiently. It returns a dictionary mapping interval patterns (as tuples of pitch classes) to their counts.
-def compute_chord_interval_histogram(dataset):
+import collections
+import json
+import pickle
+from pathlib import Path
+
+import tensorflow as tf
+
+
+def compute_chord_interval_histogram_tf(
+    dataset,
+    batch_size=4096,
+    include_silence=False,
+    save_path=None,
+    save_format="json",
+):
     """
-    Compute a histogram of chord interval patterns in the dataset.
-    The root is always the lowest note in the chord.
-    Returns a dictionary mapping interval patterns (as tuples of pitch classes) to counts.
+    TensorFlow-optimized version of compute_chord_interval_histogram.
+
+    For each frame, finds the lowest active MIDI note (root), computes
+    intervals of all active notes relative to that root (NOT wrapped to
+    pitch class -- matches original semantics exactly), encodes the
+    resulting interval-pattern as a 128-bit bitmask (since intervals can
+    range 0..127), and accumulates global counts per unique bitmask using
+    a batched Counter merge.
+
+    Single notes are now included (pattern = (0,)).
+    Silent frames (no active notes) are skipped by default since there is
+    no root to anchor intervals to; set include_silence=True to count them
+    under a special empty-pattern key ().
+
+    Args:
+        dataset: tf.data.Dataset yielding (audio, labels) batches or single
+            examples (will be unbatched/rebatched internally).
+        batch_size: batch size used for internal vectorized processing.
+        include_silence: whether to count silent frames under key ().
+        save_path: if provided, write the resulting histogram to disk at
+            this path. Directory is created if it doesn't exist.
+        save_format: "json" (human-readable, keys stringified) or
+            "pickle" (preserves exact tuple keys and Counter type).
+
+    Returns:
+        dict mapping interval pattern (tuple of ints) -> count
     """
-    import collections
-    
-    interval_histogram = collections.defaultdict(int)
-    
-    for audio, frame_nr, labels in dataset.unbatch().take(100000):
-        # Get active MIDI notes
-        note_labels = labels[:128].numpy()
-        active_notes = [i for i in range(128) if note_labels[i] > 0]
-        
-        if len(active_notes) < 2:
-            continue  # Skip single notes and silence
-        
-        # Find the lowest note (root)
-        root_note = min(active_notes)
-        root_pc = root_note % 12
-        
-        # Compute pitch classes relative to root
-        pcs_relative = sorted((n - root_note) % 12 for n in active_notes)
-        
-        # Convert to tuple for dictionary key
-        interval_pattern = tuple(pcs_relative)
-        
-        # Increment count
-        interval_histogram[interval_pattern] += 1
-    
-    return dict(interval_histogram)
+
+    flat_ds = dataset.unbatch()
+    flat_ds = flat_ds.batch(batch_size)
+
+    def process_batch(audio, labels):
+        note_labels = labels[:, :37]                     # [B, 37]
+        active = note_labels > 0                          # [B, 37] bool
+
+        active_count = tf.reduce_sum(tf.cast(active, tf.int32), axis=1)  # [B]
+
+        if include_silence:
+            valid_mask = tf.ones_like(active_count, dtype=tf.bool)
+        else:
+            valid_mask = active_count >= 1                 # only skip true silence
+
+        is_silent = tf.equal(active_count, 0)
+
+        idx = tf.range(37, dtype=tf.int32)                # [37]
+        idx_b = tf.broadcast_to(idx, tf.shape(active))     # [B, 37]
+
+        sentinel = tf.constant(37, dtype=tf.int32)
+        masked_idx = tf.where(active, idx_b, sentinel)     # [B, 37]
+        root_note = tf.reduce_min(masked_idx, axis=1)      # [B]
+
+        safe_root = tf.where(is_silent, tf.zeros_like(root_note), root_note)
+
+        rel_offsets = idx_b - safe_root[:, None]           # [B, 37]
+
+        bit_valid = active & (rel_offsets >= 0) & (rel_offsets < 37)
+        bit_valid = bit_valid & (~is_silent[:, None])
+
+        bit_positions = tf.where(bit_valid, rel_offsets, tf.zeros_like(rel_offsets))
+
+        low_mask = bit_valid & (bit_positions < 64)
+        high_mask = bit_valid & (bit_positions >= 64)
+
+        low_bits = tf.where(low_mask, bit_positions, tf.zeros_like(bit_positions))
+        high_bits = tf.where(high_mask, bit_positions - 64, tf.zeros_like(bit_positions))
+
+        low_pow = tf.bitwise.left_shift(
+            tf.ones_like(low_bits, dtype=tf.int64),
+            tf.cast(low_bits, tf.int64)
+        )
+        low_pow = tf.where(low_mask, low_pow, tf.zeros_like(low_pow))
+        low_word = tf.reduce_sum(low_pow, axis=1)          # [B] int64
+
+        high_pow = tf.bitwise.left_shift(
+            tf.ones_like(high_bits, dtype=tf.int64),
+            tf.cast(high_bits, tf.int64)
+        )
+        high_pow = tf.where(high_mask, high_pow, tf.zeros_like(high_pow))
+        high_word = tf.reduce_sum(high_pow, axis=1)        # [B] int64
+
+        low_word = tf.where(is_silent, tf.constant(-1, dtype=tf.int64), low_word)
+        high_word = tf.where(is_silent, tf.constant(-1, dtype=tf.int64), high_word)
+
+        return low_word, high_word, valid_mask
+
+    mapped_ds = flat_ds.map(process_batch, num_parallel_calls=tf.data.AUTOTUNE)
+
+    pattern_counts = collections.Counter()
+
+    for low_word, high_word, valid_mask in mapped_ds.prefetch(tf.data.AUTOTUNE):
+        low_np = low_word.numpy()
+        high_np = high_word.numpy()
+        valid_np = valid_mask.numpy()
+
+        keys = list(zip(low_np[valid_np].tolist(), high_np[valid_np].tolist()))
+        local_counter = collections.Counter(keys)
+        pattern_counts.update(local_counter)
+
+    def decode_bitmask(low_word, high_word):
+        if low_word == -1 and high_word == -1:
+            return ()  # silent/empty pattern
+        offsets = []
+        for k in range(64):
+            if (low_word >> k) & 1:
+                offsets.append(k)
+        for k in range(64):
+            if (high_word >> k) & 1:
+                offsets.append(k + 64)
+        return tuple(sorted(offsets))
+
+    interval_histogram = collections.Counter({
+        decode_bitmask(low, high): count
+        for (low, high), count in pattern_counts.items()
+    })
+
+    if save_path is not None:
+        _save_histogram(interval_histogram, save_path, save_format)
+
+    return interval_histogram
+
+
+def _save_histogram(histogram, save_path, save_format="json"):
+    """
+    Persist an interval histogram to disk.
+
+    JSON format: keys are stringified tuples (e.g. "0,4,7") sorted by
+    descending count, plus metadata (total count, num unique patterns).
+    Pickle format: exact Counter object with tuple keys, round-trips
+    perfectly via pickle.load.
+    """
+    save_path = Path(save_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if save_format == "pickle":
+        with open(save_path, "wb") as f:
+            pickle.dump(histogram, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+    elif save_format == "json":
+        total = sum(histogram.values())
+        sorted_items = sorted(histogram.items(), key=lambda kv: kv[1], reverse=True)
+
+        payload = {
+            "total_count": total,
+            "num_unique_patterns": len(histogram),
+            "histogram": [
+                {
+                    "pattern": list(pattern),          # e.g. [0, 4, 7]
+                    "pattern_str": ",".join(map(str, pattern)),
+                    "count": count,
+                    "fraction": count / total if total else 0.0,
+                }
+                for pattern, count in sorted_items
+            ],
+        }
+
+        with open(save_path, "w") as f:
+            json.dump(payload, f, indent=2)
+
+    else:
+        raise ValueError(f"Unknown save_format: {save_format!r} (use 'json' or 'pickle')")
+
+    print(f"Saved interval histogram ({len(histogram)} unique patterns) to {save_path}")
+
+
+def load_histogram(load_path):
+    """
+    Load a histogram saved by _save_histogram.
+
+    Auto-detects format by extension (.pkl/.pickle -> pickle, else JSON).
+    Returns a collections.Counter with tuple keys in both cases.
+    """
+    load_path = Path(load_path)
+
+    if load_path.suffix in (".pkl", ".pickle"):
+        with open(load_path, "rb") as f:
+            return pickle.load(f)
+
+    with open(load_path, "r") as f:
+        payload = json.load(f)
+
+    return collections.Counter({
+        tuple(entry["pattern"]): entry["count"]
+        for entry in payload["histogram"]
+    })

@@ -166,11 +166,11 @@ def build_chord_suffix_histogram_fast(
     return histogram
 
 
-def print_histogram(histogram: Counter, top_n=None):
+def print_histogram(histogram, top_n=None):
     total = sum(histogram.values())
     for suffix, count in histogram.most_common(top_n):
         pct = 100 * count / total if total else 0
-        label = suffix if suffix is not None else "<none>"
+        label = str(suffix) if suffix is not None else "<none>"
         print(f"{label:15s} {count:8d}  ({pct:5.2f}%)")
 
 
