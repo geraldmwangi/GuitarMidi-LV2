@@ -103,8 +103,8 @@ class GuitarChordAnalyzer:
             self._is_silent = True
             return
 
-        if not (1 <= len(midi_notes) <= 6):
-            raise ValueError("Please provide between 1 and 6 MIDI notes.")
+        if not (1 <= len(midi_notes) <= 12):
+            raise ValueError("Please provide between 1 and 12 MIDI notes."+str(midi_notes))
 
         self.midi_notes = sorted(midi_notes)
         self.tuning = TUNINGS.get(tuning, TUNINGS['standard'])
