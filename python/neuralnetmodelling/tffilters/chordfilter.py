@@ -667,3 +667,105 @@ def load_histogram(load_path):
         tuple(entry["pattern"]): entry["count"]
         for entry in payload["histogram"]
     })
+
+
+def load_and_compute_chord_weights(histogram_path, weight_cap=1000,include_counts=False):
+    with open(histogram_path, 'r') as f:
+        pos_chord_weights=dict()
+        data = json.load(f)
+        total_count = data['total_count']
+        num_unique_patterns = data['num_unique_patterns']
+        histogram = data['histogram']
+        for pattern_str, count in histogram.items():
+            pattern = tuple(map(int, pattern_str.split(','))) if pattern_str!='' else None
+            if include_counts:
+                pos_chord_weights[pattern] = ((total_count-count)/count if count != 0 else 1.0,count)
+            else:
+                pos_chord_weights[pattern] = (total_count-count)/count if count != 0 else 1.0
+        if include_counts:
+            #get the min weight
+            min_weight = min(weight[0] for pattern, weight in pos_chord_weights.items())
+            print("Minimum weight:", min_weight)
+            #normalize the weights by dividing by the min weight
+            pos_chord_weights = {pattern: (min(weight_cap, weight[0]/min_weight), weight[1]) for pattern, weight in pos_chord_weights.items()}
+        else:
+            #get the min weight
+            min_weight = min(pos_chord_weights.values())
+            print("Minimum weight:", min_weight)
+            #normalize the weights by dividing by the min weight
+            pos_chord_weights = {pattern: min(weight_cap, weight/min_weight) for pattern, weight in pos_chord_weights.items()}
+        return pos_chord_weights, total_count, num_unique_patterns
+
+
+def build_pattern_weight_table(histogram_path, weight_cap=1000, default_weight=1.0):
+    """
+    Build a TensorFlow StaticHashTable mapping interval patterns (as tuples of pitch classes) to their corresponding weights, based on a precomputed histogram.
+    histogram_path: Path to the JSON file containing the histogram of interval patterns and their counts.
+    weight_cap: Maximum weight to assign to any pattern (to avoid extreme values).
+    default_weight: Weight to assign to patterns not found in the histogram.
+    Returns:
+        A tf.lookup.StaticHashTable that can be used to look up weights for interval patterns.
+    """
+    pos_chord_weights, total_count, num_unique_patterns = load_and_compute_chord_weights(histogram_path, weight_cap=weight_cap, include_counts=False)
+    keys = []
+    values = []
+    for pattern, weight in pos_chord_weights.items():
+        key_str = "" if pattern is None else ",".join(map(str, pattern))
+        keys.append(key_str)
+        values.append(float(weight))
+
+    keys_tensor = tf.constant(keys, dtype=tf.string)
+    values_tensor = tf.constant(values, dtype=tf.float32)
+
+    table = tf.lookup.StaticHashTable(
+        tf.lookup.KeyValueTensorInitializer(keys_tensor, values_tensor),
+        default_value=default_weight,
+    )
+    return table
+
+
+
+def y_true_to_interval_key(y_true, num_notes=37):
+    """
+    Convert a batch of one-hot note labels to interval pattern keys (as strings).
+    Each key is a comma-separated string of intervals relative to the lowest active note (root).
+    If a frame is silent (no active notes), the key is an empty string.
+    Args:
+        y_true: Tensor of shape [batch_size, num_notes] with one-hot note labels
+        num_notes: Number of note dimensions (default 37)
+    Returns:
+        Tensor of shape [batch_size] with string keys representing interval patterns"""
+    active = tf.cast(y_true, tf.bool)
+    batch_size = tf.shape(active)[0]
+
+    active_count = tf.reduce_sum(tf.cast(active, tf.int32), axis=1)
+    is_silent = tf.equal(active_count, 0)
+
+    idx = tf.range(num_notes, dtype=tf.int32)
+    idx_b = tf.broadcast_to(idx, tf.shape(active))
+
+    sentinel = tf.constant(num_notes, dtype=tf.int32)
+    masked_idx = tf.where(active, idx_b, sentinel)
+    root_note = tf.reduce_min(masked_idx, axis=1)
+    safe_root = tf.where(is_silent, tf.zeros_like(root_note), root_note)
+
+    rel_offsets = idx_b - safe_root[:, None]
+    bit_valid = active & (rel_offsets >= 0)
+
+    def row_to_key(offsets_row, valid_row, silent_row):
+        return tf.cond(
+            silent_row,
+            lambda: tf.constant("", dtype=tf.string),
+            lambda: tf.strings.reduce_join(
+                tf.strings.as_string(tf.boolean_mask(offsets_row, valid_row)),
+                separator=",",
+            ),
+        )
+
+    keys = tf.map_fn(
+        lambda args: row_to_key(args[0], args[1], args[2]),
+        (rel_offsets, bit_valid, is_silent),
+        fn_output_signature=tf.string,
+    )
+
+    return keys
