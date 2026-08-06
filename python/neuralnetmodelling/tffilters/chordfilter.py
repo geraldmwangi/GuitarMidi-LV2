@@ -631,15 +631,11 @@ def _save_histogram(histogram, save_path, save_format="json"):
         payload = {
             "total_count": total,
             "num_unique_patterns": len(histogram),
-            "histogram": [
-                {
-                    "pattern": list(pattern),          # e.g. [0, 4, 7]
-                    "pattern_str": ",".join(map(str, pattern)),
-                    "count": count,
-                    "fraction": count / total if total else 0.0,
-                }
-                for pattern, count in sorted_items
-            ],
+            "histogram":{
+                ",".join(map(str, pattern)): count for pattern, count in sorted_items
+            },
+            
+            
         }
 
         with open(save_path, "w") as f:
