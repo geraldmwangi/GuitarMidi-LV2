@@ -478,6 +478,48 @@ from pathlib import Path
 
 import tensorflow as tf
 
+def _process_labels_to_bitpositions(labels,include_silence=True):
+        note_labels = labels[:, :37]                     # [B, 37]
+        active = note_labels > 0                          # [B, 37] bool
+
+        active_count = tf.reduce_sum(tf.cast(active, tf.int32), axis=1)  # [B]
+
+        if include_silence:
+            valid_mask = tf.ones_like(active_count, dtype=tf.bool)
+        else:
+            valid_mask = active_count >= 1                 # only skip true silence
+
+        is_silent = tf.equal(active_count, 0)
+        # Find the lowest active note (root) for each frame
+        # first, create a tensor of indices 0..36 (for 37 notes)
+        idx = tf.range(37, dtype=tf.int32)                # [37]
+
+        # Broadcast idx to match the batch size. this will create a [B, 37] tensor where each row is [0, 1, 2, ..., 36]
+        idx_b = tf.broadcast_to(idx, tf.shape(active))     # [B, 37]
+
+        # Use a sentinel value (e.g., 37) for inactive notes, so that when we take the min, we ignore them. This is safe because the max index is 36.
+        sentinel = tf.constant(37, dtype=tf.int32)
+
+        # Use tf.where to replace inactive indices with the sentinel value. This will give us a tensor where active notes have their original index, and inactive notes have 37.
+        masked_idx = tf.where(active, idx_b, sentinel)     # [B, 37]
+
+        # Now, we can safely take the min across axis=1 to find the lowest active note index for each frame. If a frame is silent, this will return 37, which we can handle later.
+        root_note = tf.reduce_min(masked_idx, axis=1)      # [B]
+
+        # For silent frames, we can set the root_note to a safe value (e.g., 0) since we won't use it. This avoids issues with negative indices or invalid operations later.
+        safe_root = tf.where(is_silent, tf.zeros_like(root_note), root_note)
+
+        # Now, compute the relative offsets of all active notes from the root. This will give us a tensor of shape [B, 37] where each entry is the interval from the root note. For silent frames, this will be ignored.
+        rel_offsets = idx_b - safe_root[:, None]           # [B, 37]
+
+        # Create a boolean mask for valid intervals: active notes that are within the range 0..36. This ensures we only consider notes that are actually present and within the valid range.
+        bit_valid = active & (rel_offsets >= 0) & (rel_offsets < 37)
+        bit_valid = bit_valid & (~is_silent[:, None])
+        # Now, we can compute the bit positions for the valid intervals. For each valid interval, we will use its relative offset as the bit position in a 128-bit integer. This will allow us to create a unique bitmask for each interval pattern.
+        bit_positions = tf.where(bit_valid, rel_offsets, tf.zeros_like(rel_offsets))
+
+        return bit_positions, bit_valid, is_silent,rel_offsets,valid_mask
+
 
 def compute_chord_interval_histogram_tf(
     dataset,
@@ -519,40 +561,17 @@ def compute_chord_interval_histogram_tf(
     flat_ds = flat_ds.batch(batch_size)
 
     def process_batch(audio, labels):
-        note_labels = labels[:, :37]                     # [B, 37]
-        active = note_labels > 0                          # [B, 37] bool
+        bit_positions, bit_valid, is_silent, rel_offsets, valid_mask = _process_labels_to_bitpositions(labels, include_silence=include_silence)
 
-        active_count = tf.reduce_sum(tf.cast(active, tf.int32), axis=1)  # [B]
-
-        if include_silence:
-            valid_mask = tf.ones_like(active_count, dtype=tf.bool)
-        else:
-            valid_mask = active_count >= 1                 # only skip true silence
-
-        is_silent = tf.equal(active_count, 0)
-
-        idx = tf.range(37, dtype=tf.int32)                # [37]
-        idx_b = tf.broadcast_to(idx, tf.shape(active))     # [B, 37]
-
-        sentinel = tf.constant(37, dtype=tf.int32)
-        masked_idx = tf.where(active, idx_b, sentinel)     # [B, 37]
-        root_note = tf.reduce_min(masked_idx, axis=1)      # [B]
-
-        safe_root = tf.where(is_silent, tf.zeros_like(root_note), root_note)
-
-        rel_offsets = idx_b - safe_root[:, None]           # [B, 37]
-
-        bit_valid = active & (rel_offsets >= 0) & (rel_offsets < 37)
-        bit_valid = bit_valid & (~is_silent[:, None])
-
-        bit_positions = tf.where(bit_valid, rel_offsets, tf.zeros_like(rel_offsets))
-
+        # Split the bit positions into two groups: those that fit in the lower 64 bits and those that fit in the upper 64 bits. This is necessary because we are using two 64-bit integers to represent the full 128-bit bitmask.
         low_mask = bit_valid & (bit_positions < 64)
         high_mask = bit_valid & (bit_positions >= 64)
 
+        # Now, we can compute the low and high words (64-bit integers) for each frame. We will use bitwise operations to set the appropriate bits in each word based on the valid bit positions.
         low_bits = tf.where(low_mask, bit_positions, tf.zeros_like(bit_positions))
         high_bits = tf.where(high_mask, bit_positions - 64, tf.zeros_like(bit_positions))
 
+        # Compute the low and high words by left-shifting 1 by the bit positions and summing them up. This will give us a unique integer representation for each interval pattern.
         low_pow = tf.bitwise.left_shift(
             tf.ones_like(low_bits, dtype=tf.int64),
             tf.cast(low_bits, tf.int64)
@@ -571,11 +590,11 @@ def compute_chord_interval_histogram_tf(
         high_word = tf.where(is_silent, tf.constant(-1, dtype=tf.int64), high_word)
 
         return low_word, high_word, valid_mask
-
+    # Map the process_batch function over the dataset with parallel calls for efficiency. This will allow us to process multiple batches concurrently, improving performance when computing the histogram.
     mapped_ds = flat_ds.map(process_batch, num_parallel_calls=tf.data.AUTOTUNE)
 
     pattern_counts = collections.Counter()
-
+    # Iterate over the mapped dataset and accumulate counts for each unique interval pattern. We will convert the low and high words to numpy arrays for easier processing and use a Counter to keep track of the occurrences of each pattern.
     for low_word, high_word, valid_mask in mapped_ds.prefetch(tf.data.AUTOTUNE):
         low_np = low_word.numpy()
         high_np = high_word.numpy()
@@ -596,12 +615,12 @@ def compute_chord_interval_histogram_tf(
             if (high_word >> k) & 1:
                 offsets.append(k + 64)
         return tuple(sorted(offsets))
-
+    # Convert the pattern_counts from (low_word, high_word) keys to actual interval patterns (tuples of offsets). This will give us a more human-readable representation of the interval patterns and their counts.
     interval_histogram = collections.Counter({
         decode_bitmask(low, high): count
         for (low, high), count in pattern_counts.items()
     })
-
+    # If a save_path is provided, persist the histogram to disk in the specified format (JSON or pickle). This allows for easy sharing and reuse of the computed histogram without needing to recompute it from the dataset.
     if save_path is not None:
         _save_histogram(interval_histogram, save_path, save_format)
 
@@ -669,15 +688,21 @@ def load_histogram(load_path):
     })
 
 
-def load_and_compute_chord_weights(histogram_path, weight_cap=1000,include_counts=False):
+def load_and_compute_chord_weights(histogram_path, weight_cap=1000,weight_cap_low=0.1,include_counts=False):
+    # Load a histogram from disk and compute weights for each interval pattern based on its frequency.
     with open(histogram_path, 'r') as f:
         pos_chord_weights=dict()
         data = json.load(f)
+
+        # Get the metadata from the histogram
         total_count = data['total_count']
         num_unique_patterns = data['num_unique_patterns']
+
+        # Compute weights for each interval pattern based on its frequency in the histogram. The weight is calculated as (total_count - count) / count, which gives higher weights to less frequent patterns. If include_counts is True, the weight is returned along with the count for each pattern.
         histogram = data['histogram']
         for pattern_str, count in histogram.items():
             pattern = tuple(map(int, pattern_str.split(','))) if pattern_str!='' else None
+            # Compute the weight for the pattern based on its frequency in the histogram
             if include_counts:
                 pos_chord_weights[pattern] = ((total_count-count)/count if count != 0 else 1.0,count)
             else:
@@ -687,40 +712,45 @@ def load_and_compute_chord_weights(histogram_path, weight_cap=1000,include_count
             min_weight = min(weight[0] for pattern, weight in pos_chord_weights.items())
             print("Minimum weight:", min_weight)
             #normalize the weights by dividing by the min weight
-            pos_chord_weights = {pattern: (min(weight_cap, weight[0]/min_weight), weight[1]) for pattern, weight in pos_chord_weights.items()}
+            pos_chord_weights = {pattern: (min(weight_cap, max(weight_cap_low, weight[0]/min_weight)), weight[1]) for pattern, weight in pos_chord_weights.items()}
         else:
             #get the min weight
             min_weight = min(pos_chord_weights.values())
             print("Minimum weight:", min_weight)
             #normalize the weights by dividing by the min weight
-            pos_chord_weights = {pattern: min(weight_cap, weight/min_weight) for pattern, weight in pos_chord_weights.items()}
+            pos_chord_weights = {pattern: min(weight_cap, max(weight_cap_low, weight/min_weight)) for pattern, weight in pos_chord_weights.items()}
         return pos_chord_weights, total_count, num_unique_patterns
 
 
-def build_pattern_weight_table(histogram_path, weight_cap=1000, default_weight=1.0):
+def build_pattern_weight_table(histogram_path, weight_cap=1000,weight_cap_low=0.1, default_weight=1.0):
     """
     Build a TensorFlow StaticHashTable mapping interval patterns (as tuples of pitch classes) to their corresponding weights, based on a precomputed histogram.
     histogram_path: Path to the JSON file containing the histogram of interval patterns and their counts.
     weight_cap: Maximum weight to assign to any pattern (to avoid extreme values).
+    weight_cap_low: Minimum weight to assign to any pattern (to avoid extreme values).
     default_weight: Weight to assign to patterns not found in the histogram.
     Returns:
         A tf.lookup.StaticHashTable that can be used to look up weights for interval patterns.
     """
-    pos_chord_weights, total_count, num_unique_patterns = load_and_compute_chord_weights(histogram_path, weight_cap=weight_cap, include_counts=False)
+
+    # Load the histogram and compute weights for each interval pattern. The weights are normalized and capped to avoid extreme values. The function returns a dictionary mapping interval patterns (as tuples) to their corresponding weights, along with the total count of patterns and the number of unique patterns.
+    pos_chord_weights, total_count, num_unique_patterns = load_and_compute_chord_weights(histogram_path, weight_cap=weight_cap, weight_cap_low=weight_cap_low, include_counts=False)
     keys = []
     values = []
     for pattern, weight in pos_chord_weights.items():
         key_str = "" if pattern is None else ",".join(map(str, pattern))
         keys.append(key_str)
         values.append(float(weight))
-
+    # Create TensorFlow tensors for the keys and values, which will be used to initialize the StaticHashTable. The keys are converted to strings, and the values are converted to float32 for compatibility with TensorFlow operations.
     keys_tensor = tf.constant(keys, dtype=tf.string)
     values_tensor = tf.constant(values, dtype=tf.float32)
 
-    table = tf.lookup.StaticHashTable(
-        tf.lookup.KeyValueTensorInitializer(keys_tensor, values_tensor),
-        default_value=default_weight,
-    )
+    # Create a StaticHashTable that maps interval pattern strings to their corresponding weights. The table is initialized with the keys and values tensors, and a default weight is specified for patterns not found in the histogram. This allows for efficient lookups of weights during model training or inference.
+    with tf.device('/GPU:0'):
+        table = tf.lookup.StaticHashTable(
+            tf.lookup.KeyValueTensorInitializer(keys_tensor, values_tensor),
+            default_value=default_weight,
+        )
     return table
 
 
@@ -735,22 +765,8 @@ def y_true_to_interval_key(y_true, num_notes=37):
         num_notes: Number of note dimensions (default 37)
     Returns:
         Tensor of shape [batch_size] with string keys representing interval patterns"""
-    active = tf.cast(y_true, tf.bool)
-    batch_size = tf.shape(active)[0]
 
-    active_count = tf.reduce_sum(tf.cast(active, tf.int32), axis=1)
-    is_silent = tf.equal(active_count, 0)
-
-    idx = tf.range(num_notes, dtype=tf.int32)
-    idx_b = tf.broadcast_to(idx, tf.shape(active))
-
-    sentinel = tf.constant(num_notes, dtype=tf.int32)
-    masked_idx = tf.where(active, idx_b, sentinel)
-    root_note = tf.reduce_min(masked_idx, axis=1)
-    safe_root = tf.where(is_silent, tf.zeros_like(root_note), root_note)
-
-    rel_offsets = idx_b - safe_root[:, None]
-    bit_valid = active & (rel_offsets >= 0)
+    bit_positions, bit_valid, is_silent, rel_offsets, valid_mask = _process_labels_to_bitpositions(y_true, include_silence=True)
 
     def row_to_key(offsets_row, valid_row, silent_row):
         return tf.cond(
@@ -761,7 +777,7 @@ def y_true_to_interval_key(y_true, num_notes=37):
                 separator=",",
             ),
         )
-
+    # Use tf.map_fn to apply the row_to_key function to each row in the batch, generating a string key for each frame based on its interval pattern. The output signature is specified as tf.string to ensure the correct data type is returned.
     keys = tf.map_fn(
         lambda args: row_to_key(args[0], args[1], args[2]),
         (rel_offsets, bit_valid, is_silent),
