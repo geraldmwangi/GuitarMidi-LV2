@@ -712,13 +712,13 @@ def load_and_compute_chord_weights(histogram_path, weight_cap=1000,weight_cap_lo
             min_weight = min(weight[0] for pattern, weight in pos_chord_weights.items())
             print("Minimum weight:", min_weight)
             #normalize the weights by dividing by the min weight
-            pos_chord_weights = {pattern: (min(weight_cap, max(weight_cap_low, weight[0]/min_weight)), weight[1]) for pattern, weight in pos_chord_weights.items()}
+            pos_chord_weights = {pattern: (min(float(weight_cap), float(max(weight_cap_low, weight[0]/min_weight)))/weight_cap_low, weight[1]) for pattern, weight in pos_chord_weights.items()}
         else:
             #get the min weight
             min_weight = min(pos_chord_weights.values())
             print("Minimum weight:", min_weight)
             #normalize the weights by dividing by the min weight
-            pos_chord_weights = {pattern: min(weight_cap, max(weight_cap_low, weight/min_weight)) for pattern, weight in pos_chord_weights.items()}
+            pos_chord_weights = {pattern: min(float(weight_cap), float(max(weight_cap_low, weight/min_weight)))/weight_cap_low for pattern, weight in pos_chord_weights.items()}
         return pos_chord_weights, total_count, num_unique_patterns
 
 
