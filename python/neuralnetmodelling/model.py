@@ -346,3 +346,53 @@ def build_1d_cnn_model(batch_sz=64, input_shape=(image_height, image_width),
     return models.Model(inputs, outputs, name="guitar_note_detector")
 
 
+def build_debug_model(cnn_model):
+    """
+    Wraps an existing trained guitar_note_detector model to expose intermediate
+    activations useful for diagnosing per-string/per-fret prediction failures.
+    """
+    m = cnn_model
+
+    debug_outputs = {}
+
+    # 1. Final sparse output (37 notes) - what you already see
+    debug_outputs["final_output"] = m.output
+
+    # 2. Pre-scatter string/fret logits (6, 13) - the direct evidence
+    #    per string before OR-combination into notes
+    debug_outputs["string_fret_probs"] = m.get_layer("string_combined").output
+
+    # 3. Per-string softmax distributions (post fret-softmax, pre-concat)
+    #    Useful to see whether a string is "confidently choosing" a fret
+    #    or spreading probability mass (ambiguous).
+    for i in range(N_STRINGS):
+        layer_name = f"chord_block_strip_silence_str{i}"
+        debug_outputs[f"str{i}_fret_softmax"] = m.get_layer(layer_name).output
+
+    # 4. Pre-softmax fret logits per string (before the AppendSilence/softmax
+    #    dance) - lets you see raw confidence/margin before normalization
+    for i in range(N_STRINGS):
+        layer_name = f"chord_block_fretlogits_str{i}"
+        debug_outputs[f"str{i}_fret_logits"] = m.get_layer(layer_name).output
+
+    # 5. Chord-conv feature maps, post Conv2D stack (before per-string split)
+    #    Useful to inspect whether the cross-string convolution is actually
+    #    seeing/mixing the right neighboring strings for this chord shape.
+    debug_outputs["chord_conv_features"] = m.get_layer("chord_block_drop1").output
+
+    # 6. Per-string backbone features going INTO the chord block
+    #    (i.e. before cross-string mixing) - to isolate whether a failure
+    #    originates in the single-string CNN or the chord-reasoning conv.
+    for i in range(N_STRINGS):
+        layer_name = f"str{i}_post_suppress_act"
+        debug_outputs[f"str{i}_pre_chord_features"] = m.get_layer(layer_name).output
+
+    # 7. Transformer output (shared frequency features before string slicing)
+    debug_outputs["transformer_out"] = m.get_layer("tfm_block1_ffn_add").output
+
+    debug_model = models.Model(
+        inputs=m.input,
+        outputs=debug_outputs,
+        name="guitar_note_detector_debug"
+    )
+    return debug_model
