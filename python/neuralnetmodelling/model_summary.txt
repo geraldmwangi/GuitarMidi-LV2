@@ -318,22 +318,22 @@ Model: "guitar_note_detector"
 │ (SpatialDropout1D)  │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str0_hollow_suppre… │ (256, 13, 64)     │          0 │ str0_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str1_hollow_suppre… │ (256, 13, 64)     │          0 │ str1_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str2_hollow_suppre… │ (256, 13, 64)     │          0 │ str2_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str3_hollow_suppre… │ (256, 13, 64)     │          0 │ str3_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str4_hollow_suppre… │ (256, 13, 64)     │          0 │ str4_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str5_hollow_suppre… │ (256, 13, 64)     │          0 │ str5_harmonic_dr… │
-│ (Lambda)            │                   │            │                   │
+│ (HollowSuppression) │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ str0_hollow_act     │ (256, 13, 64)     │          0 │ str0_hollow_supp… │
 │ (LeakyReLU)         │                   │            │                   │
@@ -562,22 +562,22 @@ Model: "guitar_note_detector"
 │ (Flatten)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_append… │ (256, 14)         │          0 │ chord_block_flat… │
-│ (Lambda)            │                   │            │                   │
+│ (AppendSilence)     │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_softma… │ (256, 14)         │          0 │ chord_block_appe… │
 │ (Softmax)           │                   │            │                   │
@@ -598,22 +598,22 @@ Model: "guitar_note_detector"
 │ (Softmax)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ chord_block_strip_… │ (256, 13)         │          0 │ chord_block_soft… │
-│ (Lambda)            │                   │            │                   │
+│ (StripSilence)      │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ string_combined     │ (256, 78)         │          0 │ chord_block_stri… │
 │ (Concatenate)       │                   │            │ chord_block_stri… │
