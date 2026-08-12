@@ -131,7 +131,99 @@ class SparseGuitarOutput(tf.keras.layers.Layer):
         config = super().get_config()
         return config
 
+class HarmonicPositionalEncoding(layers.Layer):
+    """Positional encoding for a harmonic-stacked frequency axis.
 
+    Expects the sequence axis laid out as:
+        note0_h0, note0_h1, ..., note0_h{H-1}, note1_h0, ..., note{N-1}_h{H-1}
+
+    so that  note(t) = t // n_harm  and  harm(t) = t % n_harm,
+    and therefore T == n_notes * n_harm.
+
+    Adds  note_emb[note(t)] + harm_emb[harm(t)]  scaled by a learned gate.
+
+    Input : (B, T, D)
+    Output: (B, T, D)
+    """
+
+    def __init__(self,
+                 n_notes=37,
+                 n_harm=4,
+                 scale_init=1.0,
+                 trainable_scale=True,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.n_notes = int(n_notes)
+        self.n_harm = int(n_harm)
+        self.scale_init = float(scale_init)
+        self.trainable_scale = bool(trainable_scale)
+
+    def build(self, input_shape):
+        seq_len = input_shape[1]
+        d_model = input_shape[-1]
+
+        if seq_len is None or d_model is None:
+            raise ValueError(
+                f"{self.name}: needs static T and D, got {input_shape}. "
+                "Encoding must come after Reshape, not before."
+            )
+
+        seq_len, d_model = int(seq_len), int(d_model)
+        expected = self.n_notes * self.n_harm
+        if seq_len != expected:
+            raise ValueError(
+                f"{self.name}: harmonic-stacked layout requires "
+                f"T == n_notes * n_harm == {self.n_notes}*{self.n_harm} "
+                f"== {expected}, but got T={seq_len}. Check n_notes/n_harm "
+                f"against the actual frequency axis."
+            )
+
+        self.note_emb = self.add_weight(
+            shape=(self.n_notes, d_model),
+            name="note_emb",
+            initializer=tf.keras.initializers.TruncatedNormal(stddev=0.02),
+            trainable=True,
+        )
+        self.harm_emb = self.add_weight(
+            shape=(self.n_harm, d_model),
+            name="harm_emb",
+            initializer=tf.keras.initializers.TruncatedNormal(stddev=0.02),
+            trainable=True,
+        )
+        self.scale = self.add_weight(
+            shape=(),
+            name="scale",
+            initializer=tf.keras.initializers.Constant(self.scale_init),
+            trainable=self.trainable_scale,
+        )
+
+        # Fixed index maps, derived directly from the stacking layout.
+        t = np.arange(seq_len, dtype=np.int32)
+        self.note_index = tf.constant(t // self.n_harm, dtype=tf.int32)
+        self.harm_index = tf.constant(t %  self.n_harm, dtype=tf.int32)
+
+        super().build(input_shape)
+
+    def call(self, x):
+        pe = (tf.gather(self.note_emb, self.note_index) +
+              tf.gather(self.harm_emb, self.harm_index))       # (T, D)
+        pe = tf.cast(self.scale, pe.dtype) * pe
+        return x + tf.cast(pe[tf.newaxis, ...], x.dtype)       # broadcast over B
+
+    def compute_output_shape(self, input_shape):
+        return input_shape
+
+    def get_config(self):
+        cfg = super().get_config()
+        cfg.update({
+            "n_notes": self.n_notes,
+            "n_harm": self.n_harm,
+            "scale_init": self.scale_init,
+            "trainable_scale": self.trainable_scale,
+        })
+        return cfg
+                   # (B, 148, d_model)
+    
 def string_layer(x, start, end, max_x, training, string_idx=0):
     end = min(int(end), int(max_x))
     start = max(0, int(start))
@@ -187,6 +279,7 @@ def string_layer(x, start, end, max_x, training, string_idx=0):
 def transformer_block(x, num_heads=2, head_size=32, ff_dim=128, dropout=0.1, name_prefix="tfm"):
     # --- Attention Block ---
     # 1. Apply LayerNorm BEFORE attention (Off-ramp)
+    x = HarmonicPositionalEncoding(n_notes=37, n_harm=4, name="harm_pos_enc")(x)
     x_norm1 = layers.LayerNormalization(epsilon=1e-6, name=f"{name_prefix}_ln1")(x)
     
     # 2. Compute Attention

@@ -29,13 +29,16 @@ Model: "guitar_note_detector"
 │ reshape_to_1d       │ (256, 148, 512)   │          0 │ freq_compress_dr… │
 │ (Reshape)           │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ tfm_block1_ln1      │ (256, 148, 512)   │      1,024 │ reshape_to_1d[0]… │
+│ harm_pos_enc        │ (256, 148, 512)   │     20,993 │ reshape_to_1d[0]… │
+│ (HarmonicPositiona… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ tfm_block1_ln1      │ (256, 148, 512)   │      1,024 │ harm_pos_enc[0][… │
 │ (LayerNormalizatio… │                   │            │                   │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ tfm_block1_mha      │ (256, 148, 512)   │    131,776 │ tfm_block1_ln1[0… │
 │ (MultiHeadAttentio… │                   │            │ tfm_block1_ln1[0… │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
-│ tfm_block1_attn_add │ (256, 148, 512)   │          0 │ reshape_to_1d[0]… │
+│ tfm_block1_attn_add │ (256, 148, 512)   │          0 │ harm_pos_enc[0][… │
 │ (Add)               │                   │            │ tfm_block1_mha[0… │
 ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
 │ tfm_block1_ln2      │ (256, 148, 512)   │      1,024 │ tfm_block1_attn_… │
@@ -627,6 +630,6 @@ Model: "guitar_note_detector"
 │ sparse_guitar_outp… │ (256, 37)         │          0 │ reshape[0][0]     │
 │ (SparseGuitarOutpu… │                   │            │                   │
 └─────────────────────┴───────────────────┴────────────┴───────────────────┘
- Total params: 792,750 (3.02 MB)
- Trainable params: 789,278 (3.01 MB)
+ Total params: 813,743 (3.10 MB)
+ Trainable params: 810,271 (3.09 MB)
  Non-trainable params: 3,472 (13.56 KB)
