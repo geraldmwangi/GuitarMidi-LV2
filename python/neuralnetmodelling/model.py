@@ -184,18 +184,22 @@ class HarmonicPositionalEncoding(layers.Layer):
             initializer=tf.keras.initializers.TruncatedNormal(stddev=0.02),
             trainable=True,
         )
+        self.note_emb._no_weight_decay = True
         self.harm_emb = self.add_weight(
             shape=(self.n_harm, d_model),
             name="harm_emb",
             initializer=tf.keras.initializers.TruncatedNormal(stddev=0.02),
             trainable=True,
         )
+
+        self.harm_emb._no_weight_decay = True
         self.scale = self.add_weight(
             shape=(),
             name="scale",
             initializer=tf.keras.initializers.Constant(self.scale_init),
             trainable=self.trainable_scale,
         )
+        self.scale._no_weight_decay = True
 
         # Fixed index maps, derived directly from the stacking layout.
         t = np.arange(seq_len, dtype=np.int32)
