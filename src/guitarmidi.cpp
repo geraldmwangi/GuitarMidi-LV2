@@ -25,7 +25,7 @@
 #include <lv2/options/options.h>
 #include <lv2/buf-size/buf-size.h>
 #include <lv2/urid/urid.h>
-#include <fretboard.hpp>
+#include <guitarmidi/fretboard.hpp>
 
 #define GUITARMIDI_URI "http://github.com/geraldmwangi/GuitarMidi-LV2"
 

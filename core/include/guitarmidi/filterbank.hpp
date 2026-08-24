@@ -20,7 +20,7 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include <common.hpp>
+#include <guitarmidi/common.hpp>
 using namespace std;
 #define NUM_FILTERS     (NUM_NOTES * NUM_HARMONICS)
 #define NUM_SECTIONS    2      // = N (LP prototype order). BP order = 2*N = 4.

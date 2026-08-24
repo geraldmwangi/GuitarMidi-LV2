@@ -17,13 +17,36 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <lv2/log/logger.h>
-#include <time.h>
-#include <config.hpp>
-extern LV2_Log_Logger g_logger;
+#include <iostream>
+#include <vector>
+#include <map>
+#include <memory>
+#include <guitarmidi/common.hpp>
+using namespace std;
 
-// call this function to start a nanosecond-resolution timer
-struct timespec timer_start();
+namespace GuitarMidi
+{
 
-// call this function to end a timer, returning nanoseconds elapsed as a long
-long timer_end(struct timespec start_time);
+
+    /**
+     * The GuitarNote class represents a note on the guitar fretboard.
+     */
+    class GuitarNote
+    {
+    private:
+        vector<FilterRepresentation> m_filters;
+
+
+    public:
+   
+        GuitarNote(int note_id, float centerfreq);
+        ~GuitarNote();
+
+        // Get the filter representations for this note
+        void get_filterrepresentations(map<uint,FilterRepresentation>& filterreps){
+            for (auto f:m_filters){
+                filterreps[f.filter_id]=f;
+            }
+        }
+    };
+}

@@ -18,9 +18,9 @@
  * Boston, MA  02110-1301  USA
  */
 #include <memory>
-#include <midioutput.hpp>
-#include <common.hpp>
-#include <config.hpp>
+#include <guitarmidi/midioutput.hpp>
+#include <guitarmidi/common.hpp>
+#include <guitarmidi/config.hpp>
 #include <tensorflow/lite/version.h>
 #include "tensorflow/core/public/release_version.h"
 #include "tensorflow/core/public/version.h"
@@ -31,7 +31,7 @@
 #include "tensorflow/lite/model_builder.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 #include "tensorflow/lite/delegates/xnnpack/xnnpack_delegate.h"
-#include <modelinferencer.hpp>
+#include <guitarmidi/modelinferencer.hpp>
 using namespace std;
 using namespace tflite;
 namespace GuitarMidi{

@@ -1,4 +1,4 @@
-#include <noteinferencer.hpp>
+#include <guitarmidi/noteinferencer.hpp>
 #include <iostream>
 #include <tensorflow/lite/logger.h>
 namespace GuitarMidi

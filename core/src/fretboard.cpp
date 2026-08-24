@@ -16,7 +16,7 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <fretboard.hpp>
+#include <guitarmidi/fretboard.hpp>
 #include <omp.h>
 
 using namespace GuitarMidi;

@@ -1,4 +1,4 @@
-#include <guitarstring.hpp>
+#include <guitarmidi/guitarstring.hpp>
 
 namespace GuitarMidi
 {

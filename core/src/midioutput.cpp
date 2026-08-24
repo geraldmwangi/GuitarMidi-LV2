@@ -16,7 +16,7 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <midioutput.hpp>
+#include <guitarmidi/midioutput.hpp>
 using namespace GuitarMidi;
 MidiOutput::MidiOutput(LV2_URID_Map *map)
 {

@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301  USA
  */
 #include <vector>
-#include <guitarstring.hpp>
+#include <guitarmidi/guitarstring.hpp>
 using namespace std;
 
 namespace GuitarMidi

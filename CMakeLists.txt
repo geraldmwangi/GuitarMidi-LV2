@@ -22,7 +22,9 @@ message("Number of inference threads: ${NUM_INFERENCE_THREADS}")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
-
+set(TENSORFLOW_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ext/tensorflow")
+message("Tensorflow found at ${TENSORFLOW_SOURCE_DIR}")
+add_subdirectory(core)
 add_subdirectory(src)
 
 if(${BUILD_ANALYSIS_APP})

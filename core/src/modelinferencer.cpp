@@ -1,4 +1,4 @@
-    #include <modelinferencer.hpp>
+    #include <guitarmidi/modelinferencer.hpp>
     #include <iostream>
     #include <tensorflow/lite/logger.h>
     #include <filesystem>

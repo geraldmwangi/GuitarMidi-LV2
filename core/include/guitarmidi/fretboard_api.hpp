@@ -1,4 +1,3 @@
-#pragma once
 /* GuitarMidi-LV2 Library
  * Copyright (C) 2022 Gerald Mwangi
  *
@@ -17,30 +16,12 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <guitarnote.hpp>
-using namespace std;
+#pragma once
 
-namespace GuitarMidi
-{
-    /**
-     * The GuitarString class represents a single string on the guitar fretboard.
-     * It contains a collection of GuitarNote objects, each representing a note that can be played on that string at different fret positions.
-     */
-    class GuitarString
-    {
-        vector<GuitarNote> m_notes;
+#include <vector>
 
-    public:
-        GuitarString(map<int,int> note_freqs);
-        void get_filterrepresentations(map<uint,FilterRepresentation>& filterreps)
-        {
-        
-            for (auto note : m_notes)
-            {
-                 note.get_filterrepresentations(filterreps);
-                
-            }
-            return;
-        }
-    };
-}
+
+template <typename T>
+concept FretBoardAPI=requires(T v){
+
+};

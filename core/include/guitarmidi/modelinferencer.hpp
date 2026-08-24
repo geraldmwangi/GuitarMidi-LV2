@@ -20,7 +20,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include <common.hpp>
+#include <guitarmidi/common.hpp>
 #include <tensorflow/lite/version.h>
 #include "tensorflow/core/public/release_version.h"
 #include "tensorflow/core/public/version.h"

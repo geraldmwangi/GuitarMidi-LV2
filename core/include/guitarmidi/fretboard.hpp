@@ -18,13 +18,13 @@
  */
 #pragma once
 #include <time.h>
-#include <filterbank.hpp>
-#include <fretboardrepresentation.hpp>
+#include <guitarmidi/filterbank.hpp>
+#include <guitarmidi/fretboardrepresentation.hpp>
 #include <memory>
 #include <vector>
 #include <map>
-#include <noteinferencer.hpp>
-#include <config.hpp>
+#include <guitarmidi/noteinferencer.hpp>
+#include <guitarmidi/config.hpp>
 #include <zita-resampler/resampler.h>
 typedef enum
 {

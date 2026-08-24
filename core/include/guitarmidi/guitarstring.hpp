@@ -17,36 +17,30 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <iostream>
-#include <vector>
-#include <map>
-#include <memory>
-#include <common.hpp>
+#include <guitarmidi/guitarnote.hpp>
 using namespace std;
 
 namespace GuitarMidi
 {
-
-
     /**
-     * The GuitarNote class represents a note on the guitar fretboard.
+     * The GuitarString class represents a single string on the guitar fretboard.
+     * It contains a collection of GuitarNote objects, each representing a note that can be played on that string at different fret positions.
      */
-    class GuitarNote
+    class GuitarString
     {
-    private:
-        vector<FilterRepresentation> m_filters;
-
+        vector<GuitarNote> m_notes;
 
     public:
-   
-        GuitarNote(int note_id, float centerfreq);
-        ~GuitarNote();
-
-        // Get the filter representations for this note
-        void get_filterrepresentations(map<uint,FilterRepresentation>& filterreps){
-            for (auto f:m_filters){
-                filterreps[f.filter_id]=f;
+        GuitarString(map<int,int> note_freqs);
+        void get_filterrepresentations(map<uint,FilterRepresentation>& filterreps)
+        {
+        
+            for (auto note : m_notes)
+            {
+                 note.get_filterrepresentations(filterreps);
+                
             }
+            return;
         }
     };
 }
