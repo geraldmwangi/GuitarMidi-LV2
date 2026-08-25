@@ -54,7 +54,7 @@ class MidiOutput
 private:
 public:
     MidiOutput() {};
-    virtual ~MidiOutput() = 0;
+    virtual ~MidiOutput() {};
     virtual void initializeSequence()=0;
     virtual void finalizeSequence()=0;
     virtual void sendMidiMessage(uint8_t midinote[3], int64_t frames)=0;
@@ -72,7 +72,7 @@ public:
      * @param samplerate
      */
     FretBoardAPI() { };
-    virtual ~FretBoardAPI() = 0;
+    virtual ~FretBoardAPI() {};
 
     /**
      * @brief Set the Audio Input buffer
