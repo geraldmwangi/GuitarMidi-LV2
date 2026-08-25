@@ -20,10 +20,8 @@
 
 #include <concepts>
 #include <string>
-
 #include <lv2/atom/atom.h>
 #include <lv2/urid/urid.h>
-
 
 // template <typename T>
 // concept FretBoardAPI = requires(
@@ -53,79 +51,85 @@
 // 	{ fretboard.process(nsamples) } -> std::same_as<void>;
 
 // };
+class MidiOutput
+{
+private:
+public:
+    MidiOutput() {};
+    virtual ~MidiOutput() = 0;
+    virtual void initializeSequence();
+    virtual void finalizeSequence();
+    virtual void sendMidiMessage(uint8_t midinote[3], int64_t frames);
+};
+class FretBoardAPI
+{
+protected:
+    MidiOutput *m_midiout;
 
-class FretBoardAPI{
 public:
     /**
      * @brief Construct a new Fret Board object. Setup the bank of NoteClassifiers at the standard E A D g b e tuning of the guitar up to the 5th fret
-     * 
-     * @param map 
-     * @param samplerate 
+     *
+     * @param map
+     * @param samplerate
      */
-    FretBoardAPI(){};
-    virtual ~FretBoardAPI()=0;
-
+    FretBoardAPI(MidiOutput *midiout) { m_midiout = midiout; };
+    virtual ~FretBoardAPI() = 0;
 
     /**
      * @brief Set the Audio Input buffer
-     * 
-     * @param input 
+     *
+     * @param input
      */
-    virtual void setAudioInput(const float *input)=0;
-
-
-
-
+    virtual void setAudioInput(const float *input) = 0;
 
     /**
      * @brief Set the Midi Output buffer
-     * 
-     * @param output 
+     *
+     * @param output
      */
-    virtual void setMidiOutput(LV2_Atom_Sequence *output)=0;
+    virtual MidiOutput *getMidiOutput() { return m_midiout; };
 
+    virtual void setSmoothing(float *smoothing) = 0;
 
+    virtual void setOnsetThreshold(float *threshold) = 0;
 
-    virtual void setSmoothing(float* smoothing)=0;
+    virtual void setOffsetThreshold(float *threshold) = 0;
 
-    virtual void setOnsetThreshold(float* threshold)=0;
+    virtual void setSmoothingOffset(float *smoothing_offset) = 0;
 
-    virtual void setOffsetThreshold(float* threshold)=0;
-
-    virtual void setSmoothingOffset(float* smoothing_offset)=0;
-
-    virtual void setOnsetEnergyThreshold(float* threshold)=0;
-    virtual void setOffsetEnergyThreshold(float* threshold)=0;
-    virtual void setGain(float* gain_db)=0;
-    virtual void setExpressivity(float* expressivity_db)=0;
+    virtual void setOnsetEnergyThreshold(float *threshold) = 0;
+    virtual void setOffsetEnergyThreshold(float *threshold) = 0;
+    virtual void setGain(float *gain_db) = 0;
+    virtual void setExpressivity(float *expressivity_db) = 0;
 #ifdef WITH_AUDIO_OUTPUT
-    virtual void setAudioOutputBuffer(float *output)=0;
+    virtual void setAudioOutputBuffer(float *output) = 0;
 
-    virtual void setFilterOutputBuffer(float *output)=0;
-    virtual void setNoteSelectControl(float* note_select_buffer)=0;
-    virtual void setHarmonicSelectControl(float* harmonic_select_buffer)=0;
+    virtual void setFilterOutputBuffer(float *output) = 0;
+    virtual void setNoteSelectControl(float *note_select_buffer) = 0;
+    virtual void setHarmonicSelectControl(float *harmonic_select_buffer) = 0;
 #endif
 
     /**
      * @brief initialize the filterbank
-     * 
+     *
      */
-    virtual bool initialize(const std::string& bundle_path,int samplerate,int buffer_size)=0;
+    virtual bool initialize(const std::string &bundle_path, int samplerate, int buffer_size) = 0;
 
     /**
      * @brief finalize all filters and release allocated resources
-     * 
+     *
      */
-    virtual void finalize()=0;
+    virtual void finalize() = 0;
 
     /**
-     * @brief process audio with the filterbank and noteinferencer. The audio is processed in blocks of the size of the host buffer size. 
-     * If the samplerate of the host is different from the native samplerate of the plugin, the audio is resampled before being processed by the filterbank and noteinferencer. 
-     * The output of the noteinferencer is sent to the midi output buffer as MIDI messages. 
-     * 
-     * @param nsamples 
+     * @brief process audio with the filterbank and noteinferencer. The audio is processed in blocks of the size of the host buffer size.
+     * If the samplerate of the host is different from the native samplerate of the plugin, the audio is resampled before being processed by the filterbank and noteinferencer.
+     * The output of the noteinferencer is sent to the midi output buffer as MIDI messages.
+     *
+     * @param nsamples
      */
-    virtual void process(int nsamples)=0;
+    virtual void process(int nsamples) = 0;
 };
 
-FretBoardAPI* creatFretBoard(LV2_URID_Map*);
+FretBoardAPI *creatFretBoard();

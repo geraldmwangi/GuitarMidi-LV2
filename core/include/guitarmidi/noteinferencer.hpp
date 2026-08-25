@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301  USA
  */
 #include <memory>
-#include <guitarmidi/midioutput.hpp>
+#include <guitarmidi/fretboard_api.hpp>
 #include <guitarmidi/common.hpp>
 #include <guitarmidi/config.hpp>
 #include <tensorflow/lite/version.h>
@@ -38,7 +38,7 @@ namespace GuitarMidi{
     class NoteInferencer{
        ModelInferencer m_model;
        
-        GuitarMidi::MidiOutput m_midioutput;
+        MidiOutput* m_midioutput;
         AudioBuffer2D m_audiobuffer;
         float* m_gain_db;
         float* m_expressivity_db;
@@ -58,12 +58,14 @@ namespace GuitarMidi{
         //#endif
         bool m_note_on[NUM_NOTES]={false};
         public:
-        NoteInferencer(LV2_URID_Map *map);
+        NoteInferencer(MidiOutput *midioutput);
 
         bool initialize(const std::string& bundle_path);
         void finalize();
-        void setMidiOutput(LV2_Atom_Sequence *output);
-
+        MidiOutput* getMidiOutput()
+        {
+            return m_midioutput;
+        }
         void setAudioInputBuffer(AudioBuffer2D input);
 
         void setGain(float* gain){
@@ -96,11 +98,13 @@ namespace GuitarMidi{
         }
 
         void preprocess(){
-            m_midioutput.initializeSequence();
+            if(m_midioutput)
+                m_midioutput->initializeSequence();
         }
 
         void postprocess(){
-            m_midioutput.finalizeSequence();
+            if(m_midioutput)
+                m_midioutput->finalizeSequence();
         }
         void process(int nsamples);
 

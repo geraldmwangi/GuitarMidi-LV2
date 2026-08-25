@@ -62,11 +62,9 @@ private:
 public:
     /**
      * @brief Construct a new Fret Board object. Setup the bank of NoteClassifiers at the standard E A D g b e tuning of the guitar up to the 5th fret
-     * 
-     * @param map 
-     * @param samplerate 
+
      */
-    FretBoard(LV2_URID_Map *map);
+    FretBoard();
     virtual ~FretBoard(){
 
         if(m_resampled_buffer){
