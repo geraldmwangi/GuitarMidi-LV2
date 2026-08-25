@@ -25,7 +25,29 @@
 #include <lv2/options/options.h>
 #include <lv2/buf-size/buf-size.h>
 #include <lv2/urid/urid.h>
-#include <guitarmidi/fretboard.hpp>
+#include <lv2/log/logger.h>
+#include <guitarmidi/common.hpp>
+#include <string>
+#include <cstring>
+#include <guitarmidi/fretboard_api.hpp>
+
+typedef enum
+{
+    FRETBOARD_INPUT = 0,
+    FRETBOARD_MIDIOUTPUT=1,
+    FRETBOARD_INPUT_GAIN=2,
+    FRETBOARD_EXPRESSIVITY=3,
+    FRETBOARD_SMOOTHING=4,
+    FRETBOARD_SMOOTHING_OFFSET=5,
+    FRETBOARD_ONSET_THRESHOLD=6,
+    FRETBOARD_OFFSET_THRESHOLD=7,
+    FRETBOARD_ONSET_ENERGY_THRESHOLD=8,
+    FRETBOARD_OFFSET_ENERGY_THRESHOLD=9,
+    FRETBOARD_AUDIO_OUTPUT=10,
+    FRETBOARD_NOTE_SELECT=11,
+    FRETBOARD_HARMONIC_SELECT=12,
+    FRETBOARD_FILTER_OUTPUT=13
+} PortIndex;
 
 #define GUITARMIDI_URI "http://github.com/geraldmwangi/GuitarMidi-LV2"
 
@@ -97,10 +119,10 @@ instantiate(const LV2_Descriptor *descriptor,
 
 		}}
 	
-	FretBoard *fretboard = new FretBoard(map);
+	FretBoardAPI *fretboard = creatFretBoard(map);
 	if (!fretboard->initialize(std::string(bundle_path),rate,buffer_size))
 	{
-		lv2_log_error(&g_logger, "Failed to initialize FretBoard\n");
+		lv2_log_error(&g_logger, "Failed to initialize FretBoardAPI\n");
 		delete fretboard;
 		return NULL;
 	}
@@ -112,7 +134,7 @@ connect_port(LV2_Handle instance,
 			 uint32_t port,
 			 void *data)
 {
-	FretBoard *fretboard = (FretBoard *)instance;
+	FretBoardAPI *fretboard = (FretBoardAPI *)instance;
 
 	switch ((PortIndex)port)
 	{
@@ -174,7 +196,7 @@ static void
 activate(LV2_Handle instance)
 {
 	lv2_log_note(&g_logger, "Activating GuitarMidi-LV2 Plugin\n");
-	// FretBoard *notecl = (FretBoard *)instance;
+	// FretBoardAPI *notecl = (FretBoardAPI *)instance;
 }
 
 
@@ -186,7 +208,7 @@ run(LV2_Handle instance, uint32_t n_samples)
 #ifdef WITH_TRACING_INFO
 	timespec start = timer_start();
 #endif
-	FretBoard *notecl = (FretBoard *)instance;
+	FretBoardAPI *notecl = (FretBoardAPI *)instance;
 	notecl->process(n_samples);
 #ifdef WITH_TRACING_INFO
 	auto delay = timer_end(start);
@@ -198,7 +220,7 @@ static void
 deactivate(LV2_Handle instance)
 {
 	lv2_log_note(&g_logger, "Deactivating GuitarMidi-LV2 Plugin\n");
-	FretBoard *notecl = (FretBoard *)instance;
+	FretBoardAPI *notecl = (FretBoardAPI *)instance;
 	notecl->finalize();
 }
 
@@ -206,7 +228,7 @@ static void
 cleanup(LV2_Handle instance)
 {
 	lv2_log_note(&g_logger, "Cleaning up GuitarMidi-LV2 Plugin\n");
-	FretBoard *notecl = (FretBoard *)instance;
+	FretBoardAPI *notecl = (FretBoardAPI *)instance;
 	delete notecl;
 }
 

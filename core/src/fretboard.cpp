@@ -21,6 +21,9 @@
 
 using namespace GuitarMidi;
 
+FretBoardAPI* creatFretBoard(LV2_URID_Map* map){
+    return new FretBoard(map);
+}
 FretBoard::FretBoard(LV2_URID_Map *map) : m_noteinferencer(map)
 {
 
