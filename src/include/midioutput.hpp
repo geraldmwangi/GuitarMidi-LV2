@@ -31,12 +31,13 @@
 #include <lv2/atom/atom.h>
 #include <lv2/atom/forge.h>
 #include <guitarmidi/logging.hpp>
+#include <guitarmidi/fretboard_api.hpp>
 /**
  * @brief MidiOutput abstracts lv2's midi messaging. It needs some debugging
  * 
  */
 namespace GuitarMidi {
-    class MidiOutput
+    class MidiOutputLV2:public MidiOutput
     {
     private:
         /* atom-forge and URI mapping */
@@ -51,10 +52,10 @@ namespace GuitarMidi {
             uint32_t size, int64_t frames);
 
     public:
-        MidiOutput(LV2_URID_Map *map);
+        MidiOutputLV2(LV2_URID_Map *map);
         void setMidiOutput(LV2_Atom_Sequence *output);
-        void initializeSequence();
-        void finalizeSequence();
-        void sendMidiMessage(uint8_t midinote[3], int64_t frames);
+        virtual void initializeSequence();
+        virtual void finalizeSequence();
+        virtual void sendMidiMessage(uint8_t midinote[3], int64_t frames);
     };
 }

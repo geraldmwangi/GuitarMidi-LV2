@@ -18,10 +18,8 @@
  */
 #pragma once
 
-#include <concepts>
+
 #include <string>
-#include <lv2/atom/atom.h>
-#include <lv2/urid/urid.h>
 
 // template <typename T>
 // concept FretBoardAPI = requires(
@@ -57,14 +55,14 @@ private:
 public:
     MidiOutput() {};
     virtual ~MidiOutput() = 0;
-    virtual void initializeSequence();
-    virtual void finalizeSequence();
-    virtual void sendMidiMessage(uint8_t midinote[3], int64_t frames);
+    virtual void initializeSequence()=0;
+    virtual void finalizeSequence()=0;
+    virtual void sendMidiMessage(uint8_t midinote[3], int64_t frames)=0;
 };
 class FretBoardAPI
 {
-protected:
-    MidiOutput *m_midiout;
+
+  
 
 public:
     /**
@@ -73,7 +71,7 @@ public:
      * @param map
      * @param samplerate
      */
-    FretBoardAPI(MidiOutput *midiout) { m_midiout = midiout; };
+    FretBoardAPI() { };
     virtual ~FretBoardAPI() = 0;
 
     /**
@@ -88,7 +86,7 @@ public:
      *
      * @param output
      */
-    virtual MidiOutput *getMidiOutput() { return m_midiout; };
+    virtual MidiOutput *getMidiOutput() =0;
 
     virtual void setSmoothing(float *smoothing) = 0;
 
@@ -132,4 +130,4 @@ public:
     virtual void process(int nsamples) = 0;
 };
 
-FretBoardAPI *creatFretBoard();
+FretBoardAPI *creatFretBoard(MidiOutput*);

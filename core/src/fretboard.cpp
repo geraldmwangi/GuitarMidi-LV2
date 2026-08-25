@@ -21,10 +21,10 @@
 
 using namespace GuitarMidi;
 
-FretBoardAPI* creatFretBoard(){
-    return new FretBoard(map);
+FretBoardAPI* creatFretBoard(MidiOutput* midioutput){
+    return new FretBoard(midioutput);
 }
-FretBoard::FretBoard() : m_noteinferencer(0)
+FretBoard::FretBoard(MidiOutput* midioutput) : m_noteinferencer(midioutput)
 {
 
 
@@ -43,20 +43,7 @@ void FretBoard::setAudioInput(const float *input)
     }
 }
 
-void FretBoard::setMidiOutput(LV2_Atom_Sequence *output)
-{
-    m_noteinferencer.setMidiOutput(output);
-    // if (m_midioutput)
-    // {
-    //     m_midioutput->setMidiOutput(output);
-    //     m_midioutput->initializeSequence();
 
-    //     // for (auto notecl : m_noteClassifiers)
-    //     // {
-    //     //     notecl->setMidiOutput(m_midioutput);
-    //     // }
-    // }
-}
 bool FretBoard::initialize(const std::string &bundle_path, int samplerate, int buffer_size)
 {
     lv2_log_note(&g_logger, "Initializing FretBoard with samplerate %d and buffer size %d ", samplerate, buffer_size);

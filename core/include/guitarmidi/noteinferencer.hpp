@@ -38,7 +38,7 @@ namespace GuitarMidi{
     class NoteInferencer{
        ModelInferencer m_model;
        
-        MidiOutput* m_midioutput;
+        MidiOutput* m_midioutput=nullptr;
         AudioBuffer2D m_audiobuffer;
         float* m_gain_db;
         float* m_expressivity_db;
@@ -59,6 +59,10 @@ namespace GuitarMidi{
         bool m_note_on[NUM_NOTES]={false};
         public:
         NoteInferencer(MidiOutput *midioutput);
+        ~NoteInferencer(){
+            if(m_midioutput)
+                delete m_midioutput;
+        }
 
         bool initialize(const std::string& bundle_path);
         void finalize();

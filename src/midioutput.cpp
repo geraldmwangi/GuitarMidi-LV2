@@ -16,9 +16,9 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <guitarmidi/midioutput.hpp>
+#include <midioutput.hpp>
 using namespace GuitarMidi;
-MidiOutput::MidiOutput(LV2_URID_Map *map)
+MidiOutputLV2::MidiOutputLV2(LV2_URID_Map *map)
 {
     if(map)
     {
@@ -29,7 +29,7 @@ MidiOutput::MidiOutput(LV2_URID_Map *map)
     m_midioutput=0;
 }
 
-bool MidiOutput::forge_midimessage(const uint8_t *const buffer,
+bool MidiOutputLV2::forge_midimessage(const uint8_t *const buffer,
                                    uint32_t size, int64_t frames)
 {
     LV2_Atom midiatom;
@@ -60,7 +60,7 @@ bool MidiOutput::forge_midimessage(const uint8_t *const buffer,
     return true;
 }
 
-void MidiOutput::setMidiOutput(LV2_Atom_Sequence *output)
+void MidiOutputLV2::setMidiOutput(LV2_Atom_Sequence *output)
 {
     m_midioutput = output;
     // if (m_midioutput)
@@ -71,7 +71,7 @@ void MidiOutput::setMidiOutput(LV2_Atom_Sequence *output)
     // }
 }
 
-void MidiOutput::initializeSequence()
+void MidiOutputLV2::initializeSequence()
 {
     if (m_midioutput)
     {
@@ -81,14 +81,14 @@ void MidiOutput::initializeSequence()
       
     }
 }
-void MidiOutput::finalizeSequence()
+void MidiOutputLV2::finalizeSequence()
 {
     if (m_midioutput)
     {
         lv2_atom_forge_pop(&m_forge, &m_frame);
     }
 }
-void MidiOutput::sendMidiMessage(uint8_t midinote[3], int64_t frames)
+void MidiOutputLV2::sendMidiMessage(uint8_t midinote[3], int64_t frames)
 {
 
     bool messagesent = false;

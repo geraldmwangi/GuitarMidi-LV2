@@ -62,7 +62,7 @@ add_subdirectory(
 
 
 
-set(SRC   src/midioutput.cpp src/fretboard.cpp src/fretboardrepresentation.cpp src/guitarnote.cpp src/logging.cpp src/filterbank.cpp src/guitarstring.cpp src/noteinferencer.cpp src/modelinferencer.cpp)
+set(SRC    src/fretboard.cpp src/fretboardrepresentation.cpp src/guitarnote.cpp src/logging.cpp src/filterbank.cpp src/guitarstring.cpp src/noteinferencer.cpp src/modelinferencer.cpp)
 
 add_library(guitarmidi_core STATIC ${SRC})
 
