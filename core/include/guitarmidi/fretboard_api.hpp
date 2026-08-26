@@ -67,6 +67,8 @@ public:
     /** Sends a three-byte MIDI message at the specified audio frame. */
     virtual void sendMidiMessage(uint8_t midinote[3], int64_t frames)=0;
 };
+
+
 /**
  * Interface for configuring and processing the guitar fretboard audio pipeline.
  */

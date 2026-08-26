@@ -1,5 +1,5 @@
 #include <guitarmidi/logging.hpp>
-LV2_Log_Logger g_logger;
+LoggerSingleton g_logger;
 // call this function to start a nanosecond-resolution timer
 struct timespec timer_start(){
     struct timespec start_time;

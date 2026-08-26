@@ -40,10 +40,12 @@
     {
                 // Load model
             std::string tflite_path = bundle_path + "/guitarmidi.tflite"; 
-            lv2_log_note(&g_logger, "Loading model from: %s\n", tflite_path.c_str());
+            //lv2_log_note(&g_logger, "Loading model from: %s\n", tflite_path.c_str());
+            g_logger.info("Loading model from: %s\n");
             // check if file exists
             if (!std::filesystem::exists(tflite_path)) {
-                lv2_log_error(&g_logger, "Model file not found: %s\n", tflite_path.c_str());
+                //lv2_log_error(&g_logger, "Model file not found: %s\n", tflite_path.c_str());
+                g_logger.error("Model file not found: %s\n");
                 return false;
             }
             m_model = FlatBufferModel::BuildFromFile(tflite_path.c_str());
@@ -63,7 +65,8 @@
                     TfLiteXNNPackDelegateCreate(&xnnpack_options)) != kTfLiteOk)
             {
                 // Handle error, but usually optional
-                lv2_log_error(&g_logger, "Failed to apply XNNPack delegate\n");
+                //lv2_log_error(&g_logger, "Failed to apply XNNPack delegate\n"); 
+                g_logger.error( "Failed to apply XNNPack delegate\n");
                 return false;
             }
             // Allocate tensor buffers.
@@ -71,10 +74,13 @@
             printf("=== Pre-invoke Interpreter State ===\n");
             // tflite::PrintInterpreterState(m_interpreter.get());
             tflite::LoggerOptions::SetMinimumLogSeverity(tflite::TFLITE_LOG_ERROR);
-            lv2_log_note(&g_logger, "Model loaded and interpreter initialized successfully.\n");
+            //lv2_log_note(&g_logger, "Model loaded and interpreter initialized successfully.\n");
+            g_logger.info("Model loaded and interpreter initialized successfully.\n");
             //log the ring buffer and inference thread info
-            lv2_log_note(&g_logger, "Inference thread count: %d\n", NUM_INFERENCE_THREADS);
-            lv2_log_note(&g_logger, "Ring buffer size: %d frames\n", RING_BUFFER_SIZE);
+            //lv2_log_note(&g_logger, "Inference thread count: %d\n", NUM_INFERENCE_THREADS);
+            g_logger.info("Inference thread count: %d\n");
+            // lv2_log_note(&g_logger, "Ring buffer size: %d frames\n", RING_BUFFER_SIZE);
+            g_logger.info("Ring buffer size: %d frames\n");
             return true;
     }
 
@@ -85,8 +91,10 @@
         m_interpreter=nullptr;
         inferencing_thread = std::thread(&ModelInferencer::inferencing_loop, this);
         //log the size of the ring buffers
-        lv2_log_note(&g_logger, "Audio input ring buffer size: %d frames\n", RING_BUFFER_SIZE);
-        lv2_log_note(&g_logger, "Model output ring buffer size: %d frames\n", RING_BUFFER_SIZE);
+        //lv2_log_note(&g_logger, "Audio input ring buffer size: %d frames\n", RING_BUFFER_SIZE);
+        g_logger.info("Audio input ring buffer size: %d frames\n");
+        // lv2_log_note(&g_logger, "Model output ring buffer size: %d frames\n", RING_BUFFER_SIZE);
+        g_logger.info("Model output ring buffer size: %d frames\n");
     }
 
     GuitarMidi::ModelInferencer::~ModelInferencer()

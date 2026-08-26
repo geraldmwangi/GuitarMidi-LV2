@@ -17,11 +17,36 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <lv2/log/logger.h>
+
 #include <time.h>
 #include <guitarmidi/config.hpp>
-extern LV2_Log_Logger g_logger;
+#include <string>
+class LoggingAPI{
+    public:
+    virtual void info(std::string info_message)=0;
+    virtual void error(std::string error_message)=0;
+    virtual void warn(std::string warn_message)=0;
+};
+class LoggerSingleton{
+    private:
+    LoggingAPI* m_logger=0;
+    public:
+    void info(std::string info_message){
+        if(m_logger)
+            m_logger->info(info_message);
+    }
+    void error(std::string error_message){
+        if(m_logger)
+            m_logger->error(error_message);
+    }
+    void warn(std::string warn_message){
+        if(m_logger)
+            m_logger->warn(warn_message);
+    }
 
+};
+
+extern LoggerSingleton g_logger;
 // call this function to start a nanosecond-resolution timer
 struct timespec timer_start();
 
