@@ -49,9 +49,11 @@ namespace GuitarMidi{
         atomic<size_t> write_index;
         atomic<size_t> read_index;
     public:
+        /** Creates an empty single-producer, single-consumer ring buffer. */
         SpscRingBuffer():write_index(0),read_index(0){
            
         }
+        /** Adds one fixed-size frame to the ring buffer. */
         void add_data(const float* data){
             size_t index=write_index.load();
             //performant memcpy for fixed size data
@@ -60,14 +62,17 @@ namespace GuitarMidi{
 
 
     }
+        /** Reports whether unread data is available. */
         bool has_new_data() const{
             return write_index.load()!=read_index.load();
         }
+        /** Copies the next unread frame into the supplied buffer. */
         void get_latest_data(float* output){
             size_t index=read_index.load();
             memcpy(output,buffer[index&(NumSlots-1)],Stride*sizeof(float));
             read_index.store((index+1)); // wrap around using bitwise AND, NumSlots must be a power of 2
         }
+        /** Returns the next unread frame, or nullptr when none is available. */
         float* get_latest_data(){
             if(!has_new_data()){
                 return nullptr;
@@ -94,13 +99,19 @@ class ModelInferencer {
         SpscRingBuffer<RING_BUFFER_SIZE, NUM_NOTES> model_output_buffer;
         std::thread inferencing_thread;
         bool stop_thread;
+        /** Runs model inference on frames received by the input ring buffer. */
         void inferencing_loop();
         
     public:
+        /** Creates the model inferencer. */
         ModelInferencer();
+        /** Stops inference and releases model resources. */
         ~ModelInferencer();
+        /** Loads and initializes the model from the plugin bundle. */
         bool initialize(const std::string& bundle_path);
+        /** Queues audio frames for asynchronous inference. */
         void add_audio_input(const float* input, int num_frames);
+        /** Retrieves inferred note activations for a block of frames. */
         bool get_model_output(float* output, int num_frames);
 };
 } // namespace GuitarMidi

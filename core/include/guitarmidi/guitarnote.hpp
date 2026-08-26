@@ -38,11 +38,12 @@ namespace GuitarMidi
 
 
     public:
-   
+        /** Creates a note and its harmonic filter representations. */
         GuitarNote(int note_id, float centerfreq);
+        /** Releases the note resources. */
         ~GuitarNote();
 
-        // Get the filter representations for this note
+        /** Adds this note's filter representations to the supplied map. */
         void get_filterrepresentations(map<uint,FilterRepresentation>& filterreps){
             for (auto f:m_filters){
                 filterreps[f.filter_id]=f;

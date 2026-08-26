@@ -62,6 +62,7 @@ namespace GuitarMidi{
             float* m_harmonic_select;
             #endif
             public:
+            /** Allocates and initializes the filter-bank output buffer. */
             FilterBank(){
                 // Allocate the 2D audio buffer (num_filters x window_size)
                 m_filterbankbuffer.num_filters = NUM_FILTERS;
@@ -69,15 +70,19 @@ namespace GuitarMidi{
                 m_filterbankbuffer.audio_buffer_2D = new float[NUM_FILTERS * m_filterbankbuffer.window_size];
                 m_current_buffer_offset = 0;
             };
+            /** Releases the filter-bank output buffer. */
             ~FilterBank(){
                 // Free the 2D audio buffer
                 delete[] m_filterbankbuffer.audio_buffer_2D;
             };
 
+            /** Configures filter coefficients for the requested fretboard representation. */
             void setup(map<uint,FilterRepresentation> filterreps,int samplerate,int hostbuffer_size);
+            /** Sets the filter-bank gain control. */
             void setGain(float* gain_db){
                 m_gain_db = gain_db;
             }
+            /** Sets the audio input buffer to process. */
             void setInput(const float *input)
             {
                 m_input = const_cast<float *>(input);
@@ -87,21 +92,27 @@ namespace GuitarMidi{
                 
             }
 
+            /** Processes a block of audio through all filters. */
             void process(int nsamples);
 
+            /** Returns the filter-bank output buffer. */
             AudioBuffer2D get_buffer(){
                 return m_filterbankbuffer;
             }
 
+            /** Resets filter state and processing offsets. */
             void reset();
 #ifdef WITH_AUDIO_OUTPUT
+            /** Sets the optional filter output buffer. */
             void setAudioOutputBuffer(float *output)
             {
                 m_filter_output_buffer = output;
             }
+            /** Sets the optional note-selection control buffer. */
             void setNoteSelectControl(float* note_select_buffer){
                 m_note_select = note_select_buffer;
             }
+            /** Sets the optional harmonic-selection control buffer. */
             void setHarmonicSelectControl(float* harmonic_select_buffer){
                 m_harmonic_select = harmonic_select_buffer;
             }

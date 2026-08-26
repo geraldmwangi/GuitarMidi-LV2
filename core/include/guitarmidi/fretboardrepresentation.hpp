@@ -33,8 +33,10 @@ namespace GuitarMidi
         vector<GuitarString> m_strings;
 
         public:
+        /** Creates the standard guitar tuning and fret mapping. */
         FretBoardRepresentation();
 
+        /** Collects filter representations for all strings and frets. */
         map<uint,FilterRepresentation> get_filterrepresentations(){
             map<uint,FilterRepresentation> res;
             for (auto f: m_strings)

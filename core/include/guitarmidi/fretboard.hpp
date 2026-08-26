@@ -56,7 +56,9 @@ private:
     int m_resample_buffer_size=0;
     float* m_resampled_buffer=nullptr;
 
+    /** Processes an audio block after sample-rate conversion. */
     void process_resampled(int nsamples);
+    /** Processes an audio block at the native sample rate. */
     void process_direct(int nsamples);
 
 public:
@@ -65,6 +67,7 @@ public:
 
      */
     FretBoard(MidiOutput*);
+    /** Releases resampling buffers and fretboard resources. */
     virtual ~FretBoard(){
 
         if(m_resampled_buffer){
@@ -84,54 +87,67 @@ public:
 
 
 
+    /** Returns the MIDI output used by note inference. */
     MidiOutput* getMidiOutput(){
         return m_noteinferencer.getMidiOutput();
     }
 
 
 
+    /** Sets the smoothing control. */
     virtual void setSmoothing(float* smoothing){
         m_noteinferencer.setSmoothing(smoothing);
     }
 
+    /** Sets the note-on threshold control. */
     virtual void setOnsetThreshold(float* threshold){
         m_noteinferencer.setOnsetThreshold(threshold);
     }
 
+    /** Sets the note-off threshold control. */
     virtual void setOffsetThreshold(float* threshold){
         m_noteinferencer.setOffsetThreshold(threshold);
     }
 
+    /** Sets the smoothing time used for note-off detection. */
     virtual void setSmoothingOffset(float* smoothing_offset){
         m_noteinferencer.setSmoothingOffset(smoothing_offset);
     } 
 
+    /** Sets the note-on energy threshold control. */
     virtual void setOnsetEnergyThreshold(float* threshold){
         m_noteinferencer.setOnsetEnergyThreshold(threshold);
     }
+    /** Sets the note-off energy threshold control. */
     virtual void setOffsetEnergyThreshold(float* threshold){
         m_noteinferencer.setOffsetEnergyThreshold(threshold);
     }  
+    /** Sets the filter and inference gain control. */
     virtual void setGain(float* gain_db){
         m_filterbank.setGain(gain_db);
         m_noteinferencer.setGain(gain_db);
     }
+    /** Sets the MIDI expressivity control. */
     virtual void setExpressivity(float* expressivity_db){
         m_noteinferencer.setExpressivity(expressivity_db);
     }
 #ifdef WITH_AUDIO_OUTPUT
+    /** Sets the optional audio output buffer. */
     virtual void setAudioOutputBuffer(float *output)
     {
         m_noteinferencer.setAudioOutputBuffer(output);
     }
 
+    /** Sets the optional filter output buffer. */
     virtual void setFilterOutputBuffer(float *output)
     {
         m_filterbank.setAudioOutputBuffer(output);
     }
+    /** Sets the optional note-selection control buffer. */
     virtual void setNoteSelectControl(float* note_select_buffer){
         m_filterbank.setNoteSelectControl(note_select_buffer);
     }
+    /** Sets the optional harmonic-selection control buffer. */
     virtual void setHarmonicSelectControl(float* harmonic_select_buffer){
         m_filterbank.setHarmonicSelectControl(harmonic_select_buffer);
     }
