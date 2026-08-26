@@ -31,6 +31,7 @@
 #include <cstring>
 #include <guitarmidi/fretboard_api.hpp>
 #include <midioutput.hpp>
+#include <lv2logger.hpp>
 
 typedef enum
 {
@@ -94,6 +95,9 @@ instantiate(const LV2_Descriptor *descriptor,
 		}
 	}
 	//lv2_log_logger_init(&g_logger, map, log);
+	LV2Logger* lv2logger=new LV2Logger(map,log);
+	g_logger.setLogger(lv2logger);
+
 	if (!map)
 	{
 		//lv2_log_error(&g_logger, "Host does not support urid:map\n");
@@ -120,7 +124,7 @@ instantiate(const LV2_Descriptor *descriptor,
 			{
 				buffer_size = *((uint32_t *)options[o].value);
 				//lv2_log_note(&g_logger, "Buffer size: %d\n", buffer_size);
-				g_logger.info("Buffer size: %d\n");
+				g_logger.info("Buffer size: %d\n", buffer_size);
 			}
 		}
 	}

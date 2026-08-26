@@ -21,29 +21,53 @@
 #include <time.h>
 #include <guitarmidi/config.hpp>
 #include <string>
-class LoggingAPI{
-    public:
-    virtual void info(std::string info_message)=0;
-    virtual void error(std::string error_message)=0;
-    virtual void warn(std::string warn_message)=0;
+#include <stdarg.h>
+class LoggingAPI
+{
+public:
+    virtual void info(std::string info_message, ...) = 0;
+    virtual void error(std::string error_message, ...) = 0;
+    virtual void warn(std::string warn_message, ...) = 0;
 };
-class LoggerSingleton{
-    private:
-    LoggingAPI* m_logger=0;
-    public:
-    void info(std::string info_message){
+class LoggerSingleton
+{
+private:
+    LoggingAPI *m_logger = 0;
+
+public:
+
+    ~LoggerSingleton(){
         if(m_logger)
-            m_logger->info(info_message);
+            delete m_logger;
     }
-    void error(std::string error_message){
-        if(m_logger)
-            m_logger->error(error_message);
+    void info(std::string info_message, ...)
+    {
+        va_list args;
+        va_start(args, info_message);
+        if (m_logger)
+            m_logger->info(info_message, args);
+        va_end(args);
     }
-    void warn(std::string warn_message){
-        if(m_logger)
-            m_logger->warn(warn_message);
+    void error(std::string error_message, ...)
+    {
+        va_list args;
+        va_start(args, error_message);
+        if (m_logger)
+            m_logger->error(error_message,args);
+        va_end(args);
+    }
+    void warn(std::string warn_message, ...)
+    {
+        va_list args;
+        va_start(args, warn_message);
+        if (m_logger)
+            m_logger->warn(warn_message,args);
+        va_end(args);
     }
 
+    void setLogger(LoggingAPI* logger){
+        m_logger=logger;
+    }
 };
 
 extern LoggerSingleton g_logger;

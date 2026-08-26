@@ -20,7 +20,7 @@ message("Found zita-resampler library: ${ZITA_RESAMPLER_LIB}")
 
 
 
-set(SRC guitarmidi.cpp midioutput.cpp )
+set(SRC guitarmidi.cpp midioutput.cpp lv2logger.cpp )
 
 add_library(guitarmidi SHARED ${SRC})
 
