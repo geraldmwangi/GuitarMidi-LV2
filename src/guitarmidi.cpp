@@ -118,7 +118,7 @@ instantiate(const LV2_Descriptor *descriptor,
 			{
 				rate = *((double *)options[o].value);
 				//lv2_log_note(&g_logger, "Sample rate: %f\n", rate);
-				g_logger.info( "Sample rate: %f\n");
+				g_logger.info( "Sample rate: %f\n", rate);
 			}
 			else if (options[o].key == urids.buffersize)
 			{
@@ -252,7 +252,7 @@ static const void *
 extension_data(const char *uri)
 {
 	// lv2_log_note(&g_logger, "Extension data requested for URI: %s\n", uri);
-	g_logger.info("Extension data requested for URI: %s\n");
+	g_logger.info("Extension data requested for URI: %s\n", uri);
 	return NULL;
 }
 

@@ -29,7 +29,7 @@ class LV2Logger: public LoggingAPI{
     LV2_Log_Logger m_logger;
     public: 
     LV2Logger(LV2_URID_Map *,LV2_Log_Log *);
-        virtual void info(std::string info_message,...);
-    virtual void error(std::string error_message,...);
-    virtual void warn(std::string warn_message,...);
+        virtual void info(std::string info_message, va_list args);
+    virtual void error(std::string error_message, va_list args);
+    virtual void warn(std::string warn_message, va_list args);
 };

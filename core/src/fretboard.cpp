@@ -47,12 +47,12 @@ void FretBoard::setAudioInput(const float *input)
 bool FretBoard::initialize(const std::string &bundle_path, int samplerate, int buffer_size)
 {
     //lv2_log_note(&g_logger, "Initializing FretBoard with samplerate %d and buffer size %d ", samplerate, buffer_size);
-    g_logger.info("Initializing FretBoard with samplerate %d and buffer size %d ");
+    g_logger.info("Initializing FretBoard with samplerate %d and buffer size %d ", samplerate, buffer_size);
     // check if the samplerate of the host is different from the native samplerate of the plugin, if so, setup the resampler
     if (samplerate != NATIVE_SAMPLERATE)
     {
         //lv2_log_note(&g_logger, "Host samplerate %d is different from plugin samplerate %d, resampling will be performed", samplerate, NATIVE_SAMPLERATE);
-        g_logger.info("Host samplerate  %d is different from plugin samplerate %d, resampling will be performed");
+        g_logger.info("Host samplerate  %d is different from plugin samplerate %d, resampling will be performed", samplerate, NATIVE_SAMPLERATE);
         m_resample_buffer_size = buffer_size;
         m_resampled_buffer = new float[m_resample_buffer_size];
         if (m_resampler.setup(samplerate, NATIVE_SAMPLERATE, 1, 16))

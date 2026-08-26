@@ -25,9 +25,9 @@
 class LoggingAPI
 {
 public:
-    virtual void info(std::string info_message, ...) = 0;
-    virtual void error(std::string error_message, ...) = 0;
-    virtual void warn(std::string warn_message, ...) = 0;
+    virtual void info(std::string info_message, va_list args) = 0;
+    virtual void error(std::string error_message, va_list args) = 0;
+    virtual void warn(std::string warn_message, va_list args) = 0;
 };
 class LoggerSingleton
 {
@@ -53,7 +53,7 @@ public:
         va_list args;
         va_start(args, error_message);
         if (m_logger)
-            m_logger->error(error_message,args);
+            m_logger->error(error_message, args);
         va_end(args);
     }
     void warn(std::string warn_message, ...)
@@ -61,7 +61,7 @@ public:
         va_list args;
         va_start(args, warn_message);
         if (m_logger)
-            m_logger->warn(warn_message,args);
+            m_logger->warn(warn_message, args);
         va_end(args);
     }
 
