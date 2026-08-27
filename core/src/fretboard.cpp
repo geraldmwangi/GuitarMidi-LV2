@@ -21,10 +21,10 @@
 
 using namespace GuitarMidi;
 
-FretBoardAPI* creatFretBoard(MidiOutput* midioutput){
+FretBoardAPI* creatFretBoard(GuitarMidiOutput* midioutput){
     return new FretBoard(midioutput);
 }
-FretBoard::FretBoard(MidiOutput* midioutput) : m_noteinferencer(midioutput)
+FretBoard::FretBoard(GuitarMidiOutput* midioutput) : m_noteinferencer(midioutput)
 {
 
 

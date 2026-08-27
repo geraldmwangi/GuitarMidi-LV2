@@ -66,7 +66,7 @@ public:
      * @brief Construct a new Fret Board object. Setup the bank of NoteClassifiers at the standard E A D g b e tuning of the guitar up to the 5th fret
 
      */
-    FretBoard(MidiOutput*);
+    FretBoard(GuitarMidiOutput*);
     /** Releases resampling buffers and fretboard resources. */
     virtual ~FretBoard(){
 
@@ -88,7 +88,7 @@ public:
 
 
     /** Returns the MIDI output used by note inference. */
-    MidiOutput* getMidiOutput(){
+    GuitarMidiOutput* getMidiOutput(){
         return m_noteinferencer.getMidiOutput();
     }
 

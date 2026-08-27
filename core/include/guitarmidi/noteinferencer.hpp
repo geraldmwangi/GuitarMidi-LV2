@@ -41,7 +41,7 @@ namespace GuitarMidi{
     class NoteInferencer{
        ModelInferencer m_model;
        
-        MidiOutput* m_midioutput=nullptr;
+        GuitarMidiOutput* m_midioutput=nullptr;
         AudioBuffer2D m_audiobuffer;
         float* m_gain_db;
         float* m_expressivity_db;
@@ -62,7 +62,7 @@ namespace GuitarMidi{
         bool m_note_on[NUM_NOTES]={false};
         public:
         /** Creates a note inferencer connected to the supplied MIDI output. */
-        NoteInferencer(MidiOutput *midioutput);
+        NoteInferencer(GuitarMidiOutput *midioutput);
         /** Releases the MIDI output owned by the inferencer. */
         ~NoteInferencer(){
             if(m_midioutput)
@@ -74,7 +74,7 @@ namespace GuitarMidi{
         /** Finalizes model inference and releases inference resources. */
         void finalize();
         /** Returns the MIDI output used for inferred notes. */
-        MidiOutput* getMidiOutput()
+        GuitarMidiOutput* getMidiOutput()
         {
             return m_midioutput;
         }

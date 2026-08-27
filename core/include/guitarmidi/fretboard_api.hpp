@@ -24,14 +24,14 @@
 /**
  * Interface for writing MIDI events produced by the fretboard processor.
  */
-class MidiOutput
+class GuitarMidiOutput
 {
 private:
 public:
     /** Creates a MIDI output adapter. */
-    MidiOutput() {};
+    GuitarMidiOutput() {};
     /** Releases the MIDI output adapter. */
-    virtual ~MidiOutput() {};
+    virtual ~GuitarMidiOutput() {};
     /** Starts a MIDI event sequence. */
     virtual void initializeSequence()=0;
     /** Completes a MIDI event sequence. */
@@ -74,7 +74,7 @@ public:
      * @param output
      */
     /** Returns the MIDI output used by the processor. */
-    virtual MidiOutput *getMidiOutput() =0;
+    virtual GuitarMidiOutput *getMidiOutput() =0;
 
     /** Sets the smoothing control. */
     virtual void setSmoothing(float *smoothing) = 0;
@@ -130,4 +130,4 @@ public:
     virtual void process(int nsamples) = 0;
 };
 
-FretBoardAPI *creatFretBoard(MidiOutput*);
+FretBoardAPI *creatFretBoard(GuitarMidiOutput*);

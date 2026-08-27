@@ -18,7 +18,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
 include_directories(/usr/include)
 include_directories(include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 find_package(PkgConfig REQUIRED)
 find_library(ZITA_RESAMPLER_LIB zita-resampler)
 message("Found zita-resampler library: ${ZITA_RESAMPLER_LIB}")

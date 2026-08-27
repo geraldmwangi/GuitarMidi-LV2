@@ -37,7 +37,7 @@
  * 
  */
 namespace GuitarMidi {
-    class MidiOutputLV2:public MidiOutput
+    class MidiOutputLV2:public GuitarMidiOutput
     {
     private:
         /* atom-forge and URI mapping */

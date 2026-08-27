@@ -12,7 +12,7 @@ namespace GuitarMidi
         exit(1);                                                 \
     }
 
-    NoteInferencer::NoteInferencer(MidiOutput *midioutput) : m_midioutput(midioutput)
+    NoteInferencer::NoteInferencer(GuitarMidiOutput *midioutput) : m_midioutput(midioutput)
     {
     }
     bool NoteInferencer::initialize(const std::string &bundle_path)
