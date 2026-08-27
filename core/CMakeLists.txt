@@ -1,3 +1,16 @@
+cmake_minimum_required(VERSION 3.10)
+# set -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+# set policy version to 3.5 to allow for use of cmake_policy in the debian.cmake file, which is used to set policies that are required for compatibility with older cmake versions used in debian stable
+
+project("GuitarMidi-Core")
+
+option(WITH_TRACING_INFO "Build with tracing logs" OFF)
+option(WITH_AUDIO_OUTPUT "Build with audio output support" OFF)
+set(RING_BUFFER_SIZE "8" CACHE STRING "Number of frames to store in the ring buffer") 
+set(NUM_INFERENCE_THREADS "4" CACHE STRING "Number of threads to use for inference")
+
+message("Ring buffer size: ${RING_BUFFER_SIZE}")
+message("Number of inference threads: ${NUM_INFERENCE_THREADS}")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 configure_file(include/guitarmidi/config.hpp.in include/guitarmidi/config.hpp)

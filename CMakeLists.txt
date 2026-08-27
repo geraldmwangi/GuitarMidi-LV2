@@ -12,13 +12,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # specify the C++ standard
 option(BUILD_ANALYSIS_APP "Build analysis app, usefull for development" OFF)
 
-option(WITH_TRACING_INFO "Build with tracing logs" OFF)
-option(WITH_AUDIO_OUTPUT "Build with audio output support" OFF)
-set(RING_BUFFER_SIZE "8" CACHE STRING "Number of frames to store in the ring buffer") 
-set(NUM_INFERENCE_THREADS "4" CACHE STRING "Number of threads to use for inference")
 
-message("Ring buffer size: ${RING_BUFFER_SIZE}")
-message("Number of inference threads: ${NUM_INFERENCE_THREADS}")
 
 
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
