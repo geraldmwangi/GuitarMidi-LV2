@@ -65,7 +65,7 @@ namespace GuitarMidi{
         NoteInferencer(GuitarMidiOutput *midioutput);
         /** Releases the MIDI output owned by the inferencer. */
         ~NoteInferencer(){
-            if(m_midioutput)
+            if(m_midioutput!=nullptr)
                 delete m_midioutput;
         }
 
