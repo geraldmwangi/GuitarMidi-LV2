@@ -21,34 +21,6 @@
 
 #include <string>
 
-// template <typename T>
-// concept FretBoardAPI = requires(
-// 	T& fretboard,
-// 	const float* audio_input,
-// 	LV2_Atom_Sequence* midi_output,
-// 	const std::string& bundle_path,
-// 	float* control,
-// 	int samplerate,
-// 	int buffer_size,
-// 	int nsamples)
-// {
-// 	{ fretboard.setAudioInput(audio_input) } -> std::same_as<void>;
-// 	{ fretboard.setMidiOutput(midi_output) } -> std::same_as<void>;
-
-// 	{ fretboard.setSmoothing(control) } -> std::same_as<void>;
-// 	{ fretboard.setOnsetThreshold(control) } -> std::same_as<void>;
-// 	{ fretboard.setOffsetThreshold(control) } -> std::same_as<void>;
-// 	{ fretboard.setSmoothingOffset(control) } -> std::same_as<void>;
-// 	{ fretboard.setOnsetEnergyThreshold(control) } -> std::same_as<void>;
-// 	{ fretboard.setOffsetEnergyThreshold(control) } -> std::same_as<void>;
-// 	{ fretboard.setGain(control) } -> std::same_as<void>;
-// 	{ fretboard.setExpressivity(control) } -> std::same_as<void>;
-
-// 	{ fretboard.initialize(bundle_path, samplerate, buffer_size) } -> std::same_as<bool>;
-// 	{ fretboard.finalize() } -> std::same_as<void>;
-// 	{ fretboard.process(nsamples) } -> std::same_as<void>;
-
-// };
 /**
  * Interface for writing MIDI events produced by the fretboard processor.
  */
