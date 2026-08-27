@@ -78,6 +78,6 @@ add_subdirectory(
 set(SRC    src/fretboard.cpp src/fretboardrepresentation.cpp src/guitarnote.cpp src/logging.cpp src/filterbank.cpp src/guitarstring.cpp src/noteinferencer.cpp src/modelinferencer.cpp)
 
 add_library(guitarmidi_core STATIC ${SRC})
-
+set_target_properties(guitarmidi_core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 target_link_libraries(guitarmidi_core PUBLIC tensorflow-lite  ${ZITA_RESAMPLER_LIB} )
