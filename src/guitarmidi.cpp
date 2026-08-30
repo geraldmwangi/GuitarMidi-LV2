@@ -33,6 +33,8 @@
 #include <midioutput.hpp>
 #include <lv2logger.hpp>
 
+
+LoggerSingleton g_logger;
 typedef enum
 {
 	FRETBOARD_INPUT = 0,

@@ -32,10 +32,12 @@ public:
 class LoggerSingleton
 {
 private:
-    LoggingAPI *m_logger = 0;
+    LoggingAPI *m_logger = nullptr;
 
 public:
-
+    LoggerSingleton(LoggingAPI* logger=nullptr){
+        m_logger=logger;
+    }
     ~LoggerSingleton(){
         if(m_logger)
             delete m_logger;
@@ -66,6 +68,8 @@ public:
     }
 
     void setLogger(LoggingAPI* logger){
+        if(m_logger!=nullptr)   
+            delete m_logger;
         m_logger=logger;
     }
 };
