@@ -12,19 +12,19 @@ namespace GuitarMidi
         exit(1);                                                 \
     }
 
-    NoteInferencer::NoteInferencer(LV2_URID_Map *map) :  m_midioutput(map)
+    NoteInferencer::NoteInferencer(LV2_URID_Map *map) : m_midioutput(map)
     {
     }
     bool NoteInferencer::initialize(const std::string &bundle_path)
     {
         m_midioutput.initializeSequence();
-       // #ifdef WITH_AUDIO_OUTPUT
+        // #ifdef WITH_AUDIO_OUTPUT
         m_frames = 0;
-        //#endif
+        // #endif
         return m_model.initialize(bundle_path);
     }
     void NoteInferencer::finalize()
-    { 
+    {
         m_midioutput.finalizeSequence();
     }
     void NoteInferencer::setMidiOutput(LV2_Atom_Sequence *output)
@@ -37,23 +37,27 @@ namespace GuitarMidi
     }
     void NoteInferencer::process(int nsamples)
     {
-        if(m_frames<BUFFER_SIZE){
+        if (m_frames < BUFFER_SIZE)
+        {
             m_frames += nsamples;
             return; // only process when we have a full buffer of audio samples
         }
-                        int num_active_notes = 0;
-                for (int h = 0; h < NUM_NOTES; h++)
-                {
-                   num_active_notes+=m_note_on[h];
-                }
-        m_frames=0;
+        int num_active_notes = 0;
+        for (int h = 0; h < NUM_NOTES; h++)
+        {
+            num_active_notes += m_note_on[h];
+        }
+        m_frames = 0;
         stringstream msg;
         float gain = powf(10.0f, *m_gain_db * 0.05f);
         float expressivity = powf(10.0f, *m_expressivity_db * 0.05f);
-        float en_threshold = pow(10, *m_onset_energy_threshold / 20)*gain;
-        float en_threshold_offset = pow(10, *m_offset_energy_threshold / 20)*gain;
+        float en_threshold = pow(10, *m_onset_energy_threshold / 20) * gain;
+        float en_threshold_offset = pow(10, *m_offset_energy_threshold / 20) * gain;
         m_model.add_audio_input(m_audiobuffer.audio_buffer_2D, 1);
         float output_data[NUM_NOTES];
+
+        bool triggeron[NUM_NOTES] = {false};
+        bool triggeroff[NUM_NOTES] = {false};
         if (m_model.get_model_output(output_data, 1))
         {
             msg << "Output data:";
@@ -75,80 +79,60 @@ namespace GuitarMidi
                     }
                 }
 
-
                 smoothed_onsetoutput[i] = *m_smoothing * smoothed_onsetoutput[i] + (1 - *m_smoothing) * output_data[i]; // simple low pass filter to smooth the output and reduce jitter
                 smoothed_offsetoutput[i] = *m_smoothing_offset * smoothed_offsetoutput[i] + (1 - *m_smoothing_offset) * output_data[i];
-                if(num_active_notes==1){
-                smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
-                smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy * smoothed_offsetoutput[i];
-                }else
-{                smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy; // * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
-                smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy; // * smoothed_offsetoutput[i];
-                }
-                if (!m_note_on[i]&& i != (NUM_NOTES - 1))
+                if (num_active_notes == 1)
                 {
-
-                    if (smoothed_onsetoutput[i] > *m_onset_threshold)
-                    {
-
-
-
-                        
-
-                        if (smoothed_noteenergies[i] < en_threshold)
-                        {
-                            #ifdef WITH_TRACING_INFO
-                           // lv2_log_note(&g_logger, "Note %d detected but energy %f is below threshold %f, not sending MIDI message\n", i, smoothed_noteenergies[i], threshold);
-                            #endif
-                            continue;
-                        }
-                        
-                        int velocity=(int)(smoothed_noteenergies[i]/(gain*expressivity) * 127);
-                        velocity = std::min(velocity, 127); // cap the velocity at 127
-                        msg << " " << i << "(" << smoothed_onsetoutput[i] << ")" << " energy:" << smoothed_noteenergies[i]<< " velocity:" << velocity;
-                        uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, (uint8_t)velocity};
-                        #ifdef WITH_TRACING_INFO
-                        lv2_log_note(&g_logger, "Notes: %s\n", msg.str().c_str());
-                        #endif
-
-                        #ifdef WITH_AUDIO_OUTPUT
-                        // visualize the detected notes in the audio output buffer by adding a sine wave at the corresponding note frequency
-                        float frequency = 440.0f * pow(2.0f, (i - 9) / 12.0f); // calculate the frequency of the note
-                        for (int w = 0; w < nsamples; w++)
-                        {
-                            audio_output[ w] = 0.1f * sin(2 * M_PI * frequency * (m_frames + w) / 48000.0f); // add a sine wave to the audio output buffer for visualization
-                        }
-                        #endif
-                        m_midioutput.sendMidiMessage(midinote, 0);
-                        m_note_on[i] = true;
-                    }
+                    smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
+                    smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy * smoothed_offsetoutput[i];
                 }
                 else
                 {
-                    
+                    smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy;                           // * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
+                    smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy; // * smoothed_offsetoutput[i];
+                }
 
 
-
-                    if (smoothed_offsetnoteenergies[i] > en_threshold_offset)
-                    {
-                        #ifdef WITH_TRACING_INFO
-                        //lv2_log_note(&g_logger, "Note %d detected but energy %f is below threshold %f, not sending MIDI message\n", i, smoothed_offsetnoteenergies[i], threshold);
-                        #endif
-                        continue;
-                    }
-                    // lv2_log_note(&g_logger, "Note %d OFF with confidence %f\n", i, output_data[i]);
-                    if (m_note_on[i] && smoothed_offsetoutput[i] < *m_offset_threshold && i != (NUM_NOTES - 1))
-                    {
-                        uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x00};
-                        m_midioutput.sendMidiMessage(midinote, 0);
-                        m_note_on[i] = false;
-                    }
+                if (!m_note_on[i] && i != (NUM_NOTES - 1))
+                {
+                    triggeron[i] = (smoothed_onsetoutput[i] > *m_onset_threshold && smoothed_noteenergies[i] > en_threshold);
+                }
+                else
+                {
+                    triggeroff[i] = (smoothed_offsetoutput[i] < *m_offset_threshold && smoothed_offsetnoteenergies[i] < en_threshold_offset);
                 }
             }
         }
-        //#ifdef WITH_AUDIO_OUTPUT
+        if(num_active_notes==1)//fix for bendings in solos
+            for (int i=0;i<(NUM_NOTES-1);i++)
+            {
+                if( smoothed_onsetoutput[i]> smoothed_onsetoutput[i+1])
+                {
+                    triggeroff[i+1] = m_note_on[i+1];
+                }else
+                {
+                    triggeroff[i] = m_note_on[i];
+                }
+            }
+        for (int i = 0; i < NUM_NOTES; i++)
+        {
+            if (triggeron[i])
+            {
+                int velocity = (int)(smoothed_noteenergies[i] / (gain * expressivity) * 127);
+                velocity = std::min(velocity, 127); // cap the velocity at 127
+                uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, (uint8_t)velocity};
+                m_midioutput.sendMidiMessage(midinote, 0);
+                m_note_on[i] = true;
+            }
+            if (triggeroff[i])
+            {
+                uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x00};
+                m_midioutput.sendMidiMessage(midinote, 0);
+                m_note_on[i] = false;
+            }
+        }
+        // #ifdef WITH_AUDIO_OUTPUT
 
-        
-        //#endif
+        // #endif
     }
 }
