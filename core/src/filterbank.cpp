@@ -1,5 +1,5 @@
 // filterbank.cpp
-#include "filterbank.hpp"
+#include <guitarmidi/filterbank.hpp>
 #include <complex>
 #include <cmath>
 #include <cstring>

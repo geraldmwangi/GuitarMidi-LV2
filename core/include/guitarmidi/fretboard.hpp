@@ -18,31 +18,16 @@
  */
 #pragma once
 #include <time.h>
-#include <filterbank.hpp>
-#include <fretboardrepresentation.hpp>
+#include <guitarmidi/filterbank.hpp>
+#include <guitarmidi/fretboardrepresentation.hpp>
 #include <memory>
 #include <vector>
 #include <map>
-#include <noteinferencer.hpp>
-#include <config.hpp>
+#include <guitarmidi/noteinferencer.hpp>
+#include <guitarmidi/config.hpp>
 #include <zita-resampler/resampler.h>
-typedef enum
-{
-    FRETBOARD_INPUT = 0,
-    FRETBOARD_MIDIOUTPUT=1,
-    FRETBOARD_INPUT_GAIN=2,
-    FRETBOARD_EXPRESSIVITY=3,
-    FRETBOARD_SMOOTHING=4,
-    FRETBOARD_SMOOTHING_OFFSET=5,
-    FRETBOARD_ONSET_THRESHOLD=6,
-    FRETBOARD_OFFSET_THRESHOLD=7,
-    FRETBOARD_ONSET_ENERGY_THRESHOLD=8,
-    FRETBOARD_OFFSET_ENERGY_THRESHOLD=9,
-    FRETBOARD_AUDIO_OUTPUT=10,
-    FRETBOARD_NOTE_SELECT=11,
-    FRETBOARD_HARMONIC_SELECT=12,
-    FRETBOARD_FILTER_OUTPUT=13
-} PortIndex;
+#include <guitarmidi/fretboard_api.hpp>
+
 using namespace std;
 using namespace GuitarMidi;
 /**
@@ -54,7 +39,7 @@ using namespace GuitarMidi;
  * The resampled audio is stored in a separate buffer and processed by the plugin. 
  * 
  */
-class FretBoard
+class FretBoard:public FretBoardAPI
 {
 private:
    
@@ -71,18 +56,19 @@ private:
     int m_resample_buffer_size=0;
     float* m_resampled_buffer=nullptr;
 
+    /** Processes an audio block after sample-rate conversion. */
     void process_resampled(int nsamples);
+    /** Processes an audio block at the native sample rate. */
     void process_direct(int nsamples);
 
 public:
     /**
      * @brief Construct a new Fret Board object. Setup the bank of NoteClassifiers at the standard E A D g b e tuning of the guitar up to the 5th fret
-     * 
-     * @param map 
-     * @param samplerate 
+
      */
-    FretBoard(LV2_URID_Map *map);
-    ~FretBoard(){
+    FretBoard(GuitarMidiOutput*);
+    /** Releases resampling buffers and fretboard resources. */
+    virtual ~FretBoard(){
 
         if(m_resampled_buffer){
             delete[] m_resampled_buffer;
@@ -95,64 +81,74 @@ public:
      * 
      * @param input 
      */
-    void setAudioInput(const float *input);
+    virtual void setAudioInput(const float *input);
 
 
 
 
 
-    /**
-     * @brief Set the Midi Output buffer
-     * 
-     * @param output 
-     */
-    void setMidiOutput(LV2_Atom_Sequence *output);
+    /** Returns the MIDI output used by note inference. */
+    GuitarMidiOutput* getMidiOutput(){
+        return m_noteinferencer.getMidiOutput();
+    }
 
 
 
-    void setSmoothing(float* smoothing){
+    /** Sets the smoothing control. */
+    virtual void setSmoothing(float* smoothing){
         m_noteinferencer.setSmoothing(smoothing);
     }
 
-    void setOnsetThreshold(float* threshold){
+    /** Sets the note-on threshold control. */
+    virtual void setOnsetThreshold(float* threshold){
         m_noteinferencer.setOnsetThreshold(threshold);
     }
 
-    void setOffsetThreshold(float* threshold){
+    /** Sets the note-off threshold control. */
+    virtual void setOffsetThreshold(float* threshold){
         m_noteinferencer.setOffsetThreshold(threshold);
     }
 
-    void setSmoothingOffset(float* smoothing_offset){
+    /** Sets the smoothing time used for note-off detection. */
+    virtual void setSmoothingOffset(float* smoothing_offset){
         m_noteinferencer.setSmoothingOffset(smoothing_offset);
     } 
 
-    void setOnsetEnergyThreshold(float* threshold){
+    /** Sets the note-on energy threshold control. */
+    virtual void setOnsetEnergyThreshold(float* threshold){
         m_noteinferencer.setOnsetEnergyThreshold(threshold);
     }
-    void setOffsetEnergyThreshold(float* threshold){
+    /** Sets the note-off energy threshold control. */
+    virtual void setOffsetEnergyThreshold(float* threshold){
         m_noteinferencer.setOffsetEnergyThreshold(threshold);
     }  
-    void setGain(float* gain_db){
+    /** Sets the filter and inference gain control. */
+    virtual void setGain(float* gain_db){
         m_filterbank.setGain(gain_db);
         m_noteinferencer.setGain(gain_db);
     }
-    void setExpressivity(float* expressivity_db){
+    /** Sets the MIDI expressivity control. */
+    virtual void setExpressivity(float* expressivity_db){
         m_noteinferencer.setExpressivity(expressivity_db);
     }
 #ifdef WITH_AUDIO_OUTPUT
-    void setAudioOutputBuffer(float *output)
+    /** Sets the optional audio output buffer. */
+    virtual void setAudioOutputBuffer(float *output)
     {
         m_noteinferencer.setAudioOutputBuffer(output);
     }
 
-    void setFilterOutputBuffer(float *output)
+    /** Sets the optional filter output buffer. */
+    virtual void setFilterOutputBuffer(float *output)
     {
         m_filterbank.setAudioOutputBuffer(output);
     }
-    void setNoteSelectControl(float* note_select_buffer){
+    /** Sets the optional note-selection control buffer. */
+    virtual void setNoteSelectControl(float* note_select_buffer){
         m_filterbank.setNoteSelectControl(note_select_buffer);
     }
-    void setHarmonicSelectControl(float* harmonic_select_buffer){
+    /** Sets the optional harmonic-selection control buffer. */
+    virtual void setHarmonicSelectControl(float* harmonic_select_buffer){
         m_filterbank.setHarmonicSelectControl(harmonic_select_buffer);
     }
 #endif
@@ -161,13 +157,13 @@ public:
      * @brief initialize the filterbank
      * 
      */
-    bool initialize(const std::string& bundle_path,int samplerate,int buffer_size);
+    virtual bool initialize(const std::string& bundle_path,int samplerate,int buffer_size);
 
     /**
      * @brief finalize all filters and release allocated resources
      * 
      */
-    void finalize();
+    virtual void finalize();
 
     /**
      * @brief process audio with the filterbank and noteinferencer. The audio is processed in blocks of the size of the host buffer size. 
@@ -176,5 +172,7 @@ public:
      * 
      * @param nsamples 
      */
-    void process(int nsamples);
+    virtual void process(int nsamples);
 };
+
+

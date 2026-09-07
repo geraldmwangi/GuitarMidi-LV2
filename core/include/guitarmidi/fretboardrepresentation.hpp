@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301  USA
  */
 #include <vector>
-#include <guitarstring.hpp>
+#include <guitarmidi/guitarstring.hpp>
 using namespace std;
 
 namespace GuitarMidi
@@ -33,8 +33,10 @@ namespace GuitarMidi
         vector<GuitarString> m_strings;
 
         public:
+        /** Creates the standard guitar tuning and fret mapping. */
         FretBoardRepresentation();
 
+        /** Collects filter representations for all strings and frets. */
         map<uint,FilterRepresentation> get_filterrepresentations(){
             map<uint,FilterRepresentation> res;
             for (auto f: m_strings)

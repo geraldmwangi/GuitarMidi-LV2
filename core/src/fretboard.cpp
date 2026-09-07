@@ -16,12 +16,15 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <fretboard.hpp>
+#include <guitarmidi/fretboard.hpp>
 #include <omp.h>
 
 using namespace GuitarMidi;
 
-FretBoard::FretBoard(LV2_URID_Map *map) : m_noteinferencer(map)
+FretBoardAPI* creatFretBoard(GuitarMidiOutput* midioutput){
+    return new FretBoard(midioutput);
+}
+FretBoard::FretBoard(GuitarMidiOutput* midioutput) : m_noteinferencer(midioutput)
 {
 
 
@@ -40,33 +43,22 @@ void FretBoard::setAudioInput(const float *input)
     }
 }
 
-void FretBoard::setMidiOutput(LV2_Atom_Sequence *output)
-{
-    m_noteinferencer.setMidiOutput(output);
-    // if (m_midioutput)
-    // {
-    //     m_midioutput->setMidiOutput(output);
-    //     m_midioutput->initializeSequence();
 
-    //     // for (auto notecl : m_noteClassifiers)
-    //     // {
-    //     //     notecl->setMidiOutput(m_midioutput);
-    //     // }
-    // }
-}
 bool FretBoard::initialize(const std::string &bundle_path, int samplerate, int buffer_size)
 {
-    lv2_log_note(&g_logger, "Initializing FretBoard with samplerate %d and buffer size %d ", samplerate, buffer_size);
-
+    //lv2_log_note(&g_logger, "Initializing FretBoard with samplerate %d and buffer size %d ", samplerate, buffer_size);
+    g_logger.info("Initializing FretBoard with samplerate %d and buffer size %d ", samplerate, buffer_size);
     // check if the samplerate of the host is different from the native samplerate of the plugin, if so, setup the resampler
     if (samplerate != NATIVE_SAMPLERATE)
     {
-        lv2_log_note(&g_logger, "Host samplerate %d is different from plugin samplerate %d, resampling will be performed", samplerate, NATIVE_SAMPLERATE);
+        //lv2_log_note(&g_logger, "Host samplerate %d is different from plugin samplerate %d, resampling will be performed", samplerate, NATIVE_SAMPLERATE);
+        g_logger.info("Host samplerate  %d is different from plugin samplerate %d, resampling will be performed", samplerate, NATIVE_SAMPLERATE);
         m_resample_buffer_size = buffer_size;
         m_resampled_buffer = new float[m_resample_buffer_size];
         if (m_resampler.setup(samplerate, NATIVE_SAMPLERATE, 1, 16))
         {
-            lv2_log_error(&g_logger, "Failed to setup resampler");
+            //lv2_log_error(&g_logger, "Failed to setup resampler");
+            g_logger.error("Failed to setup resampler");
             return false;
         }
         // Initialise the resamplers for zero delay.

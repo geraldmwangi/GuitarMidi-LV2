@@ -1,4 +1,4 @@
-#include "fretboardrepresentation.hpp"
+#include <guitarmidi/fretboardrepresentation.hpp>
 
 GuitarMidi::FretBoardRepresentation::FretBoardRepresentation()
 {

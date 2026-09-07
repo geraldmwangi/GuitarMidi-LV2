@@ -1,4 +1,7 @@
 #pragma once
+
+#include <lv2/core/lv2.h>
+
 /* GuitarMidi-LV2 Library
  * Copyright (C) 2022 Gerald Mwangi
  *
@@ -17,36 +20,16 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <iostream>
-#include <vector>
-#include <map>
-#include <memory>
-#include <common.hpp>
-using namespace std;
-
-namespace GuitarMidi
-{
+#include <lv2/log/logger.h>
+#include <guitarmidi/logging.hpp>
 
 
-    /**
-     * The GuitarNote class represents a note on the guitar fretboard.
-     */
-    class GuitarNote
-    {
+class LV2Logger: public LoggingAPI{
     private:
-        vector<FilterRepresentation> m_filters;
-
-
-    public:
-   
-        GuitarNote(int note_id, float centerfreq);
-        ~GuitarNote();
-
-        // Get the filter representations for this note
-        void get_filterrepresentations(map<uint,FilterRepresentation>& filterreps){
-            for (auto f:m_filters){
-                filterreps[f.filter_id]=f;
-            }
-        }
-    };
-}
+    LV2_Log_Logger m_logger;
+    public: 
+    LV2Logger(LV2_URID_Map *,LV2_Log_Log *);
+        virtual void info(std::string info_message, va_list args);
+    virtual void error(std::string error_message, va_list args);
+    virtual void warn(std::string warn_message, va_list args);
+};

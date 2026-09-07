@@ -18,9 +18,9 @@
  * Boston, MA  02110-1301  USA
  */
 #include <memory>
-#include <midioutput.hpp>
-#include <common.hpp>
-#include <config.hpp>
+#include <guitarmidi/fretboard_api.hpp>
+#include <guitarmidi/common.hpp>
+#include <guitarmidi/config.hpp>
 #include <tensorflow/lite/version.h>
 #include "tensorflow/core/public/release_version.h"
 #include "tensorflow/core/public/version.h"
@@ -31,14 +31,17 @@
 #include "tensorflow/lite/model_builder.h"
 #include "tensorflow/lite/optional_debug_tools.h"
 #include "tensorflow/lite/delegates/xnnpack/xnnpack_delegate.h"
-#include <modelinferencer.hpp>
+#include <guitarmidi/modelinferencer.hpp>
 using namespace std;
 using namespace tflite;
 namespace GuitarMidi{
+    /**
+     * Converts model note predictions into MIDI events while applying the configured thresholds and smoothing.
+     */
     class NoteInferencer{
        ModelInferencer m_model;
        
-        GuitarMidi::MidiOutput m_midioutput;
+        GuitarMidiOutput* m_midioutput=nullptr;
         AudioBuffer2D m_audiobuffer;
         float* m_gain_db;
         float* m_expressivity_db;
@@ -58,54 +61,80 @@ namespace GuitarMidi{
         //#endif
         bool m_note_on[NUM_NOTES]={false};
         public:
-        NoteInferencer(LV2_URID_Map *map);
+        /** Creates a note inferencer connected to the supplied MIDI output. */
+        NoteInferencer(GuitarMidiOutput *midioutput);
+        /** Releases the MIDI output owned by the inferencer. */
+        ~NoteInferencer(){
+            if(m_midioutput!=nullptr)
+                delete m_midioutput;
+        }
 
+        /** Loads and initializes the neural-network model. */
         bool initialize(const std::string& bundle_path);
+        /** Finalizes model inference and releases inference resources. */
         void finalize();
-        void setMidiOutput(LV2_Atom_Sequence *output);
-
+        /** Returns the MIDI output used for inferred notes. */
+        GuitarMidiOutput* getMidiOutput()
+        {
+            return m_midioutput;
+        }
+        /** Sets the filter-bank buffer consumed by inference. */
         void setAudioInputBuffer(AudioBuffer2D input);
 
+        /** Sets the gain control. */
         void setGain(float* gain){
             m_gain_db=gain;
         }
+        /** Sets the MIDI expressivity control. */
         void setExpressivity(float* expressivity){
             m_expressivity_db=expressivity;
         }
+        /** Sets the note-on threshold control. */
         void setOnsetThreshold(float* threshold){
             m_onset_threshold=threshold;
         }
 
+        /** Sets the note-off threshold control. */
         void setOffsetThreshold(float* threshold){
             m_offset_threshold=threshold;
         }
 
+        /** Sets the onset smoothing control. */
         void setSmoothing(float* smoothing){
             m_smoothing=smoothing;
         }
 
+        /** Sets the offset smoothing control. */
         void setSmoothingOffset(float* smoothing_offset){
             m_smoothing_offset=smoothing_offset;
         }
 
+        /** Sets the note-on energy threshold control. */
         void setOnsetEnergyThreshold(float* threshold){
             m_onset_energy_threshold=threshold;
         }
+        /** Sets the note-off energy threshold control. */
         void setOffsetEnergyThreshold(float* threshold){
             m_offset_energy_threshold=threshold;
         }
 
+        /** Starts a MIDI output sequence before processing a block. */
         void preprocess(){
-            m_midioutput.initializeSequence();
+            if(m_midioutput)
+                m_midioutput->initializeSequence();
         }
 
+        /** Completes a MIDI output sequence after processing a block. */
         void postprocess(){
-            m_midioutput.finalizeSequence();
+            if(m_midioutput)
+                m_midioutput->finalizeSequence();
         }
+        /** Converts model predictions for an audio block into MIDI events. */
         void process(int nsamples);
 
 #ifdef WITH_AUDIO_OUTPUT
         float *audio_output;
+        /** Sets the optional audio output buffer. */
         void setAudioOutputBuffer(float* output){
             audio_output=output;
         }

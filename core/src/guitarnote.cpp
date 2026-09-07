@@ -1,4 +1,4 @@
-#include <guitarnote.hpp>
+#include <guitarmidi/guitarnote.hpp>
 #include <memory>
 namespace GuitarMidi
 {

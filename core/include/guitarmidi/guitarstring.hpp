@@ -17,7 +17,7 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <guitarnote.hpp>
+#include <guitarmidi/guitarnote.hpp>
 using namespace std;
 
 namespace GuitarMidi
@@ -31,7 +31,9 @@ namespace GuitarMidi
         vector<GuitarNote> m_notes;
 
     public:
+        /** Creates the notes represented by the supplied MIDI note frequencies. */
         GuitarString(map<int,int> note_freqs);
+        /** Adds this string's note filter representations to the supplied map. */
         void get_filterrepresentations(map<uint,FilterRepresentation>& filterreps)
         {
         

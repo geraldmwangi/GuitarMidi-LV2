@@ -1,4 +1,4 @@
-#include <noteinferencer.hpp>
+#include <guitarmidi/noteinferencer.hpp>
 #include <iostream>
 #include <tensorflow/lite/logger.h>
 namespace GuitarMidi
@@ -12,12 +12,13 @@ namespace GuitarMidi
         exit(1);                                                 \
     }
 
-    NoteInferencer::NoteInferencer(LV2_URID_Map *map) : m_midioutput(map)
+    NoteInferencer::NoteInferencer(GuitarMidiOutput *midioutput) : m_midioutput(midioutput)
     {
     }
     bool NoteInferencer::initialize(const std::string &bundle_path)
     {
-        m_midioutput.initializeSequence();
+        if (m_midioutput)
+            m_midioutput->initializeSequence();
         // #ifdef WITH_AUDIO_OUTPUT
         m_frames = 0;
         // #endif
@@ -25,12 +26,10 @@ namespace GuitarMidi
     }
     void NoteInferencer::finalize()
     {
-        m_midioutput.finalizeSequence();
+        if (m_midioutput)
+            m_midioutput->finalizeSequence();
     }
-    void NoteInferencer::setMidiOutput(LV2_Atom_Sequence *output)
-    {
-        m_midioutput.setMidiOutput(output);
-    }
+
     void NoteInferencer::setAudioInputBuffer(AudioBuffer2D input)
     {
         m_audiobuffer = input;
@@ -121,13 +120,13 @@ namespace GuitarMidi
                 int velocity = (int)(smoothed_noteenergies[i] / (gain * expressivity) * 127);
                 velocity = std::min(velocity, 127); // cap the velocity at 127
                 uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, (uint8_t)velocity};
-                m_midioutput.sendMidiMessage(midinote, 0);
+                m_midioutput->sendMidiMessage(midinote, 0);
                 m_note_on[i] = true;
             }
             if (triggeroff[i])
             {
                 uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x00};
-                m_midioutput.sendMidiMessage(midinote, 0);
+                m_midioutput->sendMidiMessage(midinote, 0);
                 m_note_on[i] = false;
             }
         }
