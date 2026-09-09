@@ -2,7 +2,8 @@
 A concept for guitar to midi as an lv2 plugin. GuitarMidi-LV2 analyses the signal of a guitar in standard tuning E A D g b e extracts the notes played.
 It deploys a bank of butterworth bandpass filters to separate the polyphonic audio into monophonic frequency segments, which are then analysed for multiple fundamental frequencies by a custom neural net.
 
-
+## Demo and news
+Check out the demo at https://www.lodi-audio.com/plugins/guitarmidi. For general news on my work see https://www.lodi-audio.com
 
 
 # Installation
