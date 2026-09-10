@@ -11,6 +11,7 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # specify the C++ standard
 option(BUILD_ANALYSIS_APP "Build analysis app, usefull for development" OFF)
+option(BUILD_UI "Build the X11/Cairo plugin UI" ON)
 
 
 
@@ -21,6 +22,10 @@ set(TENSORFLOW_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ext/tensorflow")
 message("Tensorflow found at ${TENSORFLOW_SOURCE_DIR}")
 add_subdirectory(core)
 add_subdirectory(src)
+
+if(BUILD_UI)
+add_subdirectory(ui)
+endif()
 
 if(${BUILD_ANALYSIS_APP})
 add_subdirectory(AnalysisApp)

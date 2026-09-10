@@ -11,6 +11,13 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix urid:  <http://lv2plug.in/ns/ext/urid#> .
 @prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
+@prefix ui:    <http://lv2plug.in/ns/extensions/ui#> .
+
+# X11 UI for the plugin
+<http://github.com/geraldmwangi/GuitarMidi-LV2#ui>
+	a ui:X11UI ;
+	lv2:requiredFeature ui:idleInterface ;
+	lv2:extensionData ui:idleInterface .
 
 # First the type of the plugin is described.  All plugins must explicitly list
 # `lv2:Plugin` as a type.  A more specific type should also be given, where
@@ -24,6 +31,7 @@
 	doap:name "Guitar Midi";
 	doap:license <http://opensource.org/licenses/isc> ;
 	lv2:optionalFeature lv2:hardRTCapable ;
+	ui:ui <http://github.com/geraldmwangi/GuitarMidi-LV2#ui> ;
 	lv2:port [
 		a lv2:AudioPort ,
 			lv2:InputPort ;

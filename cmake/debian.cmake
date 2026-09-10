@@ -27,7 +27,18 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 
 # Runtime dependencies for the Debian package
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libzita-resampler1")
+# Automatically compute dependencies from the linked shared libraries
+# (requires dpkg-shlibdeps from the dpkg-dev package at build time)
+find_program(DPKG_SHLIBDEPS_EXECUTABLE dpkg-shlibdeps)
+if(DPKG_SHLIBDEPS_EXECUTABLE)
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS YES)
+else()
+    # Fallback: explicit dependency list when dpkg-shlibdeps is unavailable
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libzita-resampler1, libc6, libstdc++6, libgcc-s1")
+    if(BUILD_UI)
+        string(APPEND CPACK_DEBIAN_PACKAGE_DEPENDS ", libx11-6, libcairo2")
+    endif()
+endif()
 
 # package name for deb. If set, then instead of some-application-0.9.2-Linux.deb
 # you'll get some-application_0.9.2_amd64.deb (note the underscores too)
