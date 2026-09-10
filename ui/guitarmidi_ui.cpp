@@ -30,7 +30,7 @@
 // Layout constants
 // ---------------------------------------------------------------------------
 static const int UI_W = 780;
-static const int UI_H = 380;
+static const int UI_H = 280;
 
 // ---------------------------------------------------------------------------
 // Color helpers
@@ -65,6 +65,8 @@ struct Knob {
     uint32_t    port;       // LV2 port index
     const char* label;
     const char* unit;       // may be ""
+
+    const char* tooltip; //the description of the parameter
     float       min, max, def;
     int         decimals;   // display precision
     Color       accent;
@@ -108,21 +110,24 @@ struct GuitarMidiUI {
 static void init_knobs(GuitarMidiUI* ui)
 {
     ui->knobs = {
-        // port, label, unit, min, max, default, decimals, accent
-        {2, "Input Gain",   "dB", -20.0f, 40.0f,  0.0f,  1, COL_ACCENT3, 0, 0, 0, 0.0f},
-        {3, "Expressivity", "dB",  -3.0f, 20.0f,  7.0f,  1, COL_ACCENT3, 0, 0, 0, 7.0f},
+        // port, label, unit,tooltip, min, max, default, decimals, accent
+        {2, "Input Gain",   "dB","Add gain to the input signal prior to processing", -20.0f, 40.0f,  0.0f,  1, COL_ACCENT3, 0, 0, 0, 0.0f},
+        {3, "Expressivity", "dB", "The range of the attack velocity . For low values any attack strength of the string produces max velocity, passed to the synth", -3.0f, 20.0f,  7.0f,  1, COL_ACCENT3, 0, 0, 0, 7.0f},
+        // onset knobs
+        {4, "Smoothing",    "",   "Timewise smoothing of the note begin to avoid jitter. High values produce smoother predictions at the expense of latency",   0.0f,  0.9f,  0.3f,  2, COL_ACCENT,  0, 0, 0, 0.3f},
+        {6, "Confidence",   "",   "The confidence level of the note beginning. Use to filter out false notes. High values lead to more conservative note detection",   0.0f,  0.99f, 0.95f, 2, COL_ACCENT,  0, 0, 0, 0.95f},
+        {8, "Energy",       "dB", "The energy threshold for note detection. Lower values make the detector more sensitive to quieter notes", -20.0f,  3.0f,  -9.0f,  1, COL_ACCENT,  0, 0, 0, -9.0f},
 
-        {4, "Smoothing",    "",     0.0f,  0.9f,  0.8f,  2, COL_ACCENT,  0, 0, 0, 0.8f},
-        {6, "Confidence",   "",     0.0f,  0.99f, 0.80f, 2, COL_ACCENT,  0, 0, 0, 0.8f},
-        {8, "Energy",       "dB", -20.0f,  3.0f,  0.7f,  1, COL_ACCENT,  0, 0, 0, 0.7f},
-
-        {5, "Smoothing",    "",     0.0f,  0.9f,  0.3f,  2, COL_ACCENT2, 0, 0, 0, 0.3f},
-        {7, "Confidence",   "",     0.0f,  0.99f, 0.10f, 2, COL_ACCENT2, 0, 0, 0, 0.1f},
-        {9, "Energy",       "dB", -20.0f,  3.0f, -18.0f, 1, COL_ACCENT2, 0, 0, 0, -18.0f},
+        // offset knobs
+        {5, "Smoothing",    "",   "Timewise smoothing of the note ends to avoid jitter. Lower values lead to notes being released more quickly",   0.0f,  0.9f,  0.1f,  2, COL_ACCENT2, 0, 0, 0, 0.1f},
+        {7, "Confidence",   "",   "The confidence level of the note ending. Lower values make the notes linger on",   0.0f,  0.99f, 0.3f, 2, COL_ACCENT2, 0, 0, 0, 0.3f},
+        {9, "Energy",       "dB", "The energy threshold for note detection. Lower values make the notes linger on, especially when chords change fast", -20.0f,  3.0f, -18.0f, 1, COL_ACCENT2, 0, 0, 0, -18.0f},
     };
     for (auto& k : ui->knobs)
         k.value = k.def;
 }
+
+
 
 // Panel geometry ------------------------------------------------------------
 struct Panel {
@@ -181,6 +186,41 @@ static void rounded_rect(cairo_t* cr, double x, double y, double w, double h, do
     cairo_close_path(cr);
 }
 
+
+// Draw the tooptip for a knob
+static void draw_tooltip(cairo_t* cr, const Knob& k){
+    cairo_select_font_face(cr,"sans-serif",CAIRO_FONT_SLANT_NORMAL,CAIRO_FONT_WEIGHT_NORMAL);
+
+    cairo_set_font_size(cr,11);
+    cairo_text_extents_t ext;
+    cairo_text_extents(cr,k.tooltip,&ext);
+
+    const double padding_x=10;
+    const double padding_y=7;
+
+    const double width=ext.width+padding_x*2;
+    const double height=24;
+
+    double x=k.cx-width/2;
+    double y=k.cy-k.radius-height-20;
+
+    if (x < 6)
+        x = 6;
+    if (x + width > UI_W - 6)
+        x = UI_W - width - 6;
+    if (y < 6)
+        y = 6;
+
+    set_color(cr,COL_PANEL_EDGE,0.98);
+    rounded_rect(cr,x,y,width,height,5);
+    cairo_fill(cr);
+    
+    //show the text
+    set_color(cr,COL_TEXT);
+    cairo_move_to(cr,x+padding_x,y+padding_y+height/2);
+    cairo_show_text(cr,k.tooltip);
+
+}
 static void draw_text(cairo_t* cr, double x, double y, const char* text,
                       double size, Color col, bool bold, bool center)
 {
@@ -347,6 +387,8 @@ static void draw_ui(GuitarMidiUI* ui)
     for (size_t i = 0; i < ui->knobs.size(); ++i)
         draw_knob(cr, ui->knobs[i], (int)i == ui->hover_knob);
 
+    if(ui->hover_knob>=0)
+        draw_tooltip(cr,ui->knobs[ui->hover_knob]);
     // Footer hint (centered)
     draw_text(cr, UI_W / 2.0, UI_H - 6,
               "drag: adjust    shift+drag: fine    double-click: reset    scroll: step", 10,
