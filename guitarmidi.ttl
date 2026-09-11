@@ -51,7 +51,7 @@
         lv2:index 2 ;
         lv2:symbol "gain" ;
         lv2:name "Input Gain (dB)" ;
-        lv2:default 0.0 ;
+        lv2:default 28.0 ;
         lv2:minimum -20.0 ;
         lv2:maximum 40.0 ;
 	],[
@@ -59,15 +59,15 @@
         lv2:index 3 ;
         lv2:symbol "expressivity" ;
         lv2:name "Expressivity Range (dB)" ;
-        lv2:default 7.0 ;
-        lv2:minimum -3.0 ;
+        lv2:default 3.0 ;
+        lv2:minimum 0.0 ;
         lv2:maximum 20.0 ;
 	],[
 		a lv2:InputPort, lv2:ControlPort ;
         lv2:index 4 ;
         lv2:symbol "onsetsmoothing" ;
         lv2:name "Onset Smoothing" ;
-        lv2:default 0.8 ;
+        lv2:default 0.3 ;
         lv2:minimum 0.0 ;
         lv2:maximum 0.9 ;
 	],[
@@ -83,7 +83,7 @@
         lv2:index 6 ;
         lv2:symbol "onsetconfthr" ;
         lv2:name "Onset Confidence Threshold" ;
-        lv2:default 0.80 ;
+        lv2:default 0.95 ;
         lv2:minimum 0.00 ;
         lv2:maximum 0.99 ;
 	],[
@@ -91,7 +91,7 @@
         lv2:index 7 ;
         lv2:symbol "offsetconfthr" ;
         lv2:name "Offset Confidence Threshold" ;
-        lv2:default 0.10 ;
+        lv2:default 0.3 ;
         lv2:minimum 0.00 ;
         lv2:maximum 0.99 ;
 	],[
@@ -99,7 +99,7 @@
         lv2:index 8 ;
         lv2:symbol "onsetenthr" ;
         lv2:name "Onset Energy Threshold (dB)" ;
-        lv2:default 0.70 ;
+        lv2:default -18.0 ;
         lv2:minimum -20.00 ;
         lv2:maximum 3.00 ;
 	],[

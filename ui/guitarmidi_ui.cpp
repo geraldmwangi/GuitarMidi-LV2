@@ -111,15 +111,15 @@ static void init_knobs(GuitarMidiUI* ui)
 {
     ui->knobs = {
         // port, label, unit,tooltip, min, max, default, decimals, accent
-        {2, "Input Gain",   "dB","Add gain to the input signal prior to processing", -20.0f, 40.0f,  0.0f,  1, COL_ACCENT3, 0, 0, 0, 0.0f},
-        {3, "Expressivity", "dB", "The range of the attack velocity . For low values any attack strength of the string produces max velocity, passed to the synth", -3.0f, 20.0f,  7.0f,  1, COL_ACCENT3, 0, 0, 0, 7.0f},
+        {2, "Input Gain",   "dB","Add gain to the input signal prior to processing", -20.0f, 40.0f,  28.0f,  1, COL_ACCENT3, 0, 0, 0, 28.0f},
+        {3, "Expressivity", "dB", "The range of the attack velocity . For low values any attack strength of the string produces max velocity, passed to the synth", -3.0f, 20.0f,  3.0f,  1, COL_ACCENT3, 0, 0, 0, 3.0f},
         // onset knobs
         {4, "Smoothing",    "",   "Timewise smoothing of the note begin to avoid jitter. High values produce smoother predictions at the expense of latency",   0.0f,  0.9f,  0.3f,  2, COL_ACCENT,  0, 0, 0, 0.3f},
         {6, "Confidence",   "",   "The confidence level of the note beginning. Use to filter out false notes. High values lead to more conservative note detection",   0.0f,  0.99f, 0.95f, 2, COL_ACCENT,  0, 0, 0, 0.95f},
-        {8, "Energy",       "dB", "The energy threshold for note detection. Lower values make the detector more sensitive to quieter notes", -20.0f,  3.0f,  -9.0f,  1, COL_ACCENT,  0, 0, 0, -9.0f},
+        {8, "Energy",       "dB", "The energy threshold for note detection. Lower values make the detector more sensitive to quieter notes", -20.0f,  3.0f,  -18.0f,  1, COL_ACCENT,  0, 0, 0, -18.0f},
 
         // offset knobs
-        {5, "Smoothing",    "",   "Timewise smoothing of the note ends to avoid jitter. Lower values lead to notes being released more quickly",   0.0f,  0.9f,  0.1f,  2, COL_ACCENT2, 0, 0, 0, 0.1f},
+        {5, "Smoothing",    "",   "Timewise smoothing of the note ends to avoid jitter. Lower values lead to notes being released more quickly",   0.0f,  0.9f,  0.3f,  2, COL_ACCENT2, 0, 0, 0, 0.3f},
         {7, "Confidence",   "",   "The confidence level of the note ending. Lower values make the notes linger on",   0.0f,  0.99f, 0.3f, 2, COL_ACCENT2, 0, 0, 0, 0.3f},
         {9, "Energy",       "dB", "The energy threshold for note detection. Lower values make the notes linger on, especially when chords change fast", -20.0f,  3.0f, -18.0f, 1, COL_ACCENT2, 0, 0, 0, -18.0f},
     };
