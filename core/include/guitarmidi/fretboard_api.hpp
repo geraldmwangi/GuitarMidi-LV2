@@ -20,7 +20,7 @@
 
 
 #include <string>
-
+#include <cstdint>
 /**
  * Interface for writing MIDI events produced by the fretboard processor.
  */
