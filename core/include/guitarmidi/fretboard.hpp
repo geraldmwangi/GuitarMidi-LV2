@@ -25,7 +25,9 @@
 #include <map>
 #include <guitarmidi/noteinferencer.hpp>
 #include <guitarmidi/config.hpp>
+#ifndef WIN32
 #include <zita-resampler/resampler.h>
+#endif
 #include <guitarmidi/fretboard_api.hpp>
 
 using namespace std;
@@ -51,7 +53,9 @@ private:
     FilterBank m_filterbank;
     NoteInferencer m_noteinferencer;
     int m_samplerate=48000;
+    #ifndef WIN32
     Resampler m_resampler;
+    #endif
     float* m_input_buffer=nullptr;
     int m_resample_buffer_size=0;
     float* m_resampled_buffer=nullptr;

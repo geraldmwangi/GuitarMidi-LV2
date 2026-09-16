@@ -55,6 +55,7 @@ bool FretBoard::initialize(const std::string &bundle_path, int samplerate, int b
         g_logger.info("Host samplerate  %d is different from plugin samplerate %d, resampling will be performed", samplerate, NATIVE_SAMPLERATE);
         m_resample_buffer_size = buffer_size;
         m_resampled_buffer = new float[m_resample_buffer_size];
+        #ifndef WIN32
         if (m_resampler.setup(samplerate, NATIVE_SAMPLERATE, 1, 16))
         {
             //lv2_log_error(&g_logger, "Failed to setup resampler");
@@ -71,6 +72,7 @@ bool FretBoard::initialize(const std::string &bundle_path, int samplerate, int b
         // Set the initial conditions, input buffer empty.
         m_resampler.out_data = m_resampled_buffer;
         m_resampler.out_count = buffer_size;
+        #endif
     }
 
     // setup the filterbank with the filter representations from the fretboard representation
@@ -105,6 +107,7 @@ void FretBoard::process(int nsamples)
 void FretBoard::process_resampled(int nsamples)
 {
     m_noteinferencer.preprocess();
+    #ifndef WIN32
     m_resampler.inp_data=m_input_buffer;
     m_resampler.inp_count=nsamples;
     while(m_resampler.inp_count){
@@ -116,6 +119,7 @@ void FretBoard::process_resampled(int nsamples)
             m_resampler.out_count=m_resample_buffer_size;
         }
     }
+    #endif
     m_noteinferencer.postprocess();
 
 }

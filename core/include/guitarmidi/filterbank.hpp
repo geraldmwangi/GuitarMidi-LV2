@@ -77,7 +77,7 @@ namespace GuitarMidi{
             };
 
             /** Configures filter coefficients for the requested fretboard representation. */
-            void setup(map<uint,FilterRepresentation> filterreps,int samplerate,int hostbuffer_size);
+            void setup(map<unsigned int,FilterRepresentation> filterreps,int samplerate,int hostbuffer_size);
             /** Sets the filter-bank gain control. */
             void setGain(float* gain_db){
                 m_gain_db = gain_db;

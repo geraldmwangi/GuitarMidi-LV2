@@ -37,8 +37,8 @@ namespace GuitarMidi
         FretBoardRepresentation();
 
         /** Collects filter representations for all strings and frets. */
-        map<uint,FilterRepresentation> get_filterrepresentations(){
-            map<uint,FilterRepresentation> res;
+        map<unsigned int,FilterRepresentation> get_filterrepresentations(){
+            map<unsigned int,FilterRepresentation> res;
             for (auto f: m_strings)
                 f.get_filterrepresentations(res);
 

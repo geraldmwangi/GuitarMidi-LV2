@@ -44,7 +44,7 @@ namespace GuitarMidi
         ~GuitarNote();
 
         /** Adds this note's filter representations to the supplied map. */
-        void get_filterrepresentations(map<uint,FilterRepresentation>& filterreps){
+        void get_filterrepresentations(map<unsigned int,FilterRepresentation>& filterreps){
             for (auto f:m_filters){
                 filterreps[f.filter_id]=f;
             }
