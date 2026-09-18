@@ -12,6 +12,7 @@ set(NUM_INFERENCE_THREADS "4" CACHE STRING "Number of threads to use for inferen
 message("Ring buffer size: ${RING_BUFFER_SIZE}")
 message("Number of inference threads: ${NUM_INFERENCE_THREADS}")
 set(CMAKE_CXX_STANDARD 20)
+
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 configure_file(include/guitarmidi/config.hpp.in include/guitarmidi/config.hpp)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
@@ -23,6 +24,11 @@ if(NOT WIN32)
 find_package(PkgConfig REQUIRED)
 find_library(ZITA_RESAMPLER_LIB zita-resampler)
 message("Found zita-resampler library: ${ZITA_RESAMPLER_LIB}")
+endif()
+if(MSVC)
+  # MSVC has no C99 mode. XNNPACK's SET(CMAKE_C_STANDARD 99) therefore leaves us
+  # on the legacy C frontend, where <inttypes.h> withholds PRIu32 and friends.
+  string(APPEND CMAKE_C_FLAGS " /std:c11 /D__STDC_FORMAT_MACROS")
 endif()
 #find_package(OpenMP REQUIRED)
 # pkg_check_modules(Pango REQUIRED pango)
