@@ -23,7 +23,7 @@ message("Tensorflow found at ${TENSORFLOW_SOURCE_DIR}")
 add_subdirectory(core)
 add_subdirectory(src)
 
-if(BUILD_UI)
+if(${BUILD_UI})
 add_subdirectory(ui)
 endif()
 
