@@ -7,6 +7,8 @@ It deploys a bank of butterworth bandpass filters to separate the polyphonic aud
 ## Demo and news
 Check out the demo at https://www.lodi-audio.com/plugins/guitarmidi. For general news on my work see https://www.lodi-audio.com
 
+## Support and Feedback
+Head to the [forum on my site](https://lodi-audio.com/forum) for support and feedback
 
 # Installation
 Packages for Debian/Ubuntu are available at https://github.com/geraldmwangi/GuitarMidi-LV2/releases
