@@ -57,9 +57,9 @@ private:
     float* m_resampled_buffer=nullptr;
 
     /** Processes an audio block after sample-rate conversion. */
-    void process_resampled(int nsamples);
+    void process_resampled(int nsamples,int pos=0);
     /** Processes an audio block at the native sample rate. */
-    void process_direct(int nsamples);
+    void process_direct(int nsamples,int pos=0);
 
 public:
     /**

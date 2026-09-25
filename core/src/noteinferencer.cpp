@@ -34,7 +34,7 @@ namespace GuitarMidi
     {
         m_audiobuffer = input;
     }
-    void NoteInferencer::process(int nsamples)
+    void NoteInferencer::process(int nsamples,int pos)
     {
         if (m_frames < BUFFER_SIZE)
         {
@@ -120,13 +120,13 @@ namespace GuitarMidi
                 int velocity = (int)(smoothed_noteenergies[i] / (gain * expressivity) * 127);
                 velocity = std::min(velocity, 127); // cap the velocity at 127
                 uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, (uint8_t)velocity};
-                m_midioutput->sendMidiMessage(midinote, 0);
+                m_midioutput->sendMidiMessage(midinote, pos);
                 m_note_on[i] = true;
             }
             if (triggeroff[i])
             {
                 uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x00};
-                m_midioutput->sendMidiMessage(midinote, 0);
+                m_midioutput->sendMidiMessage(midinote, pos);
                 m_note_on[i] = false;
             }
         }

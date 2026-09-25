@@ -131,12 +131,13 @@ void FilterBank::reset()
     std::memset(m_s2, 0, sizeof(m_s2));
 }
 
-void FilterBank::process(int nsamples)
+void FilterBank::process(int nsamples,int pos)
 {
     float gain = powf(10.0f, *m_gain_db * 0.05f);
     for (int n = 0; n < nsamples; ++n)
-    {
-        const float x = gain * m_input[n];
+    { 
+        // nsamples + pos is expected to be smaller then the buffersize. not asserting here for performance reasons
+        const float x = gain * m_input[n+pos];
         for (int f = 0; f < NUM_FILTERS; ++f)
         {
             const float b0_0 = m_b0[f][0], b1_0 = m_b1[f][0], b2_0 = m_b2[f][0];

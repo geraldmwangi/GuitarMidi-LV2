@@ -93,7 +93,7 @@ namespace GuitarMidi{
             }
 
             /** Processes a block of audio through all filters. */
-            void process(int nsamples);
+            void process(int nsamples,int pos=0);
 
             /** Returns the filter-bank output buffer. */
             AudioBuffer2D get_buffer(){

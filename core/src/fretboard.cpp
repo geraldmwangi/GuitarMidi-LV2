@@ -90,40 +90,70 @@ void FretBoard::finalize()
 
 void FretBoard::process(int nsamples)
 {
-    if (m_samplerate != NATIVE_SAMPLERATE)
+    // prepare the output stream
+    m_noteinferencer.preprocess();
+
+    // define the processing lambda
+    auto proc=[this](int ns,int p){
+        if (m_samplerate != NATIVE_SAMPLERATE)
+        {
+            process_resampled(ns,p);
+        }
+        else
+        {
+            process_direct(ns,p);
+        }
+    };
+
+    // process once for realtime buffer sizes
+    if (nsamples <= BUFFER_SIZE)
     {
-        process_resampled(nsamples);
+        proc(nsamples,0);
     }
     else
     {
-        process_direct(nsamples);
+        // non realtime, run processing in chunks of BUFFER_SIZE
+        int multiple=nsamples/BUFFER_SIZE;
+        int rest=nsamples%BUFFER_SIZE;
+
+        for (int m = 0; m < multiple; m++)
+        {
+            proc(BUFFER_SIZE,m*BUFFER_SIZE);
+        }
+        // process the rest. Some sound servers provide non log2 buffer sizes like nsamples=480 
+        // so here the fractional rest is processed
+        if(rest>0)
+            proc(rest,multiple*BUFFER_SIZE);
     }
+
+    m_noteinferencer.postprocess();
 }
 
 
 
-void FretBoard::process_resampled(int nsamples)
+void FretBoard::process_resampled(int nsamples,int pos)
 {
-    m_noteinferencer.preprocess();
+ 
     m_resampler.inp_data=m_input_buffer;
     m_resampler.inp_count=nsamples;
     while(m_resampler.inp_count){
         m_resampler.process();
         if(m_resampler.out_count==0){
-            m_filterbank.process(m_resample_buffer_size);
-            m_noteinferencer.process(nsamples);
+            // m_filterbank.process(m_resample_buffer_size);
+            // m_noteinferencer.process(nsamples);
+            process_direct(nsamples,pos);
             m_resampler.out_data=m_resampled_buffer;
             m_resampler.out_count=m_resample_buffer_size;
         }
     }
-    m_noteinferencer.postprocess();
+
 
 }
-void FretBoard::process_direct(int nsamples)
+void FretBoard::process_direct(int nsamples,int pos)
 {
-    m_filterbank.process(nsamples);
+    m_filterbank.process(nsamples,pos);
 
-    m_noteinferencer.preprocess();
-    m_noteinferencer.process(nsamples);
-    m_noteinferencer.postprocess();
+    
+    m_noteinferencer.process(nsamples,pos);
+    
 }

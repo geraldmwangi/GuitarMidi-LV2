@@ -130,7 +130,7 @@ namespace GuitarMidi{
                 m_midioutput->finalizeSequence();
         }
         /** Converts model predictions for an audio block into MIDI events. */
-        void process(int nsamples);
+        void process(int nsamples,int pos=0);
 
 #ifdef WITH_AUDIO_OUTPUT
         float *audio_output;
