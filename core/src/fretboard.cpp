@@ -134,14 +134,13 @@ void FretBoard::process(int nsamples)
 void FretBoard::process_resampled(int nsamples,int pos)
 {
  
-    m_resampler.inp_data=m_input_buffer;
+    m_resampler.inp_data=m_input_buffer+pos;// push the pointer forward when the sound servers buffersize is larger than BUFFER_SIZE
     m_resampler.inp_count=nsamples;
     while(m_resampler.inp_count){
         m_resampler.process();
         if(m_resampler.out_count==0){
-            // m_filterbank.process(m_resample_buffer_size);
-            // m_noteinferencer.process(nsamples);
-            process_direct(nsamples,pos);
+            m_filterbank.process(m_resample_buffer_size);
+            m_noteinferencer.process(nsamples,pos);
             m_resampler.out_data=m_resampled_buffer;
             m_resampler.out_count=m_resample_buffer_size;
         }
