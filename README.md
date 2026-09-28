@@ -106,7 +106,7 @@ sudo apt install git cmake build-essential libzita-resampler-dev lv2-dev
 * run cmake, make, make install:
 ```bash
 cd GuitarMidi-LV2
-git submodule update --init
+git submodule update --init --depth 1
 mkdir build
 cd build
 
