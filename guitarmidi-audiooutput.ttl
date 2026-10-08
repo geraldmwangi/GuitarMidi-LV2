@@ -8,6 +8,7 @@
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 @prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix rsz:   <http://lv2plug.in/ns/ext/resize-port#> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix urid:  <http://lv2plug.in/ns/ext/urid#> .
 @prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
@@ -16,7 +17,7 @@
 # X11 UI for the plugin
 <http://github.com/geraldmwangi/GuitarMidi-LV2#ui>
 	a ui:X11UI ;
-	lv2:requiredFeature ui:idleInterface ;
+    lv2:requiredFeature ui:idleInterface, ui:portMap, urid:map ;
 	lv2:extensionData ui:idleInterface .
 
 # First the type of the plugin is described.  All plugins must explicitly list
@@ -30,7 +31,8 @@
 	lv2:project <http://lv2plug.in/ns/lv2> ;
 	doap:name "Guitar Midi";
 	doap:license <http://opensource.org/licenses/isc> ;
-	lv2:optionalFeature lv2:hardRTCapable ;
+    lv2:optionalFeature lv2:hardRTCapable ;
+    lv2:requiredFeature urid:map ;
 	ui:ui <http://github.com/geraldmwangi/GuitarMidi-LV2#ui> ;
 	lv2:port [
 		a lv2:AudioPort ,
@@ -146,5 +148,20 @@
 		lv2:index 13 ;
 		lv2:symbol "filterout" ;
 		lv2:name "Filter Out"
+    ], [
+        a lv2:OutputPort, atom:AtomPort ;
+        atom:bufferType atom:Sequence ;
+        atom:supports atom:Vector ;
+        rsz:minimumSize 768 ;
+        lv2:index 14 ;
+        lv2:symbol "debugdata" ;
+        lv2:name "Note Debug Data"
 	] .
+
+<http://github.com/geraldmwangi/GuitarMidi-LV2#ui>
+    ui:portNotification [
+        ui:plugin <http://github.com/geraldmwangi/GuitarMidi-LV2> ;
+        lv2:symbol "debugdata" ;
+        ui:protocol atom:eventTransfer
+    ] .
 

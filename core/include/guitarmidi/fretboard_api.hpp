@@ -21,6 +21,7 @@
 
 #include <string>
 #include <cstdint>
+#include <guitarmidi/common.hpp>
 /**
  * Interface for writing MIDI events produced by the fretboard processor.
  */
@@ -128,6 +129,10 @@ public:
      * @param nsamples
      */
     virtual void process(int nsamples) = 0;
+
+    /** Copies the latest smoothed and momentary note confidence and energy values. */
+    virtual void getNoteDebugData(float *smoothed_confidences, float *smoothed_energies,
+                                  float *momentary_confidences, float *momentary_energies) const = 0;
 };
 
 FretBoardAPI *creatFretBoard(GuitarMidiOutput*);

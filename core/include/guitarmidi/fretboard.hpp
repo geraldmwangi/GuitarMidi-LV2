@@ -173,6 +173,14 @@ public:
      * @param nsamples 
      */
     virtual void process(int nsamples);
+
+    /** Copies the latest smoothed and momentary note debug values. */
+    virtual void getNoteDebugData(float *smoothed_confidences, float *smoothed_energies,
+                                  float *momentary_confidences, float *momentary_energies) const
+    {
+        m_noteinferencer.getDebugData(smoothed_confidences, smoothed_energies,
+                                      momentary_confidences, momentary_energies);
+    }
 };
 
 

@@ -22,6 +22,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <lv2/core/lv2.h>
+#include <lv2/atom/forge.h>
 #include <lv2/options/options.h>
 #include <lv2/buf-size/buf-size.h>
 #include <lv2/urid/urid.h>
@@ -52,6 +53,22 @@ typedef enum
 	FRETBOARD_HARMONIC_SELECT = 12,
 	FRETBOARD_FILTER_OUTPUT = 13
 } PortIndex;
+
+#ifdef WITH_AUDIO_OUTPUT
+static constexpr uint32_t DEBUG_DATA_PORT = 14;
+#else
+static constexpr uint32_t DEBUG_DATA_PORT = 10;
+#endif
+
+struct GuitarMidiPlugin
+{
+	FretBoardAPI *fretboard;
+	LV2_Atom_Sequence *debug_output = nullptr;
+	LV2_Atom_Forge debug_forge;
+	float debug_tick = 0.0f;
+	uint64_t debug_samples_since_update = 0;
+	uint64_t debug_update_interval_samples = 2400;
+};
 
 #define GUITARMIDI_URI "http://github.com/geraldmwangi/GuitarMidi-LV2"
 
@@ -131,15 +148,21 @@ instantiate(const LV2_Descriptor *descriptor,
 		}
 	}
 	GuitarMidi::MidiOutputLV2 *midi = new GuitarMidi::MidiOutputLV2(map);
-	FretBoardAPI *fretboard = creatFretBoard(midi);
-	if (!fretboard->initialize(std::string(bundle_path), rate, buffer_size))
+	GuitarMidiPlugin *plugin = new GuitarMidiPlugin();
+	lv2_atom_forge_init(&plugin->debug_forge, map);
+	plugin->debug_update_interval_samples = static_cast<uint64_t>(rate / 20.0);
+	if (plugin->debug_update_interval_samples == 0)
+		plugin->debug_update_interval_samples = 1;
+	plugin->fretboard = creatFretBoard(midi);
+	if (!plugin->fretboard->initialize(std::string(bundle_path), rate, buffer_size))
 	{
 		//lv2_log_error(&g_logger, "Failed to initialize FretBoardAPI\n");
 		g_logger.error("Failed to initialize FretBoardAPI\n");
-		delete fretboard;
+		delete plugin->fretboard;
+		delete plugin;
 		return NULL;
 	}
-	return (LV2_Handle)fretboard;
+	return (LV2_Handle)plugin;
 }
 
 static void
@@ -147,7 +170,13 @@ connect_port(LV2_Handle instance,
 			 uint32_t port,
 			 void *data)
 {
-	FretBoardAPI *fretboard = (FretBoardAPI *)instance;
+	GuitarMidiPlugin *plugin = (GuitarMidiPlugin *)instance;
+	FretBoardAPI *fretboard = plugin->fretboard;
+	if (port == DEBUG_DATA_PORT)
+	{
+		plugin->debug_output = (LV2_Atom_Sequence *)data;
+		return;
+	}
 
 	switch ((PortIndex)port)
 	{
@@ -224,8 +253,45 @@ run(LV2_Handle instance, uint32_t n_samples)
 #ifdef WITH_TRACING_INFO
 	timespec start = timer_start();
 #endif
-	FretBoardAPI *notecl = (FretBoardAPI *)instance;
-	notecl->process(n_samples);
+	GuitarMidiPlugin *plugin = (GuitarMidiPlugin *)instance;
+	plugin->fretboard->process(n_samples);
+	if (plugin->debug_output)
+	{
+		plugin->debug_samples_since_update += n_samples;
+		const bool send_debug_data = plugin->debug_samples_since_update >=
+			plugin->debug_update_interval_samples;
+		if (send_debug_data)
+			plugin->debug_samples_since_update %= plugin->debug_update_interval_samples;
+
+		lv2_atom_forge_set_buffer(&plugin->debug_forge,
+			(uint8_t *)plugin->debug_output, plugin->debug_output->atom.size);
+		LV2_Atom_Forge_Frame sequence_frame;
+		if (lv2_atom_forge_sequence_head(&plugin->debug_forge, &sequence_frame, 0))
+		{
+			if (send_debug_data)
+			{
+				float values[NUM_NOTES * 4 + 1];
+				float smoothed_energies[NUM_NOTES];
+				float momentary_confidences[NUM_NOTES];
+				float momentary_energies[NUM_NOTES];
+				plugin->fretboard->getNoteDebugData(values, smoothed_energies,
+					momentary_confidences, momentary_energies);
+				for (uint32_t i = 0; i < NUM_NOTES; ++i)
+				{
+					values[NUM_NOTES + i] = smoothed_energies[i];
+					values[NUM_NOTES * 2 + i] = momentary_confidences[i];
+					values[NUM_NOTES * 3 + i] = momentary_energies[i];
+				}
+				plugin->debug_tick = 1.0f - plugin->debug_tick;
+				values[NUM_NOTES * 4] = plugin->debug_tick;
+
+				lv2_atom_forge_frame_time(&plugin->debug_forge, 0);
+				lv2_atom_forge_vector(&plugin->debug_forge, sizeof(float),
+					plugin->debug_forge.Float, NUM_NOTES * 4 + 1, values);
+			}
+			lv2_atom_forge_pop(&plugin->debug_forge, &sequence_frame);
+		}
+	}
 #ifdef WITH_TRACING_INFO
 	auto delay = timer_end(start);
 	lv2_log_trace(&g_logger, "processing in %ld\n", delay);
@@ -237,8 +303,8 @@ deactivate(LV2_Handle instance)
 {
 	// lv2_log_note(&g_logger, "Deactivating GuitarMidi-LV2 Plugin\n");
 	g_logger.info( "Deactivating GuitarMidi-LV2 Plugin\n");
-	FretBoardAPI *notecl = (FretBoardAPI *)instance;
-	notecl->finalize();
+	GuitarMidiPlugin *plugin = (GuitarMidiPlugin *)instance;
+	plugin->fretboard->finalize();
 }
 
 static void
@@ -246,8 +312,9 @@ cleanup(LV2_Handle instance)
 {
 	// lv2_log_note(&g_logger, "Cleaning up GuitarMidi-LV2 Plugin\n");
 	g_logger.info("Cleaning up GuitarMidi-LV2 Plugin\n");
-	FretBoardAPI *notecl = (FretBoardAPI *)instance;
-	delete notecl;
+	GuitarMidiPlugin *plugin = (GuitarMidiPlugin *)instance;
+	delete plugin->fretboard;
+	delete plugin;
 }
 
 static const void *

@@ -55,6 +55,8 @@ namespace GuitarMidi{
         float smoothed_offsetoutput[NUM_NOTES]={0};
         float smoothed_noteenergies[NUM_NOTES]={0};
         float smoothed_offsetnoteenergies[NUM_NOTES]={0};
+        float m_momentary_confidences[NUM_NOTES]={0};
+        float m_momentary_noteenergies[NUM_NOTES]={0};
         // std::unique_ptr<tflite::FlatBufferModel> model;
         //#ifdef WITH_AUDIO_OUTPUT
         int64_t m_frames=0;
@@ -131,6 +133,10 @@ namespace GuitarMidi{
         }
         /** Converts model predictions for an audio block into MIDI events. */
         void process(int nsamples,int pos=0);
+
+        /** Copies the latest smoothed and momentary confidence and energy values. */
+        void getDebugData(float *smoothed_confidences, float *smoothed_energies,
+                  float *momentary_confidences, float *momentary_energies) const;
 
 #ifdef WITH_AUDIO_OUTPUT
         float *audio_output;

@@ -9,6 +9,9 @@
  */
 
 #include <lv2/core/lv2.h>
+#include <lv2/atom/atom.h>
+#include <lv2/atom/util.h>
+#include <lv2/urid/urid.h>
 #include <lv2/ui/ui.h>
 
 #include <X11/Xlib.h>
@@ -20,6 +23,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <array>
 #include <string>
 #include <vector>
 
@@ -29,8 +33,16 @@
 // ---------------------------------------------------------------------------
 // Layout constants
 // ---------------------------------------------------------------------------
-static const int UI_W = 780;
+static const int UI_W = 1000;
 static const int UI_H = 280;
+static const int DEBUG_W = 800;
+static const int DEBUG_H = 560;
+static const size_t NOTE_COUNT = 37;
+static const size_t PLOT_COUNT = 4;
+static const size_t HISTORY_SIZE = 960;
+static const size_t DEFAULT_VISIBLE_COLUMNS = 240;
+static const size_t MIN_VISIBLE_COLUMNS = 30;
+static const double DEBUG_UPDATES_PER_SECOND = 20.0;
 
 // ---------------------------------------------------------------------------
 // Color helpers
@@ -76,10 +88,29 @@ struct Knob {
     float value;
 };
 
+struct DebugPlot {
+    Window window = 0;
+    cairo_surface_t* surface = nullptr;
+    cairo_surface_t* backbuffer = nullptr;
+    int width = DEBUG_W;
+    int height = DEBUG_H;
+    bool visible = false;
+    bool dirty = false;
+    size_t next_column = 0;
+    size_t columns_filled = 0;
+    size_t visible_columns = DEFAULT_VISIBLE_COLUMNS;
+    std::array<std::array<float, NOTE_COUNT>, HISTORY_SIZE> history = {};
+};
+
 struct GuitarMidiUI {
     // LV2 plumbing
     LV2UI_Write_Function write;
     LV2UI_Controller     controller;
+    uint32_t debug_port;
+    LV2_URID event_transfer;
+    LV2_URID vector_type;
+    LV2_URID float_type;
+    Atom wm_delete;
 
     // X11
     Display* dpy;
@@ -93,6 +124,7 @@ struct GuitarMidiUI {
 
     // Widgets
     std::vector<Knob> knobs;
+    DebugPlot plots[PLOT_COUNT];
 
     // Interaction state
     int    drag_knob;     // index into knobs, -1 = none
@@ -337,27 +369,27 @@ static void draw_ui(GuitarMidiUI* ui)
 
     draw_text(cr, 20, 55, "Neural guitar-to-MIDI converter", 11, COL_TEXT_DIM, false, false);
 
-    // Stylized string/fret glyph on the right of header
-    {
-        const double gx = UI_W - 150, gy = 14, gw = 130, gh = 36;
-        set_color(cr, COL_TEXT_DIM, 0.5);
+    const double button_y = 15;
+    const double button_w = 112;
+    const double button_h = 30;
+    const double button_gap = 6;
+    const double button_start = UI_W - 16 - PLOT_COUNT * button_w - (PLOT_COUNT - 1) * button_gap;
+    const Color button_colors[PLOT_COUNT] = {COL_ACCENT, COL_ACCENT2, COL_ACCENT, COL_ACCENT2};
+    const char* button_labels[PLOT_COUNT] = {
+        "CONF SMOOTH", "ENERGY SMOOTH", "CONF RAW", "ENERGY RAW"
+    };
+    for (size_t i = 0; i < PLOT_COUNT; ++i) {
+        const double x = button_start + i * (button_w + button_gap);
+        set_color(cr, COL_PANEL);
+        rounded_rect(cr, x, button_y, button_w, button_h, 4);
+        cairo_fill(cr);
+        set_color(cr, button_colors[i], 0.75);
         cairo_set_line_width(cr, 1.0);
-        for (int s = 0; s < 6; ++s) {
-            double y = gy + 4 + s * (gh - 8) / 5.0;
-            cairo_move_to(cr, gx, y);
-            cairo_line_to(cr, gx + gw, y);
-            cairo_stroke(cr);
-        }
-        // "notes" dots
-        set_color(cr, COL_ACCENT, 0.9);
-        cairo_arc(cr, gx + 30, gy + 4 + 1 * (gh - 8) / 5.0, 3, 0, 2 * M_PI);
-        cairo_fill(cr);
-        set_color(cr, COL_ACCENT2, 0.9);
-        cairo_arc(cr, gx + 70, gy + 4 + 3 * (gh - 8) / 5.0, 3, 0, 2 * M_PI);
-        cairo_fill(cr);
-        set_color(cr, COL_ACCENT3, 0.9);
-        cairo_arc(cr, gx + 105, gy + 4 + 4 * (gh - 8) / 5.0, 3, 0, 2 * M_PI);
-        cairo_fill(cr);
+        rounded_rect(cr, x + 0.5, button_y + 0.5,
+                     button_w - 1, button_h - 1, 4);
+        cairo_stroke(cr);
+        draw_text(cr, x + button_w / 2, button_y + 19,
+                  button_labels[i], 10, COL_TEXT, true, true);
     }
 
     // Panels -----------------------------------------------------------------
@@ -396,6 +428,139 @@ static void draw_ui(GuitarMidiUI* ui)
 
     cairo_destroy(cr);
     cairo_surface_flush(ui->surface);
+}
+
+static void open_plot_window(GuitarMidiUI* ui, int plot_index)
+{
+    DebugPlot& plot = ui->plots[plot_index];
+    if (!plot.window) {
+        plot.window = XCreateSimpleWindow(ui->dpy, RootWindow(ui->dpy, ui->screen),
+            80 + plot_index * 50, 80 + plot_index * 50, DEBUG_W, DEBUG_H,
+            0, BlackPixel(ui->dpy, ui->screen), BlackPixel(ui->dpy, ui->screen));
+        XSelectInput(ui->dpy, plot.window,
+                 ExposureMask | StructureNotifyMask | ButtonPressMask);
+        static const char* window_titles[PLOT_COUNT] = {
+            "GuitarMidi Smoothed Note Confidences",
+            "GuitarMidi Smoothed Note Energies",
+            "GuitarMidi Momentary Note Confidences",
+            "GuitarMidi Momentary Note Energies"
+        };
+        XStoreName(ui->dpy, plot.window, window_titles[plot_index]);
+        XSetWMProtocols(ui->dpy, plot.window, &ui->wm_delete, 1);
+        XSizeHints hints = {};
+        hints.flags = PMinSize;
+        hints.min_width = 500;
+        hints.min_height = 320;
+        XSetWMNormalHints(ui->dpy, plot.window, &hints);
+        plot.surface = cairo_xlib_surface_create(ui->dpy, plot.window,
+            DefaultVisual(ui->dpy, ui->screen), plot.width, plot.height);
+        plot.backbuffer = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
+            plot.width, plot.height);
+    }
+    plot.visible = true;
+    plot.dirty = true;
+    XMapRaised(ui->dpy, plot.window);
+    XFlush(ui->dpy);
+}
+
+static void draw_debug_plot(GuitarMidiUI* ui, int plot_index)
+{
+    DebugPlot& plot = ui->plots[plot_index];
+    if (!plot.surface || !plot.backbuffer || !plot.visible)
+        return;
+
+    cairo_t* cr = cairo_create(plot.backbuffer);
+    cairo_set_source_rgb(cr, COL_BG_BOT.r, COL_BG_BOT.g, COL_BG_BOT.b);
+    cairo_paint(cr);
+
+    static const char* titles[PLOT_COUNT] = {
+        "SMOOTHED CONFIDENCE", "SMOOTHED ENERGY",
+        "MOMENTARY CONFIDENCE", "MOMENTARY ENERGY"
+    };
+    const bool is_confidence = plot_index == 0 || plot_index == 2;
+    const char* title = titles[plot_index];
+    const Color accent = is_confidence ? COL_ACCENT : COL_ACCENT2;
+    draw_text(cr, 20, 30, title, 16, COL_TEXT, true, false);
+    char duration[32];
+    snprintf(duration, sizeof(duration), "%.1f s", plot.visible_columns / DEBUG_UPDATES_PER_SECOND);
+    draw_text(cr, 190, 30, duration, 11, COL_TEXT_DIM, false, false);
+    draw_text(cr, plot.width - 55, 29, "older", 10, COL_TEXT_DIM, false, false);
+    draw_text(cr, plot.width - 55, 43, "newer", 10, COL_TEXT_DIM, false, false);
+
+    const double label_w = 58;
+    const double chart_x = label_w;
+    const double chart_y = 56;
+    const double chart_w = plot.width - label_w - 18;
+    const double chart_h = plot.height - chart_y - 18;
+    const double cell_w = chart_w / plot.visible_columns;
+    const double cell_h = chart_h / NOTE_COUNT;
+    const char* pitch_names[] = {"C", "C#", "D", "D#", "E", "F",
+                                 "F#", "G", "G#", "A", "A#", "B"};
+    const size_t visible_count = std::min(plot.columns_filled, plot.visible_columns);
+    const size_t first_column = (plot.next_column + HISTORY_SIZE - visible_count) % HISTORY_SIZE;
+
+    for (size_t note = 0; note < NOTE_COUNT; ++note) {
+        const int midi_note = 40 + static_cast<int>(note);
+        char label[16];
+        snprintf(label, sizeof(label), "%s%d", pitch_names[midi_note % 12], midi_note / 12 - 1);
+        const double y = chart_y + (NOTE_COUNT - 1 - note) * cell_h;
+        draw_text(cr, label_w - 7, y + cell_h * 0.78, label, 8, COL_TEXT_DIM, false, true);
+
+        for (size_t column = 0; column < visible_count; ++column) {
+            float value = plot.history[(first_column + column) % HISTORY_SIZE][note];
+            value = std::max(0.0f, value);
+            if (is_confidence)
+                value = std::min(1.0f, value);
+            else
+                value = static_cast<float>(std::min(1.0, std::log1p(value) / std::log(101.0)));
+
+            const double x = chart_x + (plot.visible_columns - visible_count + column) * cell_w;
+            set_color(cr, COL_TRACK);
+            cairo_rectangle(cr, x, y, cell_w + 0.3, cell_h - 0.7);
+            cairo_fill(cr);
+            set_color(cr, accent, 0.12 + value * 0.88);
+            cairo_rectangle(cr, x, y, cell_w + 0.3, cell_h - 0.7);
+            cairo_fill(cr);
+        }
+    }
+
+    cairo_destroy(cr);
+    cairo_surface_flush(plot.backbuffer);
+    cairo_t* window_cr = cairo_create(plot.surface);
+    cairo_set_source_surface(window_cr, plot.backbuffer, 0, 0);
+    cairo_paint(window_cr);
+    cairo_destroy(window_cr);
+    cairo_surface_flush(plot.surface);
+}
+
+static void handle_plot_event(GuitarMidiUI* ui, int plot_index, XEvent* ev)
+{
+    DebugPlot& plot = ui->plots[plot_index];
+    if (ev->type == ConfigureNotify &&
+        (plot.width != ev->xconfigure.width || plot.height != ev->xconfigure.height)) {
+        plot.width = ev->xconfigure.width;
+        plot.height = ev->xconfigure.height;
+        cairo_xlib_surface_set_size(plot.surface, plot.width, plot.height);
+        cairo_surface_destroy(plot.backbuffer);
+        plot.backbuffer = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
+            plot.width, plot.height);
+        plot.dirty = true;
+    } else if (ev->type == Expose && ev->xexpose.count == 0) {
+        plot.dirty = true;
+    } else if (ev->type == ButtonPress &&
+               (ev->xbutton.button == Button4 || ev->xbutton.button == Button5)) {
+        const size_t new_zoom = ev->xbutton.button == Button4
+            ? std::max(MIN_VISIBLE_COLUMNS, plot.visible_columns / 2)
+            : std::min(HISTORY_SIZE, plot.visible_columns * 2);
+        if (new_zoom != plot.visible_columns) {
+            plot.visible_columns = new_zoom;
+            plot.dirty = true;
+        }
+    } else if (ev->type == ClientMessage &&
+               static_cast<Atom>(ev->xclient.data.l[0]) == ui->wm_delete) {
+        plot.visible = false;
+        XUnmapWindow(ui->dpy, plot.window);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -438,6 +603,20 @@ static void handle_event(GuitarMidiUI* ui, XEvent* ev)
         break;
 
     case ButtonPress: {
+        if (ev->xbutton.button == Button1 && ev->xbutton.y >= 15 && ev->xbutton.y <= 45) {
+            const double button_w = 112;
+            const double button_gap = 6;
+            const double button_start = UI_W - 16 - PLOT_COUNT * button_w - (PLOT_COUNT - 1) * button_gap;
+            for (size_t i = 0; i < PLOT_COUNT; ++i) {
+                const double x = button_start + i * (button_w + button_gap);
+                if (ev->xbutton.x >= x && ev->xbutton.x < x + button_w) {
+                    open_plot_window(ui, static_cast<int>(i));
+                    break;
+                }
+            }
+            if (ev->xbutton.x >= button_start && ev->xbutton.x < UI_W - 16)
+                break;
+        }
         const int idx = knob_at(ui, ev->xbutton.x, ev->xbutton.y);
         if (idx < 0)
             break;
@@ -533,9 +712,28 @@ static LV2UI_Handle instantiate(const LV2UI_Descriptor*   descriptor,
         return nullptr;
     }
 
+    LV2_URID_Map* map = nullptr;
+    LV2UI_Port_Map* port_map = nullptr;
+    for (int i = 0; features[i]; ++i) {
+        if (!strcmp(features[i]->URI, LV2_URID__map))
+            map = (LV2_URID_Map*)features[i]->data;
+        else if (!strcmp(features[i]->URI, LV2_UI__portMap))
+            port_map = (LV2UI_Port_Map*)features[i]->data;
+    }
+    if (!map || !port_map)
+        return nullptr;
+
     GuitarMidiUI* ui = new GuitarMidiUI();
     ui->write = write_function;
     ui->controller = controller;
+    ui->debug_port = port_map->port_index(port_map->handle, "debugdata");
+    ui->event_transfer = map->map(map->handle, LV2_ATOM__eventTransfer);
+    ui->vector_type = map->map(map->handle, LV2_ATOM__Vector);
+    ui->float_type = map->map(map->handle, LV2_ATOM__Float);
+    if (ui->debug_port == LV2UI_INVALID_PORT_INDEX) {
+        delete ui;
+        return nullptr;
+    }
     ui->drag_knob = -1;
     ui->hover_knob = -1;
     ui->dirty = true;
@@ -548,6 +746,7 @@ static LV2UI_Handle instantiate(const LV2UI_Descriptor*   descriptor,
     }
     ui->screen = DefaultScreen(ui->dpy);
     ui->parent = parent;
+    ui->wm_delete = XInternAtom(ui->dpy, "WM_DELETE_WINDOW", False);
 
     XSetWindowAttributes attr = {};
     attr.event_mask = ExposureMask | ButtonPressMask | ButtonReleaseMask |
@@ -584,6 +783,14 @@ static void cleanup(LV2UI_Handle handle)
     GuitarMidiUI* ui = (GuitarMidiUI*)handle;
     if (ui->surface)
         cairo_surface_destroy(ui->surface);
+    for (auto& plot : ui->plots) {
+        if (plot.surface)
+            cairo_surface_destroy(plot.surface);
+        if (plot.backbuffer)
+            cairo_surface_destroy(plot.backbuffer);
+        if (plot.window)
+            XDestroyWindow(ui->dpy, plot.window);
+    }
     if (ui->dpy) {
         XDestroyWindow(ui->dpy, ui->win);
         XCloseDisplay(ui->dpy);
@@ -597,10 +804,33 @@ static void port_event(LV2UI_Handle handle,
                        uint32_t     format,
                        const void*  buffer)
 {
+    GuitarMidiUI* ui = (GuitarMidiUI*)handle;
+    if (port_index == ui->debug_port && format == ui->event_transfer &&
+        buffer_size >= sizeof(LV2_Atom_Vector_Body) +
+            (NOTE_COUNT * PLOT_COUNT + 1) * sizeof(float)) {
+        const auto* atom = (const LV2_Atom*)buffer;
+        if (atom->type != ui->vector_type ||
+            atom->size < sizeof(LV2_Atom_Vector_Body) +
+                (NOTE_COUNT * PLOT_COUNT + 1) * sizeof(float) ||
+            atom->size > buffer_size)
+            return;
+        const auto* vector = (const LV2_Atom_Vector*)atom;
+        if (vector->body.child_size != sizeof(float) || vector->body.child_type != ui->float_type)
+            return;
+        const auto* values = (const float*)((const uint8_t*)vector + sizeof(LV2_Atom_Vector));
+        for (size_t plot_index = 0; plot_index < PLOT_COUNT; ++plot_index) {
+            DebugPlot& plot = ui->plots[plot_index];
+            for (size_t note = 0; note < NOTE_COUNT; ++note)
+                plot.history[plot.next_column][note] = values[plot_index * NOTE_COUNT + note];
+            plot.next_column = (plot.next_column + 1) % HISTORY_SIZE;
+            plot.columns_filled = std::min(HISTORY_SIZE, plot.columns_filled + 1);
+            plot.dirty = plot.visible;
+        }
+        return;
+    }
     if (format != 0 || buffer_size != sizeof(float))
         return;
 
-    GuitarMidiUI* ui = (GuitarMidiUI*)handle;
     const float v = *(const float*)buffer;
 
     for (auto& k : ui->knobs) {
@@ -622,13 +852,29 @@ static int ui_idle(LV2UI_Handle handle)
     XEvent ev;
     while (XPending(ui->dpy) > 0) {
         XNextEvent(ui->dpy, &ev);
-        handle_event(ui, &ev);
+        if (ev.xany.window == ui->win) {
+            handle_event(ui, &ev);
+        } else {
+            for (size_t i = 0; i < PLOT_COUNT; ++i) {
+                if (ev.xany.window == ui->plots[i].window) {
+                    handle_plot_event(ui, static_cast<int>(i), &ev);
+                    break;
+                }
+            }
+        }
     }
 
     if (ui->dirty) {
         draw_ui(ui);
         XFlush(ui->dpy);
         ui->dirty = false;
+    }
+    for (size_t i = 0; i < PLOT_COUNT; ++i) {
+        if (ui->plots[i].dirty) {
+            draw_debug_plot(ui, static_cast<int>(i));
+            XFlush(ui->dpy);
+            ui->plots[i].dirty = false;
+        }
     }
     return 0;
 }

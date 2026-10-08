@@ -34,6 +34,17 @@ namespace GuitarMidi
     {
         m_audiobuffer = input;
     }
+    void NoteInferencer::getDebugData(float *smoothed_confidences, float *smoothed_energies,
+                                      float *momentary_confidences, float *momentary_energies) const
+    {
+        for (int i = 0; i < NUM_NOTES; ++i)
+        {
+            smoothed_confidences[i] = smoothed_onsetoutput[i];
+            smoothed_energies[i] = smoothed_noteenergies[i];
+            momentary_confidences[i] = m_momentary_confidences[i];
+            momentary_energies[i] = m_momentary_noteenergies[i];
+        }
+    }
     void NoteInferencer::process(int nsamples,int pos)
     {
         if (m_frames < BUFFER_SIZE)
@@ -78,6 +89,9 @@ namespace GuitarMidi
                     }
                 }
 
+                m_momentary_confidences[i] = output_data[i];
+                m_momentary_noteenergies[i] = note_energy;
+
                 smoothed_onsetoutput[i] = *m_smoothing * smoothed_onsetoutput[i] + (1 - *m_smoothing) * output_data[i]; // simple low pass filter to smooth the output and reduce jitter
                 smoothed_offsetoutput[i] = *m_smoothing_offset * smoothed_offsetoutput[i] + (1 - *m_smoothing_offset) * output_data[i];
                 if (num_active_notes == 1)
@@ -95,10 +109,20 @@ namespace GuitarMidi
                 if (!m_note_on[i] && i != (NUM_NOTES - 1))
                 {
                     triggeron[i] = (smoothed_onsetoutput[i] > *m_onset_threshold && smoothed_noteenergies[i] > en_threshold);
+
+                    // if(triggeron[i])
+                    // {
+                    //     smoothed_noteenergies[i] = note_energy; // reset the smoothed note energy when a note is triggered on to avoid false offsets
+                    // }
                 }
                 else
                 {
                     triggeroff[i] = (smoothed_offsetoutput[i] < *m_offset_threshold && smoothed_offsetnoteenergies[i] < en_threshold_offset);
+
+                    // if(triggeroff[i])
+                    // {
+                    //     smoothed_offsetnoteenergies[i] = note_energy; // reset the smoothed note energy when a note is triggered off to avoid false offsets
+                    // }
                 }
             }
         }
