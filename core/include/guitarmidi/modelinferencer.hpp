@@ -18,6 +18,7 @@
  * Boston, MA  02110-1301  USA
  */
 #include <thread>
+#include <future>
 #include <mutex>
 #include <condition_variable>
 #include <guitarmidi/common.hpp>
@@ -100,7 +101,10 @@ class ModelInferencer {
         std::thread inferencing_thread;
         bool stop_thread;
         /** Runs model inference on frames received by the input ring buffer. */
-        void inferencing_loop();
+        void inferencing_loop(const std::string& bundle_path);
+
+        bool initialize_interpreter(const std::string& bundle_path);
+         std::promise<bool> m_initialization_promise;
         
     public:
         /** Creates the model inferencer. */

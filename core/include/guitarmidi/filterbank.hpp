@@ -41,6 +41,7 @@ namespace GuitarMidi{
         private:
            
             AudioBuffer2D m_filterbankbuffer; //number of filters x buffersize
+            AudioBuffer2D m_filterwaveformbuffer;
             //filter coefficients for the filters in the filter bank for direct form II implementation
             // Per filter, per section: biquad coefficients (a0 normalized to 1)
             float m_b0[NUM_FILTERS][NUM_SECTIONS];
@@ -56,24 +57,33 @@ namespace GuitarMidi{
             float *m_gain_db;
             int m_hostbuffer_size;
             int m_current_buffer_offset;
+            uint32_t m_waveform_sample_phase = 0;
+            uint32_t m_waveform_capture_column = 0;
+            static constexpr uint32_t WAVEFORM_CAPTURE_INTERVAL = NATIVE_SAMPLERATE / 20;
             #ifdef WITH_AUDIO_OUTPUT
             float *m_filter_output_buffer;  
             float* m_note_select;
             float* m_harmonic_select;
             #endif
             public:
+            static constexpr uint32_t WAVEFORM_SAMPLES = 64;
+
             /** Allocates and initializes the filter-bank output buffer. */
             FilterBank(){
                 // Allocate the 2D audio buffer (num_filters x window_size)
                 m_filterbankbuffer.num_filters = NUM_FILTERS;
                 m_filterbankbuffer.window_size = BUFFER_SIZE;
                 m_filterbankbuffer.audio_buffer_2D = new float[NUM_FILTERS * m_filterbankbuffer.window_size];
+                m_filterwaveformbuffer.num_filters = NUM_FILTERS;
+                m_filterwaveformbuffer.window_size = WAVEFORM_SAMPLES;
+                m_filterwaveformbuffer.audio_buffer_2D = new float[NUM_FILTERS * m_filterwaveformbuffer.window_size];
                 m_current_buffer_offset = 0;
             };
             /** Releases the filter-bank output buffer. */
             ~FilterBank(){
                 // Free the 2D audio buffer
                 delete[] m_filterbankbuffer.audio_buffer_2D;
+                delete[] m_filterwaveformbuffer.audio_buffer_2D;
             };
 
             /** Configures filter coefficients for the requested fretboard representation. */
@@ -96,8 +106,13 @@ namespace GuitarMidi{
             void process(int nsamples,int pos=0);
 
             /** Returns the filter-bank output buffer. */
-            AudioBuffer2D get_buffer(){
+            AudioBuffer2D get_buffer() const{
                 return m_filterbankbuffer;
+            }
+
+            /** Returns the signed filter responses used for waveform visualization. */
+            AudioBuffer2D get_waveform_buffer() const{
+                return m_filterwaveformbuffer;
             }
 
             /** Resets filter state and processing offsets. */

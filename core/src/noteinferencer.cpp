@@ -57,6 +57,7 @@ namespace GuitarMidi
         {
             num_active_notes += m_note_on[h];
         }
+        //num_active_notes=1;
         m_frames = 0;
         stringstream msg;
         float gain = powf(10.0f, *m_gain_db * 0.05f);
@@ -96,8 +97,8 @@ namespace GuitarMidi
                 smoothed_offsetoutput[i] = *m_smoothing_offset * smoothed_offsetoutput[i] + (1 - *m_smoothing_offset) * output_data[i];
                 if (num_active_notes == 1)
                 {
-                    smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy * smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
-                    smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy * smoothed_offsetoutput[i];
+                    smoothed_noteenergies[i] = *m_smoothing * smoothed_noteenergies[i] + (1 - *m_smoothing) * note_energy *output_data[i];// smoothed_onsetoutput[i]; // smooth the note energy to avoid jitter
+                    smoothed_offsetnoteenergies[i] = *m_smoothing_offset * smoothed_offsetnoteenergies[i] + (1 - *m_smoothing_offset) * note_energy * output_data[i];//smoothed_offsetoutput[i];
                 }
                 else
                 {

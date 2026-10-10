@@ -156,3 +156,20 @@ void FretBoard::process_direct(int nsamples,int pos)
     m_noteinferencer.process(nsamples,pos);
     
 }
+
+void FretBoard::getFilterWaveforms(float *waveforms, uint32_t samples_per_filter) const
+{
+    if (samples_per_filter == 0)
+        return;
+
+    const AudioBuffer2D filter_buffer = m_filterbank.get_waveform_buffer();
+    for (int filter = 0; filter < NUM_FILTERS; ++filter)
+    {
+        const float *samples = filter_buffer.audio_buffer_2D + filter * filter_buffer.window_size;
+        for (uint32_t point = 0; point < samples_per_filter; ++point)
+        {
+            const uint32_t sample = point * filter_buffer.window_size / samples_per_filter;
+            waveforms[filter * samples_per_filter + point] = samples[sample];
+        }
+    }
+}

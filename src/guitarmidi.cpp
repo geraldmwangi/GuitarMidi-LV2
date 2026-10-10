@@ -28,6 +28,7 @@
 #include <lv2/urid/urid.h>
 #include <lv2/log/logger.h>
 #include <guitarmidi/common.hpp>
+#include <guitarmidi/filterbank.hpp>
 #include <string>
 #include <cstring>
 #include <guitarmidi/fretboard_api.hpp>
@@ -59,6 +60,7 @@ static constexpr uint32_t DEBUG_DATA_PORT = 14;
 #else
 static constexpr uint32_t DEBUG_DATA_PORT = 10;
 #endif
+static constexpr uint32_t FILTER_WAVEFORM_SAMPLES = 64;
 
 struct GuitarMidiPlugin
 {
@@ -270,24 +272,29 @@ run(LV2_Handle instance, uint32_t n_samples)
 		{
 			if (send_debug_data)
 			{
-				float values[NUM_NOTES * 4 + 1];
+				float values[NUM_NOTES * 4 + NUM_FILTERS * FILTER_WAVEFORM_SAMPLES + 1];
 				float smoothed_energies[NUM_NOTES];
 				float momentary_confidences[NUM_NOTES];
 				float momentary_energies[NUM_NOTES];
+				float filter_waveforms[NUM_FILTERS * FILTER_WAVEFORM_SAMPLES];
 				plugin->fretboard->getNoteDebugData(values, smoothed_energies,
 					momentary_confidences, momentary_energies);
+				plugin->fretboard->getFilterWaveforms(filter_waveforms, FILTER_WAVEFORM_SAMPLES);
 				for (uint32_t i = 0; i < NUM_NOTES; ++i)
 				{
 					values[NUM_NOTES + i] = smoothed_energies[i];
 					values[NUM_NOTES * 2 + i] = momentary_confidences[i];
 					values[NUM_NOTES * 3 + i] = momentary_energies[i];
 				}
+				for (uint32_t i = 0; i < NUM_FILTERS * FILTER_WAVEFORM_SAMPLES; ++i)
+					values[NUM_NOTES * 4 + i] = filter_waveforms[i];
 				plugin->debug_tick = 1.0f - plugin->debug_tick;
-				values[NUM_NOTES * 4] = plugin->debug_tick;
+				values[NUM_NOTES * 4 + NUM_FILTERS * FILTER_WAVEFORM_SAMPLES] = plugin->debug_tick;
 
 				lv2_atom_forge_frame_time(&plugin->debug_forge, 0);
 				lv2_atom_forge_vector(&plugin->debug_forge, sizeof(float),
-					plugin->debug_forge.Float, NUM_NOTES * 4 + 1, values);
+					plugin->debug_forge.Float,
+					NUM_NOTES * 4 + NUM_FILTERS * FILTER_WAVEFORM_SAMPLES + 1, values);
 			}
 			lv2_atom_forge_pop(&plugin->debug_forge, &sequence_frame);
 		}

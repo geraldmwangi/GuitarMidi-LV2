@@ -133,6 +133,9 @@ public:
     /** Copies the latest smoothed and momentary note confidence and energy values. */
     virtual void getNoteDebugData(float *smoothed_confidences, float *smoothed_energies,
                                   float *momentary_confidences, float *momentary_energies) const = 0;
+
+    /** Copies decimated signed waveform samples for every filter. */
+    virtual void getFilterWaveforms(float *waveforms, uint32_t samples_per_filter) const = 0;
 };
 
 FretBoardAPI *creatFretBoard(GuitarMidiOutput*);

@@ -129,6 +129,10 @@ void FilterBank::reset()
 {
     std::memset(m_s1, 0, sizeof(m_s1));
     std::memset(m_s2, 0, sizeof(m_s2));
+    std::memset(m_filterwaveformbuffer.audio_buffer_2D, 0,
+                NUM_FILTERS * WAVEFORM_SAMPLES * sizeof(float));
+    m_waveform_sample_phase = 0;
+    m_waveform_capture_column = 0;
 }
 
 void FilterBank::process(int nsamples,int pos)
@@ -136,6 +140,14 @@ void FilterBank::process(int nsamples,int pos)
     float gain = powf(10.0f, *m_gain_db * 0.05f);
     for (int n = 0; n < nsamples; ++n)
     { 
+        m_waveform_sample_phase += WAVEFORM_SAMPLES;
+        int waveform_capture_column = -1;
+        if (m_waveform_sample_phase >= WAVEFORM_CAPTURE_INTERVAL)
+        {
+            m_waveform_sample_phase -= WAVEFORM_CAPTURE_INTERVAL;
+            waveform_capture_column = static_cast<int>(m_waveform_capture_column);
+            m_waveform_capture_column = (m_waveform_capture_column + 1) % WAVEFORM_SAMPLES;
+        }
         // nsamples + pos is expected to be smaller then the buffersize. not asserting here for performance reasons
         const float x = gain * m_input[n+pos];
         for (int f = 0; f < NUM_FILTERS; ++f)
@@ -150,6 +162,8 @@ void FilterBank::process(int nsamples,int pos)
 
             float *__restrict out =
                 m_filterbankbuffer.audio_buffer_2D + f * m_filterbankbuffer.window_size + m_current_buffer_offset;
+            float *__restrict waveform_out =
+                m_filterwaveformbuffer.audio_buffer_2D + f * m_filterwaveformbuffer.window_size;
 
             // Section 0 (Transposed Direct Form II)
             const float y0 = b0_0 * x + s1_0;
@@ -161,7 +175,10 @@ void FilterBank::process(int nsamples,int pos)
             s1_1 = b1_1 * y0 - a1_1 * y1 + s2_1;
             s2_1 = b2_1 * y0 - a2_1 * y1;
 
-            out[n] = std::fabs(y1);
+            const float rectified_output = std::fabs(y1);
+            out[n] = rectified_output;
+            if (waveform_capture_column >= 0)
+                waveform_out[waveform_capture_column] = rectified_output;
             // output the audio for the selected filter and note/harmonic if audio output is enabled. if selected harmonic is 4, output the sum of all filters
 #ifdef WITH_AUDIO_OUTPUT
 

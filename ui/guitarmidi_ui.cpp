@@ -1,11 +1,12 @@
 /*
  * GuitarMidi-LV2 - X11/Cairo UI
  *
- * A self-contained modern dark UI for the GuitarMidi plugin.
+        const double row_bottom = chart_y + (FILTER_COUNT - filter) * cell_h;
  * Uses raw Xlib + Cairo, implements the LV2UI X11 interface with
  * the ui:idleInterface extension (no toolkit event loop needed).
  *
- * License: ISC (same as plugin)
+            draw_text(cr, chart_x - 7, row_bottom - cell_h * 0.5 + 3,
+                      label, 8, COL_TEXT_DIM, false, true);
  */
 
 #include <lv2/core/lv2.h>
@@ -20,10 +21,13 @@
 #include <cairo/cairo-xlib.h>
 
 #include <cmath>
+#include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <array>
+#include <filesystem>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -38,11 +42,23 @@ static const int UI_H = 280;
 static const int DEBUG_W = 800;
 static const int DEBUG_H = 560;
 static const size_t NOTE_COUNT = 37;
-static const size_t PLOT_COUNT = 4;
+static const size_t FILTER_COUNT = 148;
+static const size_t HARMONICS_PER_NOTE = FILTER_COUNT / NOTE_COUNT;
+static const int MIDI_NOTE_OFFSET = 40;
+static const size_t FILTER_WAVEFORM_SAMPLES = 64;
+static const size_t NOTE_PLOT_COUNT = 4;
+static const size_t PLOT_COUNT = NOTE_PLOT_COUNT + 1;
+static const size_t TOOLBAR_BUTTON_COUNT = PLOT_COUNT + 1;
 static const size_t HISTORY_SIZE = 960;
 static const size_t DEFAULT_VISIBLE_COLUMNS = 240;
 static const size_t MIN_VISIBLE_COLUMNS = 30;
+static const size_t MIN_FILTER_VISIBLE_SAMPLES = 16;
 static const double DEBUG_UPDATES_PER_SECOND = 20.0;
+static const size_t FILTER_SAMPLE_RATE = 1280;
+static const size_t FILTER_HISTORY_SIZE = FILTER_SAMPLE_RATE * 48;
+static const size_t DEFAULT_FILTER_VISIBLE_SAMPLES = FILTER_SAMPLE_RATE * 12;
+static const double PLOT_BUTTON_WIDTH = 96.0;
+static const double PLOT_BUTTON_GAP = 6.0;
 
 // ---------------------------------------------------------------------------
 // Color helpers
@@ -54,6 +70,22 @@ struct Color {
 static inline void set_color(cairo_t* cr, Color c, double a = 1.0)
 {
     cairo_set_source_rgba(cr, c.r, c.g, c.b, a);
+}
+
+static Color note_color(size_t note)
+{
+    const double hue = std::fmod(note * 0.6180339887498949, 1.0) * 6.0;
+    const double saturation = 0.82;
+    const double lightness = 0.62;
+    const double chroma = (1.0 - std::fabs(2.0 * lightness - 1.0)) * saturation;
+    const double secondary = chroma * (1.0 - std::fabs(std::fmod(hue, 2.0) - 1.0));
+    const double offset = lightness - chroma * 0.5;
+    if (hue < 1.0) return {chroma + offset, secondary + offset, offset};
+    if (hue < 2.0) return {secondary + offset, chroma + offset, offset};
+    if (hue < 3.0) return {offset, chroma + offset, secondary + offset};
+    if (hue < 4.0) return {offset, secondary + offset, chroma + offset};
+    if (hue < 5.0) return {secondary + offset, offset, chroma + offset};
+    return {chroma + offset, offset, secondary + offset};
 }
 
 // Palette (modern dark)
@@ -99,7 +131,10 @@ struct DebugPlot {
     size_t next_column = 0;
     size_t columns_filled = 0;
     size_t visible_columns = DEFAULT_VISIBLE_COLUMNS;
-    std::array<std::array<float, NOTE_COUNT>, HISTORY_SIZE> history = {};
+    size_t row_count = NOTE_COUNT;
+    std::array<std::array<float, FILTER_COUNT>, HISTORY_SIZE> history = {};
+    std::vector<std::array<float, FILTER_COUNT>> filter_history;
+    std::vector<float> filter_column_peaks;
 };
 
 struct GuitarMidiUI {
@@ -134,6 +169,7 @@ struct GuitarMidiUI {
     int    hover_knob;
 
     bool dirty;
+    std::string save_status;
 };
 
 // ---------------------------------------------------------------------------
@@ -370,15 +406,18 @@ static void draw_ui(GuitarMidiUI* ui)
     draw_text(cr, 20, 55, "Neural guitar-to-MIDI converter", 11, COL_TEXT_DIM, false, false);
 
     const double button_y = 15;
-    const double button_w = 112;
+    const double button_w = PLOT_BUTTON_WIDTH;
     const double button_h = 30;
-    const double button_gap = 6;
-    const double button_start = UI_W - 16 - PLOT_COUNT * button_w - (PLOT_COUNT - 1) * button_gap;
-    const Color button_colors[PLOT_COUNT] = {COL_ACCENT, COL_ACCENT2, COL_ACCENT, COL_ACCENT2};
-    const char* button_labels[PLOT_COUNT] = {
-        "CONF SMOOTH", "ENERGY SMOOTH", "CONF RAW", "ENERGY RAW"
+    const double button_gap = PLOT_BUTTON_GAP;
+    const double button_start = UI_W - 16 - TOOLBAR_BUTTON_COUNT * button_w -
+        (TOOLBAR_BUTTON_COUNT - 1) * button_gap;
+    const Color button_colors[TOOLBAR_BUTTON_COUNT] = {
+        COL_ACCENT, COL_ACCENT2, COL_ACCENT, COL_ACCENT2, COL_ACCENT3, COL_TEXT_DIM
     };
-    for (size_t i = 0; i < PLOT_COUNT; ++i) {
+    const char* button_labels[TOOLBAR_BUTTON_COUNT] = {
+        "CONF SMOOTH", "ENERGY SMOOTH", "CONF RAW", "ENERGY RAW", "FILTER OUT", "SAVE PLOTS"
+    };
+    for (size_t i = 0; i < TOOLBAR_BUTTON_COUNT; ++i) {
         const double x = button_start + i * (button_w + button_gap);
         set_color(cr, COL_PANEL);
         rounded_rect(cr, x, button_y, button_w, button_h, 4);
@@ -422,8 +461,10 @@ static void draw_ui(GuitarMidiUI* ui)
     if(ui->hover_knob>=0)
         draw_tooltip(cr,ui->knobs[ui->hover_knob]);
     // Footer hint (centered)
-    draw_text(cr, UI_W / 2.0, UI_H - 6,
-              "drag: adjust    shift+drag: fine    double-click: reset    scroll: step", 10,
+    const char* footer = ui->save_status.empty()
+        ? "drag: adjust    shift+drag: fine    double-click: reset    scroll: step"
+        : ui->save_status.c_str();
+    draw_text(cr, UI_W / 2.0, UI_H - 6, footer, 10,
               COL_TEXT_DIM, false, true);
 
     cairo_destroy(cr);
@@ -437,13 +478,18 @@ static void open_plot_window(GuitarMidiUI* ui, int plot_index)
         plot.window = XCreateSimpleWindow(ui->dpy, RootWindow(ui->dpy, ui->screen),
             80 + plot_index * 50, 80 + plot_index * 50, DEBUG_W, DEBUG_H,
             0, BlackPixel(ui->dpy, ui->screen), BlackPixel(ui->dpy, ui->screen));
+        plot.row_count = plot_index == static_cast<int>(NOTE_PLOT_COUNT)
+            ? FILTER_COUNT : NOTE_COUNT;
+        if (plot_index == static_cast<int>(NOTE_PLOT_COUNT))
+            plot.visible_columns = DEFAULT_FILTER_VISIBLE_SAMPLES;
         XSelectInput(ui->dpy, plot.window,
                  ExposureMask | StructureNotifyMask | ButtonPressMask);
         static const char* window_titles[PLOT_COUNT] = {
             "GuitarMidi Smoothed Note Confidences",
             "GuitarMidi Smoothed Note Energies",
             "GuitarMidi Momentary Note Confidences",
-            "GuitarMidi Momentary Note Energies"
+            "GuitarMidi Momentary Note Energies",
+            "GuitarMidi Filter Bank Outputs"
         };
         XStoreName(ui->dpy, plot.window, window_titles[plot_index]);
         XSetWMProtocols(ui->dpy, plot.window, &ui->wm_delete, 1);
@@ -463,6 +509,164 @@ static void open_plot_window(GuitarMidiUI* ui, int plot_index)
     XFlush(ui->dpy);
 }
 
+static void draw_filter_waveforms(cairo_t* cr, const DebugPlot& plot,
+                                  double chart_x, double chart_y,
+                                  double chart_w, double chart_h)
+{
+    const size_t visible_samples = std::min(plot.columns_filled, plot.visible_columns);
+    const size_t first_column = (plot.next_column + FILTER_HISTORY_SIZE - visible_samples) % FILTER_HISTORY_SIZE;
+    const double cell_h = chart_h / FILTER_COUNT;
+    float amplitude_limit = 0.0f;
+    for (size_t column = 0; column < visible_samples; ++column)
+        amplitude_limit = std::max(amplitude_limit,
+            plot.filter_column_peaks[(first_column + column) % FILTER_HISTORY_SIZE]);
+    if (amplitude_limit < 1.0e-12f)
+        amplitude_limit = 1.0f;
+
+    for (size_t filter = 0; filter < FILTER_COUNT; ++filter) {
+        const double row_bottom = chart_y + (FILTER_COUNT - filter) * cell_h;
+        const Color trace_color = note_color(filter / HARMONICS_PER_NOTE);
+        if (filter % HARMONICS_PER_NOTE == 0) {
+            static const char* pitch_names[] = {
+                "C", "C#", "D", "D#", "E", "F",
+                "F#", "G", "G#", "A", "A#", "B"
+            };
+            const int midi_note = MIDI_NOTE_OFFSET + static_cast<int>(filter / HARMONICS_PER_NOTE);
+            char label[16];
+            snprintf(label, sizeof(label), "%s%d", pitch_names[midi_note % 12], midi_note / 12 - 1);
+            const double group_center = chart_y +
+                (FILTER_COUNT - filter - HARMONICS_PER_NOTE * 0.5) * cell_h;
+            draw_text(cr, chart_x * 0.5, group_center + 3,
+                      label, 8, trace_color, true, true);
+            draw_text(cr, chart_x + chart_w + chart_x * 0.5, group_center + 3,
+                      label, 8, trace_color, true, true);
+        }
+
+        set_color(cr, COL_TRACK, 0.65);
+        cairo_set_line_width(cr, 0.5);
+        cairo_move_to(cr, chart_x, row_bottom);
+        cairo_line_to(cr, chart_x + chart_w, row_bottom);
+        cairo_stroke(cr);
+
+        cairo_new_path(cr);
+        if (visible_samples <= static_cast<size_t>(chart_w)) {
+            for (size_t point = 0; point < visible_samples; ++point) {
+                const size_t column = (first_column + point) % FILTER_HISTORY_SIZE;
+                const double x = chart_x + (visible_samples > 1
+                    ? static_cast<double>(point) * chart_w / (visible_samples - 1) : chart_w);
+                const double y = row_bottom - std::min(1.0f,
+                    plot.filter_history[column][filter] / amplitude_limit) * cell_h * 0.9;
+                if (point == 0)
+                    cairo_move_to(cr, x, y);
+                else
+                    cairo_line_to(cr, x, y);
+            }
+            cairo_set_line_width(cr, 1.0);
+            set_color(cr, trace_color);
+            cairo_stroke(cr);
+        } else {
+            const size_t pixel_count = static_cast<size_t>(chart_w);
+            for (size_t pixel = 0; pixel < pixel_count; ++pixel) {
+                const size_t begin = pixel * visible_samples / pixel_count;
+                const size_t end = std::max(begin + 1,
+                    (pixel + 1) * visible_samples / pixel_count);
+                float minimum = std::numeric_limits<float>::max();
+                float maximum = 0.0f;
+                for (size_t point = begin; point < std::min(end, visible_samples); ++point) {
+                    const size_t column = (first_column + point) % FILTER_HISTORY_SIZE;
+                    const float value = plot.filter_history[column][filter];
+                    minimum = std::min(minimum, value);
+                    maximum = std::max(maximum, value);
+                }
+                const double x = chart_x + pixel;
+                const double y_top = row_bottom - std::min(1.0f, maximum / amplitude_limit) * cell_h * 0.9;
+                const double y_bottom = row_bottom - std::min(1.0f, minimum / amplitude_limit) * cell_h * 0.9;
+                cairo_move_to(cr, x, y_top);
+                cairo_line_to(cr, x, y_bottom);
+            }
+            set_color(cr, trace_color);
+            cairo_set_line_width(cr, 1.0);
+            cairo_stroke(cr);
+        }
+    }
+}
+
+static void render_debug_plot(GuitarMidiUI* ui, int plot_index, cairo_t* cr)
+{
+    DebugPlot& plot = ui->plots[plot_index];
+    cairo_set_source_rgb(cr, COL_BG_BOT.r, COL_BG_BOT.g, COL_BG_BOT.b);
+    cairo_paint(cr);
+
+    static const char* titles[PLOT_COUNT] = {
+        "SMOOTHED CONFIDENCE", "SMOOTHED ENERGY",
+        "MOMENTARY CONFIDENCE", "MOMENTARY ENERGY", "FILTER WAVEFORMS"
+    };
+    const bool is_confidence = plot_index == 0 || plot_index == 2;
+    const char* title = titles[plot_index];
+    const Color accent = plot_index == static_cast<int>(NOTE_PLOT_COUNT)
+        ? COL_ACCENT3 : (is_confidence ? COL_ACCENT : COL_ACCENT2);
+    draw_text(cr, 20, 30, title, 16, COL_TEXT, true, false);
+    char duration[32];
+    if (plot_index == static_cast<int>(NOTE_PLOT_COUNT))
+        snprintf(duration, sizeof(duration), "%zu samples / %.2f ms",
+                 plot.visible_columns,
+                 plot.visible_columns * 1000.0 / FILTER_SAMPLE_RATE);
+    else
+        snprintf(duration, sizeof(duration), "%.1f s", plot.visible_columns / DEBUG_UPDATES_PER_SECOND);
+    draw_text(cr, 190, 30, duration, 11, COL_TEXT_DIM, false, false);
+    draw_text(cr, plot.width - 55, 29,
+              plot_index == static_cast<int>(NOTE_PLOT_COUNT) ? "start" : "older",
+              10, COL_TEXT_DIM, false, false);
+    draw_text(cr, plot.width - 55, 43,
+              plot_index == static_cast<int>(NOTE_PLOT_COUNT) ? "end" : "newer",
+              10, COL_TEXT_DIM, false, false);
+
+    const double label_w = 58;
+    const double chart_x = label_w;
+    const double chart_y = 56;
+    const double chart_w = plot.width - 2 * label_w;
+    const double chart_h = plot.height - chart_y - 18;
+    if (plot_index == static_cast<int>(NOTE_PLOT_COUNT)) {
+        draw_filter_waveforms(cr, plot, chart_x, chart_y, chart_w, chart_h);
+    } else {
+        const double cell_w = chart_w / plot.visible_columns;
+        const double cell_h = chart_h / NOTE_COUNT;
+        const char* pitch_names[] = {"C", "C#", "D", "D#", "E", "F",
+                                     "F#", "G", "G#", "A", "A#", "B"};
+        const size_t visible_count = std::min(plot.columns_filled, plot.visible_columns);
+        const size_t first_column = (plot.next_column + HISTORY_SIZE - visible_count) % HISTORY_SIZE;
+        for (size_t note = 0; note < NOTE_COUNT; ++note) {
+            const int midi_note = 40 + static_cast<int>(note);
+            char label[16];
+            snprintf(label, sizeof(label), "%s%d", pitch_names[midi_note % 12], midi_note / 12 - 1);
+            const double y = chart_y + (plot.row_count - 1 - note) * cell_h;
+            const Color note_accent = note_color(note);
+            draw_text(cr, chart_x * 0.5, y + cell_h * 0.78,
+                      label, 8, note_accent, true, true);
+            draw_text(cr, chart_x + chart_w + chart_x * 0.5, y + cell_h * 0.78,
+                      label, 8, note_accent, true, true);
+
+            for (size_t column = 0; column < visible_count; ++column) {
+                float value = plot.history[(first_column + column) % HISTORY_SIZE][note];
+                value = std::max(0.0f, value);
+                if (is_confidence)
+                    value = std::min(1.0f, value);
+                else
+                    value = static_cast<float>(std::min(1.0, std::log1p(value) / std::log(101.0)));
+
+                const double x = chart_x + (plot.visible_columns - visible_count + column) * cell_w;
+                set_color(cr, COL_TRACK);
+                cairo_rectangle(cr, x, y, cell_w + 0.3, cell_h - 0.7);
+                cairo_fill(cr);
+                set_color(cr, accent, 0.12 + value * 0.88);
+                cairo_rectangle(cr, x, y, cell_w + 0.3, cell_h - 0.7);
+                cairo_fill(cr);
+            }
+        }
+    }
+
+}
+
 static void draw_debug_plot(GuitarMidiUI* ui, int plot_index)
 {
     DebugPlot& plot = ui->plots[plot_index];
@@ -470,60 +674,7 @@ static void draw_debug_plot(GuitarMidiUI* ui, int plot_index)
         return;
 
     cairo_t* cr = cairo_create(plot.backbuffer);
-    cairo_set_source_rgb(cr, COL_BG_BOT.r, COL_BG_BOT.g, COL_BG_BOT.b);
-    cairo_paint(cr);
-
-    static const char* titles[PLOT_COUNT] = {
-        "SMOOTHED CONFIDENCE", "SMOOTHED ENERGY",
-        "MOMENTARY CONFIDENCE", "MOMENTARY ENERGY"
-    };
-    const bool is_confidence = plot_index == 0 || plot_index == 2;
-    const char* title = titles[plot_index];
-    const Color accent = is_confidence ? COL_ACCENT : COL_ACCENT2;
-    draw_text(cr, 20, 30, title, 16, COL_TEXT, true, false);
-    char duration[32];
-    snprintf(duration, sizeof(duration), "%.1f s", plot.visible_columns / DEBUG_UPDATES_PER_SECOND);
-    draw_text(cr, 190, 30, duration, 11, COL_TEXT_DIM, false, false);
-    draw_text(cr, plot.width - 55, 29, "older", 10, COL_TEXT_DIM, false, false);
-    draw_text(cr, plot.width - 55, 43, "newer", 10, COL_TEXT_DIM, false, false);
-
-    const double label_w = 58;
-    const double chart_x = label_w;
-    const double chart_y = 56;
-    const double chart_w = plot.width - label_w - 18;
-    const double chart_h = plot.height - chart_y - 18;
-    const double cell_w = chart_w / plot.visible_columns;
-    const double cell_h = chart_h / NOTE_COUNT;
-    const char* pitch_names[] = {"C", "C#", "D", "D#", "E", "F",
-                                 "F#", "G", "G#", "A", "A#", "B"};
-    const size_t visible_count = std::min(plot.columns_filled, plot.visible_columns);
-    const size_t first_column = (plot.next_column + HISTORY_SIZE - visible_count) % HISTORY_SIZE;
-
-    for (size_t note = 0; note < NOTE_COUNT; ++note) {
-        const int midi_note = 40 + static_cast<int>(note);
-        char label[16];
-        snprintf(label, sizeof(label), "%s%d", pitch_names[midi_note % 12], midi_note / 12 - 1);
-        const double y = chart_y + (NOTE_COUNT - 1 - note) * cell_h;
-        draw_text(cr, label_w - 7, y + cell_h * 0.78, label, 8, COL_TEXT_DIM, false, true);
-
-        for (size_t column = 0; column < visible_count; ++column) {
-            float value = plot.history[(first_column + column) % HISTORY_SIZE][note];
-            value = std::max(0.0f, value);
-            if (is_confidence)
-                value = std::min(1.0f, value);
-            else
-                value = static_cast<float>(std::min(1.0, std::log1p(value) / std::log(101.0)));
-
-            const double x = chart_x + (plot.visible_columns - visible_count + column) * cell_w;
-            set_color(cr, COL_TRACK);
-            cairo_rectangle(cr, x, y, cell_w + 0.3, cell_h - 0.7);
-            cairo_fill(cr);
-            set_color(cr, accent, 0.12 + value * 0.88);
-            cairo_rectangle(cr, x, y, cell_w + 0.3, cell_h - 0.7);
-            cairo_fill(cr);
-        }
-    }
-
+    render_debug_plot(ui, plot_index, cr);
     cairo_destroy(cr);
     cairo_surface_flush(plot.backbuffer);
     cairo_t* window_cr = cairo_create(plot.surface);
@@ -531,6 +682,64 @@ static void draw_debug_plot(GuitarMidiUI* ui, int plot_index)
     cairo_paint(window_cr);
     cairo_destroy(window_cr);
     cairo_surface_flush(plot.surface);
+}
+
+static void save_plot_snapshots(GuitarMidiUI* ui)
+{
+    const char* home = std::getenv("HOME");
+    if (!home || !*home) {
+        ui->save_status = "Save failed: HOME is not set";
+        ui->dirty = true;
+        return;
+    }
+
+    const std::filesystem::path output_directory =
+        std::filesystem::path(home) / "Pictures" / "GuitarMidiSnapshots";
+    std::error_code error;
+    std::filesystem::create_directories(output_directory, error);
+    if (error) {
+        ui->save_status = "Save failed: " + error.message();
+        ui->dirty = true;
+        return;
+    }
+
+    static const char* file_stems[PLOT_COUNT] = {
+        "smoothed-confidence", "smoothed-energy", "momentary-confidence",
+        "momentary-energy", "filter-waveforms"
+    };
+    const auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+
+    for (size_t i = 0; i < PLOT_COUNT; ++i) {
+        DebugPlot& plot = ui->plots[i];
+        cairo_surface_t* image = cairo_image_surface_create(
+            CAIRO_FORMAT_ARGB32, plot.width, plot.height);
+        if (cairo_surface_status(image) != CAIRO_STATUS_SUCCESS) {
+            const std::string message = cairo_status_to_string(cairo_surface_status(image));
+            cairo_surface_destroy(image);
+            ui->save_status = "Save failed: " + message;
+            ui->dirty = true;
+            return;
+        }
+
+        cairo_t* cr = cairo_create(image);
+        render_debug_plot(ui, static_cast<int>(i), cr);
+        cairo_destroy(cr);
+        cairo_surface_flush(image);
+
+        const std::filesystem::path file = output_directory /
+            (std::string(file_stems[i]) + "-" + std::to_string(timestamp) + ".png");
+        const cairo_status_t status = cairo_surface_write_to_png(image, file.c_str());
+        cairo_surface_destroy(image);
+        if (status != CAIRO_STATUS_SUCCESS) {
+            ui->save_status = "Save failed: " + std::string(cairo_status_to_string(status));
+            ui->dirty = true;
+            return;
+        }
+    }
+
+    ui->save_status = "Saved 5 PNGs to ~/Pictures/GuitarMidiSnapshots";
+    ui->dirty = true;
 }
 
 static void handle_plot_event(GuitarMidiUI* ui, int plot_index, XEvent* ev)
@@ -549,9 +758,13 @@ static void handle_plot_event(GuitarMidiUI* ui, int plot_index, XEvent* ev)
         plot.dirty = true;
     } else if (ev->type == ButtonPress &&
                (ev->xbutton.button == Button4 || ev->xbutton.button == Button5)) {
-        const size_t new_zoom = ev->xbutton.button == Button4
-            ? std::max(MIN_VISIBLE_COLUMNS, plot.visible_columns / 2)
-            : std::min(HISTORY_SIZE, plot.visible_columns * 2);
+            const size_t new_zoom = ev->xbutton.button == Button4
+                ? std::max(plot_index == static_cast<int>(NOTE_PLOT_COUNT)
+                               ? MIN_FILTER_VISIBLE_SAMPLES : MIN_VISIBLE_COLUMNS,
+                           plot.visible_columns / 2)
+                : std::min(plot_index == static_cast<int>(NOTE_PLOT_COUNT)
+                               ? FILTER_HISTORY_SIZE : HISTORY_SIZE,
+                           plot.visible_columns * 2);
         if (new_zoom != plot.visible_columns) {
             plot.visible_columns = new_zoom;
             plot.dirty = true;
@@ -604,13 +817,17 @@ static void handle_event(GuitarMidiUI* ui, XEvent* ev)
 
     case ButtonPress: {
         if (ev->xbutton.button == Button1 && ev->xbutton.y >= 15 && ev->xbutton.y <= 45) {
-            const double button_w = 112;
-            const double button_gap = 6;
-            const double button_start = UI_W - 16 - PLOT_COUNT * button_w - (PLOT_COUNT - 1) * button_gap;
-            for (size_t i = 0; i < PLOT_COUNT; ++i) {
+            const double button_w = PLOT_BUTTON_WIDTH;
+            const double button_gap = PLOT_BUTTON_GAP;
+            const double button_start = UI_W - 16 - TOOLBAR_BUTTON_COUNT * button_w -
+                (TOOLBAR_BUTTON_COUNT - 1) * button_gap;
+            for (size_t i = 0; i < TOOLBAR_BUTTON_COUNT; ++i) {
                 const double x = button_start + i * (button_w + button_gap);
                 if (ev->xbutton.x >= x && ev->xbutton.x < x + button_w) {
-                    open_plot_window(ui, static_cast<int>(i));
+                    if (i == PLOT_COUNT)
+                        save_plot_snapshots(ui);
+                    else
+                        open_plot_window(ui, static_cast<int>(i));
                     break;
                 }
             }
@@ -726,6 +943,7 @@ static LV2UI_Handle instantiate(const LV2UI_Descriptor*   descriptor,
     GuitarMidiUI* ui = new GuitarMidiUI();
     ui->write = write_function;
     ui->controller = controller;
+    ui->plots[NOTE_PLOT_COUNT].visible_columns = DEFAULT_FILTER_VISIBLE_SAMPLES;
     ui->debug_port = port_map->port_index(port_map->handle, "debugdata");
     ui->event_transfer = map->map(map->handle, LV2_ATOM__eventTransfer);
     ui->vector_type = map->map(map->handle, LV2_ATOM__Vector);
@@ -807,11 +1025,11 @@ static void port_event(LV2UI_Handle handle,
     GuitarMidiUI* ui = (GuitarMidiUI*)handle;
     if (port_index == ui->debug_port && format == ui->event_transfer &&
         buffer_size >= sizeof(LV2_Atom_Vector_Body) +
-            (NOTE_COUNT * PLOT_COUNT + 1) * sizeof(float)) {
+            (NOTE_COUNT * NOTE_PLOT_COUNT + FILTER_COUNT * FILTER_WAVEFORM_SAMPLES + 1) * sizeof(float)) {
         const auto* atom = (const LV2_Atom*)buffer;
         if (atom->type != ui->vector_type ||
             atom->size < sizeof(LV2_Atom_Vector_Body) +
-                (NOTE_COUNT * PLOT_COUNT + 1) * sizeof(float) ||
+                (NOTE_COUNT * NOTE_PLOT_COUNT + FILTER_COUNT * FILTER_WAVEFORM_SAMPLES + 1) * sizeof(float) ||
             atom->size > buffer_size)
             return;
         const auto* vector = (const LV2_Atom_Vector*)atom;
@@ -820,10 +1038,32 @@ static void port_event(LV2UI_Handle handle,
         const auto* values = (const float*)((const uint8_t*)vector + sizeof(LV2_Atom_Vector));
         for (size_t plot_index = 0; plot_index < PLOT_COUNT; ++plot_index) {
             DebugPlot& plot = ui->plots[plot_index];
-            for (size_t note = 0; note < NOTE_COUNT; ++note)
-                plot.history[plot.next_column][note] = values[plot_index * NOTE_COUNT + note];
-            plot.next_column = (plot.next_column + 1) % HISTORY_SIZE;
-            plot.columns_filled = std::min(HISTORY_SIZE, plot.columns_filled + 1);
+            if (plot_index < NOTE_PLOT_COUNT) {
+                const size_t value_offset = plot_index * NOTE_COUNT;
+                for (size_t row = 0; row < NOTE_COUNT; ++row)
+                    plot.history[plot.next_column][row] = values[value_offset + row];
+                plot.next_column = (plot.next_column + 1) % HISTORY_SIZE;
+                plot.columns_filled = std::min(HISTORY_SIZE, plot.columns_filled + 1);
+            } else {
+                if (plot.filter_history.empty()) {
+                    plot.filter_history.resize(FILTER_HISTORY_SIZE);
+                    plot.filter_column_peaks.resize(FILTER_HISTORY_SIZE);
+                }
+                const size_t value_offset = NOTE_PLOT_COUNT * NOTE_COUNT;
+                for (size_t sample = 0; sample < FILTER_WAVEFORM_SAMPLES; ++sample) {
+                    float column_peak = 0.0f;
+                    for (size_t filter = 0; filter < FILTER_COUNT; ++filter)
+                    {
+                        const float value = values[value_offset +
+                            filter * FILTER_WAVEFORM_SAMPLES + sample];
+                        plot.filter_history[plot.next_column][filter] = value;
+                        column_peak = std::max(column_peak, std::fabs(value));
+                    }
+                    plot.filter_column_peaks[plot.next_column] = column_peak;
+                    plot.next_column = (plot.next_column + 1) % FILTER_HISTORY_SIZE;
+                    plot.columns_filled = std::min(FILTER_HISTORY_SIZE, plot.columns_filled + 1);
+                }
+            }
             plot.dirty = plot.visible;
         }
         return;

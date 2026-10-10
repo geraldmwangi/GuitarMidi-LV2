@@ -181,6 +181,9 @@ public:
         m_noteinferencer.getDebugData(smoothed_confidences, smoothed_energies,
                                       momentary_confidences, momentary_energies);
     }
+
+    /** Copies decimated signed waveform samples for every filter. */
+    virtual void getFilterWaveforms(float *waveforms, uint32_t samples_per_filter) const;
 };
 
 
