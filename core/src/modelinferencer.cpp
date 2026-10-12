@@ -9,8 +9,15 @@
             fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); \
             exit(1);                                                 \
         }
-    void GuitarMidi::ModelInferencer::inferencing_loop()
+    void GuitarMidi::ModelInferencer::inferencing_loop(const std::string& bundle_path)
     {
+        if (!initialize_interpreter(bundle_path)) {
+            //lv2_log_error(&g_logger, "Failed to initialize interpreter.\n");
+            g_logger.error("Failed to initialize interpreter.\n");
+            m_initialization_promise.set_value(false);
+            return;
+        }
+        m_initialization_promise.set_value(true);
         while (!stop_thread) {
             // std::unique_lock<std::mutex> lock(buffer_mutex);
             // buffer_cv.wait(lock, [this] { return stop_thread || audio_input_buffer.has_new_data(); });
@@ -36,9 +43,9 @@
         }
     }
 
-    bool GuitarMidi::ModelInferencer::initialize(const std::string& bundle_path)
+    bool GuitarMidi::ModelInferencer::initialize_interpreter(const std::string &bundle_path)
     {
-                // Load model
+                        // Load model
             std::string tflite_path = bundle_path + "/guitarmidi.tflite"; 
             //lv2_log_note(&g_logger, "Loading model from: %s\n", tflite_path.c_str());
             g_logger.info("Loading model from: %s\n", tflite_path.c_str());
@@ -84,12 +91,35 @@
             return true;
     }
 
+    bool GuitarMidi::ModelInferencer::initialize(const std::string& bundle_path)
+    {
+        auto init_future = m_initialization_promise.get_future();
+        inferencing_thread = std::thread(&ModelInferencer::inferencing_loop, this,bundle_path);
+        auto status = init_future.get();
+        // sleep for a short time to allow the thread to start and initialize the interpreter
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        //check if the interpreter was initialized successfully
+        if (!status) {
+            //lv2_log_error(&g_logger, "Failed to initialize interpreter in inferencing thread.\n");
+            g_logger.error("Failed to initialize interpreter in inferencing thread.\n");
+            return false;
+        }
+        else {
+            //lv2_log_note(&g_logger, "Interpreter initialized successfully in inferencing thread.\n");
+            g_logger.info("Interpreter initialized successfully in inferencing thread.\n");
+        }
+
+        
+        return true;
+    }
+
     GuitarMidi::ModelInferencer::ModelInferencer()
     {
 
         stop_thread = false;
         m_interpreter=nullptr;
-        inferencing_thread = std::thread(&ModelInferencer::inferencing_loop, this);
+        
         //log the size of the ring buffers
         //lv2_log_note(&g_logger, "Audio input ring buffer size: %d frames\n", RING_BUFFER_SIZE);
         g_logger.info("Audio input ring buffer size: %d frames\n", RING_BUFFER_SIZE);
