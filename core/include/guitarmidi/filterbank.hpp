@@ -22,7 +22,7 @@
 #include <memory>
 #include <guitarmidi/common.hpp>
 using namespace std;
-
+#define NUM_FILTERS     (NUM_NOTES * NUM_HARMONICS)
 #define NUM_SECTIONS    2      // = N (LP prototype order). BP order = 2*N = 4.
 namespace GuitarMidi{
 
@@ -73,14 +73,17 @@ namespace GuitarMidi{
                 // Allocate the 2D audio buffer (num_filters x window_size)
                 m_filterbankbuffer.num_filters = NUM_FILTERS;
                 m_filterbankbuffer.window_size = BUFFER_SIZE;
+                m_filterbankbuffer.audio_buffer_2D = new float[NUM_FILTERS * m_filterbankbuffer.window_size];
                 m_filterwaveformbuffer.num_filters = NUM_FILTERS;
                 m_filterwaveformbuffer.window_size = WAVEFORM_SAMPLES;
+                m_filterwaveformbuffer.audio_buffer_2D = new float[NUM_FILTERS * m_filterwaveformbuffer.window_size];
                 m_current_buffer_offset = 0;
             };
             /** Releases the filter-bank output buffer. */
             ~FilterBank(){
                 // Free the 2D audio buffer
-
+                delete[] m_filterbankbuffer.audio_buffer_2D;
+                delete[] m_filterwaveformbuffer.audio_buffer_2D;
             };
 
             /** Configures filter coefficients for the requested fretboard representation. */
