@@ -27,7 +27,7 @@
 
 #define NUM_STRINGS 6
 #define NUM_FRETS 12
-
+#define NUM_FILTERS     (NUM_NOTES * NUM_HARMONICS)
 #define Q_FACTOR 6
 namespace GuitarMidi
 {
@@ -43,7 +43,7 @@ namespace GuitarMidi
     {
         int num_filters;
         int window_size;
-        float *audio_buffer_2D;
+        float audio_buffer_2D[NUM_FILTERS * BUFFER_SIZE];
     };
 
     /* 

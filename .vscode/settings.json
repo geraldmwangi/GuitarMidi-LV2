@@ -1,4 +1,5 @@
 {
+    "cmake.useCMakePresets": "always",
     "files.associations": {
         "bandpassfilter.h": "c",
         "cassert": "cpp",

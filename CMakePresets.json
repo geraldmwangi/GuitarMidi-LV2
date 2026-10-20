@@ -1,0 +1,61 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "linux-base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/linux",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "ubuntu-debug",
+            "inherits": "linux-base",
+            "displayName": "Ubuntu Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "ubuntu-release",
+            "inherits": "linux-base",
+            "displayName": "Ubuntu Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "ubuntu-debug",
+            "configurePreset": "ubuntu-debug",
+            "jobs": 14
+        },
+        {
+            "name": "ubuntu-release",
+            "configurePreset": "ubuntu-release",
+            "jobs": 14
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "ubuntu-debian",
+            "description": "Debian package for Ubuntu",
+            "displayName": "Debian Package",
+            "configurePreset": "ubuntu-release"
+        }
+    ]
+}
