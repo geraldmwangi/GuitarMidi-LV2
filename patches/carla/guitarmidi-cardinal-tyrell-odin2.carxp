@@ -1,0 +1,2642 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE CARLA-PROJECT>
+<CARLA-PROJECT VERSION='2.5'>
+ <EngineSettings>
+  <ForceStereo>false</ForceStereo>
+  <PreferPluginBridges>false</PreferPluginBridges>
+  <PreferUiBridges>true</PreferUiBridges>
+  <UIsAlwaysOnTop>false</UIsAlwaysOnTop>
+  <MaxParameters>200</MaxParameters>
+  <UIBridgesTimeout>4000</UIBridgesTimeout>
+ </EngineSettings>
+
+ <!-- Cardinal Synth -->
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>Cardinal Synth</Name>
+   <URI>https://distrho.kx.studio/plugins/cardinal#synth</URI>
+  </Info>
+
+  <Data>
+   <Active>Yes</Active>
+   <Volume>0.2732044</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+
+   <Parameter>
+    <Index>0</Index>
+    <Name>Parameter 1</Name>
+    <Symbol>param_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>1</Index>
+    <Name>Parameter 2</Name>
+    <Symbol>param_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>2</Index>
+    <Name>Parameter 3</Name>
+    <Symbol>param_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>3</Index>
+    <Name>Parameter 4</Name>
+    <Symbol>param_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>4</Index>
+    <Name>Parameter 5</Name>
+    <Symbol>param_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>5</Index>
+    <Name>Parameter 6</Name>
+    <Symbol>param_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>6</Index>
+    <Name>Parameter 7</Name>
+    <Symbol>param_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>7</Index>
+    <Name>Parameter 8</Name>
+    <Symbol>param_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>8</Index>
+    <Name>Parameter 9</Name>
+    <Symbol>param_9</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>9</Index>
+    <Name>Parameter 10</Name>
+    <Symbol>param_10</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>10</Index>
+    <Name>Parameter 11</Name>
+    <Symbol>param_11</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>11</Index>
+    <Name>Parameter 12</Name>
+    <Symbol>param_12</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>12</Index>
+    <Name>Parameter 13</Name>
+    <Symbol>param_13</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>13</Index>
+    <Name>Parameter 14</Name>
+    <Symbol>param_14</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>14</Index>
+    <Name>Parameter 15</Name>
+    <Symbol>param_15</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>15</Index>
+    <Name>Parameter 16</Name>
+    <Symbol>param_16</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>16</Index>
+    <Name>Parameter 17</Name>
+    <Symbol>param_17</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>17</Index>
+    <Name>Parameter 18</Name>
+    <Symbol>param_18</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>18</Index>
+    <Name>Parameter 19</Name>
+    <Symbol>param_19</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>19</Index>
+    <Name>Parameter 20</Name>
+    <Symbol>param_20</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>20</Index>
+    <Name>Parameter 21</Name>
+    <Symbol>param_21</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>21</Index>
+    <Name>Parameter 22</Name>
+    <Symbol>param_22</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>22</Index>
+    <Name>Parameter 23</Name>
+    <Symbol>param_23</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>23</Index>
+    <Name>Parameter 24</Name>
+    <Symbol>param_24</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>24</Index>
+    <Name>Enabled</Name>
+    <Symbol>lv2_enabled</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>25</Index>
+    <Name>Show tooltips</Name>
+    <Symbol>tooltips</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>26</Index>
+    <Name>Cable opacity</Name>
+    <Symbol>cableOpacity</Symbol>
+    <Value>50</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>27</Index>
+    <Name>Cable tension</Name>
+    <Symbol>cableTension</Symbol>
+    <Value>75</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>28</Index>
+    <Name>Room brightness</Name>
+    <Symbol>rackBrightness</Symbol>
+    <Value>100</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>29</Index>
+    <Name>Light Bloom</Name>
+    <Symbol>haloBrightness</Symbol>
+    <Value>25</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>30</Index>
+    <Name>Knob mode</Name>
+    <Symbol>knobMode</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>31</Index>
+    <Name>Scroll wheel knob control</Name>
+    <Symbol>knobScroll</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>32</Index>
+    <Name>Scroll wheel knob sensitivity</Name>
+    <Symbol>knobScrollSensitivity</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>33</Index>
+    <Name>Lock module positions</Name>
+    <Symbol>lockModules</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>34</Index>
+    <Name>Update rate limit</Name>
+    <Symbol>rateLimit</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>35</Index>
+    <Name>Browser sort</Name>
+    <Symbol>browserSort</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>36</Index>
+    <Name>Browser zoom</Name>
+    <Symbol>browserZoom</Symbol>
+    <Value>50</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>37</Index>
+    <Name>Invert zoom</Name>
+    <Symbol>invertZoom</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>38</Index>
+    <Name>Auto-squeeze module positions</Name>
+    <Symbol>squeezeModules</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <CustomData>
+    <Type>http://lv2plug.in/ns/ext/atom#String</Type>
+    <Key>urn:distrho:patch</Key>
+    <Value>
+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
+    </Value>
+   </CustomData>
+
+   <CustomData>
+    <Type>http://lv2plug.in/ns/ext/atom#String</Type>
+    <Key>https://distrho.kx.studio/plugins/cardinal#synth#screenshot</Key>
+    <Value></Value>
+   </CustomData>
+
+   <CustomData>
+    <Type>http://lv2plug.in/ns/ext/atom#String</Type>
+    <Key>https://distrho.kx.studio/plugins/cardinal#synth#comment</Key>
+    <Value></Value>
+   </CustomData>
+
+   <CustomData>
+    <Type>http://lv2plug.in/ns/ext/atom#String</Type>
+    <Key>urn:distrho:windowSize</Key>
+    <Value>2881:1223</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+
+ <!-- TyrellN6 -->
+ <Plugin>
+  <Info>
+   <Type>VST3</Type>
+   <Name>TyrellN6</Name>
+   <Binary>/home/gerald/.vst3/u-he/TyrellN6.vst3</Binary>
+   <Label>TyrellN6</Label>
+  </Info>
+
+  <Data>
+   <Active>Yes</Active>
+   <Volume>0.8754902</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f9</Options>
+
+   <CurrentProgramIndex>1</CurrentProgramIndex>
+   <CurrentProgramName>Program 0</CurrentProgramName>
+
+   <Chunk>
+VkMyIfYgAAA8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYtOCI/PiA8VlNUM1BsdWdpblN0YXRlPjxJQ29tcG9uZW50PjMxMTAuaS4yWXMwQ1Nr
+MFZjeGtWWGZIaUtuSUNiSjdoSi4wVFl6RWxCSkhUWHRzbE5KYkJVNElXWXJ3bFMxLmhRZ01GY3VJV2RmWDJMdC55SUpuUFAwUUdadUltTkpiaFIwd1ZaZzRG
+SFJFVmRtbmZCRFUxYmlJV1p2UVdadTRsTkpiaFVnSVdaZ1FXWnU0Rkhoa0dIVmsxWno4bGJmYlVZbzBWWXhjaEJKVDBiZ2NWWTVudklNY0VIOC5oYXVrMWJr
+d2tiQVFFSDgueGN1SWxYclUxSUpudlBnUVdZbThsYm9VMWI1bnZJUEVGWXlvU1B0RUZhdWNWY2t3QkhQRUZZeW95VHVVbWFqTTJYZ0FXWW1uZkJGVVZYelVt
+YmtNbU5KYkJUdXdWZHIueFBuOGxiandCSFN3MWEyQWhUa3dWWWdNV1ltbmZCQ2dWWHhFMVh6VWxiNW52SVM4bFl6d0JIUGdWWHp3QkhTa21hemdWWXprMVht
+bmZCcDdoQkpMUlBNMENVNElXWXJ3bFMxbnZIVlVsYnkwU0x2LlNMdm52SEU0RllvRWxhOHZWWnpRR2Frb3ZIdDBWT3diaUJpejFiODMxYXRVbEJpejFiOHp6
+YWpjRVpyb3ZIc01XT1BrRmNpZzFVSkxSYXkweVB6SUdhQW92SHNNV09DUW1icklqQml6MWI4YlRYelVsQml6MWI4WFVZcjgxWG9RV2RKTFJheTBDVHhVMWJ5
+VW1ia292SHNNV09LVVZkRjhGYXI4MWNKTFJheTB5UmtrbVF1d0ZhdWNtTEpMUmF5MFNQclFXWXg0Vlh6VWxCaXoxYjhIVVh0UTFhc292SHNNV09TUVdYaXNs
+VXVrMVhrb3ZIc01XT0FRelRSRWlCaXoxYjhERFFTSWtMSkxSYXkwQ1NGOFRMSkxSYXkwQ1NGOGpMSkxoYTEwaUxKTFJhMTB5UWdRV1lKTFJhMTBTUERNa1R3
+bnZIaTBWT3NFVlp0b3ZQaThEYjhEQ0x2M0JMdm52SENnbGJ5RVNPd252SGkwVk9QTXpheFVsQk0wRFV3ekNVNElXWXJ3bE5SVTFiSnpUU1NFU093blBTTVFU
+TDhUQ0x0LkNMSnpUU1ZNVUw4LmlCTTBqVURFU093LmlLdi5pQk0wRFV4ekNVNElXWXJ3bE5TVW1YVjhGYUp6VFNTSVNPd1BpQk0wRFF4elNLMC5pS3YuaUJN
+MGpVU0lTT3ZuUFNNWUVReHpDTHQuQ0xKTGtQZ01XWThQaUJTY1dadGNWT3YzQkx2bnZUVElXWm0wU0xKLkVUeDhsWjguaUJQWXphclFWT3ZuLlRGa0ZhazBT
+TEpialFvd1ZZOEhpQkdNMFhnd1ZZOC5pQkNnRlNna1dPdm52VDBJbWJPMENMSkhVWTEwU0wxanlNMW4uU0VRVE92M0JMdm4uVEFjVFE4LmlCUEUxWWtNMlN0
+MENMSkx6YXhVbFM4TGlCU3dWWmlVVk96blBVSTgwYXYwQ0xKelRaamtWUDhUaUJNa0ZZb0FVTzFuLlFGOEZhajB5TUpMRGN4d1ZQOEhpQkNRbWJySVRPd0Rp
+QkdNMFhTVUZjOC5pQkNnMVNDMGlMSnZqUUUwQ0xKTFRZdDBDTEp6emF0OFZSdDBDTEpMeFhzMGlVQ01qQlY4Vlppa2xhbTBTTEp6emFqVVZPdm4uVHVJR2Nn
+MFRPdm4uVHVJR2NnMENMdC5DTEouMGF4UVdYeHpTS3pIaUt2LmlCUElVWHRjVlk4RENMdjNCTHZuLlRCMENMSi5rUEQwQ0xKUGpibFFXT3duUFNUVW1hUzBD
+TEp6RFUwNGxTOGZpQk1RVWN0UVVPNG4uVXhNR2I4RGlMSi5rYm84bGI4LmlCTVUyUHVJV1k4LmlCQzhsYXpVamE4RGlCUjR6YXpVVk92bmZUVlVGYTguaUJp
+TFZhOFRqU1ZFaUJBUTJaOFhDTXQuQ0xKUFRZaTB5TTAzQkx2bnZUME1XTzBMaUt2LmlCRklVT3YzQkx2bmZUa3dWTzBmaUt2LmlCVlVGYThmQ0x0LkNMSkhV
+U3VRVk92M0JMdm4uU2dJVllyMFNMdm4uVXhrMVk4LmlCaUxWYThUalNWSWlCQVEyWjguaUt2LmlCRFUxWDhUeUx0LkNMSkxVY3kwU0wxM0JMdm5mUVIwQ0x0
+LkNMSkhVWXIwU00zM0JMdm5mVWt3Vk93LkNMdC5DTEpIVVN1UVZPdy5pS3YuaUJMRWxYa3dWT3dEaUJUSVdabTBDTEpMeFhzMENTRjhUTEpMVWR0TVZPeW4u
+VXhrMVk4TGlCV0VsY2swaU1KLkVaeVVWT3YzQkx2bi5UdXdWWHgwQ0xKUERhNDB5TTAzQkx2bi5RTU1VTDhiaUJEMERRd3pDTHQuQ0xKSFVYelVWT3MuaUt6
+LmlCRjB6VHd6eU1KWFRTREVTT3czaE12bnZIaTBWT0xZelN4bnZUNDQxWDhYaUJUSVdabTB5TEpiVVgxVVZPd24uVG5NV1k4LmlLdi5pQlA4RmFnSVdPdm4u
+UXJrV093LkNMdC5DTEpQVFNTRVNPd24uUU1RVEw4LmlLdi5pQlJFRmNrMENMdC5DTEpYVFNTRVNPMm5mUU1RVEw4VGlLdi5pQmlMVmE4UFVkeFVGYXJvdlRu
+QVdMOERpSzJQaUJUMHpUeE1WTDguaUJUMERRdlFXTDh6Qkx0LmlNSkxFWnZJU094M0JMdm4uVTA0Vll4enlNdC5DTEpYVFp0VWxMOERTTnQuQ0xKUFVTU0ky
+WHh6Q05KUFVTREFHY3h6U0t2M0JNdm4uVFdRRGJ6MHlMMDNCTHZuLlRXTWtiaTBTTHluLlFrUVdjdFVWT3YzQkx2bnZUNDQxWDguaUt2LmlCVlEyYUQweUx0
+LkNMSkhVU29FU08wbmZUTWtsTDhEaUJGSVRadDBDTEozemFvTVdZOERpS3YuaUJPTTJYVjhGYXd6U0t3LkNMdC5DTEo3emJpWTBhcklTT3NMU010VENMSkxV
+Y2hZMGFyMFNLMS5pS3YuaUJOTVdZVjhGYTh6Qk52M0JMdm5mVE1ZMGFyMFNLdy5DTHQuQ0xKWGpQVjhGYTh6Qk0wM0JMdm5mVUNZVGF1UVZPdm5mVUNZRFR1
+d1ZPd252UDBRMmFsWVZPM0hpS3YuaUJGMHpUeE1WTDhEQ01KWFRTREFHY3d6U012M0JMdm5mUU1Na2JpSVNPMW5mUU1RRGJ6SVNPeC5pS3YuaUJLVVZkRjhG
+YThQU0x0LkNMSkhVWXkwQ015M0JMdm5QUzNNRWI4LmlLdi5pQk1nMlR2TWtiaTBDTEpEalRTSTJYOC5pQkFJRVFrTUdjOC5pQkFJRVF2UVdPMS5pSzAuaUJB
+SVVTdVFWT3ZudkhpMFZPVk1UUHduZlVDRVRPd25QUHpRMlQ4RGlCaUxWYThMRFp4TVdMSlBVZHZVVk93bmZUZ1FXWThMQ010LkNMSlBUWXZRR1o4TENMdC5D
+TEpiVVl6MENNeTNCTHZuZkJKbmZCSjd4S2ZMVVlpUVdadTRGSGw4bGJmVDJZcmtHSGk4VmF2SVdZeU1XWWpBaFhvNFZYeGtHSERFRmNnb3ZLdS5CUU80eklU
+QUJVT1UwUEhBQlVIa3pUSm4uSWpQQkl3amlMem52T21RMVlpVWxha0lsTmtFVlhnRVZYZ0VsTmdFVlhoRVZYZ0VsTmdFVlhna1ZYakFtTmdFVlhnRVZYa0Vs
+TmdFVlhnVVZYa0VsTmdFVlhna1ZYa0VsTkpEVlhnRTFaZ1VWWDVEVlhnRVZhZ1VWWDVEVlhnRTFhZ1VWWDVEVlg1VDFYNVRsWDVMVlg1UFZYNWJsWDVQMVg1
+ZlZYNURWWTVIVlg1TEZiNVRWWTVUbEJzb2lZaW9pWWpveVlwb3lZc29DWmxvU1pnb1NYaW9TWG9vU1hzb2lYa29pWG9vaVhzb3lYa0VSYnlFek1LMHpZdmNG
+WUZFMFJFUUZaRDh6WXZJMFl1b3ZZa2dGWW1RbFFIY2xZblFWUHhMQ013SVdQMnp6WWxjbGFSZzFYUFlEUUdNMWFtazFRSEVUTXZEbWJBY1NMd0lXUDIubWF2
+OEZidkVUWGhRVVhqa1RYSlhWWG1FRlpVRWxaZ3NWWHJZVVh0RTFhZ0FtUmhJbFhpSUZZV0lsWWhjbFhuZ2tYcEkxWmh3VlZoNGxYdUlGYkRNbFhpTTFYam8w
+WGxNMVlpZzFYb01sQnBNMVppdzFYc01sYWk4MVJFUWxYR1FGWWpVRllsUTFZamdGWW9RbFpqc0ZZclFWYXdrVFB3LkNUczRWUUFFMmJBY1NZcUlVVFBZell1
+UWpTRmdsWkFvZkx6VFNiU0VUTHlmU2J5RWpMMUxTYnhFRE15UFdjMWNHZDRvV2JBUVVQMFBXUHlQV2MxY0dkNG9XUHhMVFB3bnpQQUVDUUNFVExFTVRQd1RW
+WENFVExKWFZYQ0VUTG1FMVBBRUNSQ0VUTFNNVFB3alZaQ0VUTHBFMVBBRWlab01UUHdyVlhDRVRMcWsxUEFFQ2FnTVRQd3ZWWkNFVExzRTFQQUVTYW9NVFB3
+M2xCZ01UUHczVlpDRVRMdUUxUEFFeWFvTVRQdy5XWENFVEx2azFQQUlpUEFFU1JCRVRMVUlUUHdYa1BBRWlSQkVUTFdJVFB3ZmtQQUVTVkJFVExESVRQd25m
+VkJFVExpa2xQQUV5WHNJVFB3VGpQQUVDWWtJVFB3UFZaQkVUTGowbFBBRVNZZ0lUUHd2alBBRVNZb0lUUHd6alBBRWlZZ0lUUHdYVllCRVRMbGtsUEpEVExs
+MGxQQUV5WWdJVFB3YlZZQkVUTG1rbFBBRVNUQkVUTEhJVFB3ZlZZQkVUTG5rbFBBRUNac0lUUHdMa1BBRVNaaUlUUHdqVllCRVRMb2NsUEFFaUJva2xQQUVT
+WnFJVFB3alZhQkVUTG84bFBBRWlaZ0lUUHduMVhCRVRMcFVsUEFFaVptSVRQd25WWkJFVExwc2xQQUVpWnNJVFB3bjFhQkVUTHFFbFBBb1BMcU1sUEFFeVpr
+SVRQd3IxWUJFVExxa2xQQUV5WnFJVFB3clZhQkVUTHE4bFBBRUNhZ0lUUHd2MVhCRVRMclVsUEFFQ2FtSVRQd3ZWWkJFVExyc2xQSkRUTHIwbFBBRUNhdUlU
+UHd6VlhCRVRMc01sUEFFU2FrSVRQd3oxWUJFVExza2xQQUVTYXFJVFB3elZhQkVUTHM4bFBBRWlhZ0lUUHczMVhCRVRMdFVsQkJFVEx0Y2xQQUVpYW9JVFB3
+MzFaQkVUTHQwbFBBRWlhdUlUUHc3VlhCRVRMdU1sUEFFeWFrSVRQdzcxWUJFVEx1a2xQQUV5YXFJVFB3N1ZhQkVUTHVvdmFCRVRMdkVsUEFFQ2JpSVRQdy5X
+WUJFVEx2Y2xQQUVDYm9JVFB3LjJaQkVUTHYwbFBBRUNidUlUYkRFVEx2TERTTzREUWpJVlB4VFNiREVUTHZMRFNKN2pTRGNUUHhUU08zUENOelhpQi4uLjwv
+SUNvbXBvbmVudD48SUVkaXRDb250cm9sbGVyPjMxMTAuaS4yWXMwQ1NrMFZjeGtWWGZIaUtuSUNiSjdoSi4wVFl6RWxCSkhUWHRzbE5KYkJVNElXWXJ3bFMx
+LmhRZ01GY3VJV2RmWDJMdC55SUpuUFAwUUdadUltTkpiaFIwd1ZaZzRGSFJFVmRtbmZCRFUxYmlJV1p2UVdadTRsTkpiaFVnSVdaZ1FXWnU0Rkhoa0dIVmsx
+Wno4bGJmYlVZbzBWWXhjaEJKVDBiZ2NWWTVudklNY0VIOC5oYXVrMWJrd2tiQVFFSDgueGN1SWxYclUxSUpudlBnUVdZbThsYm9VMWI1bnZJUEVGWXlvU1B0
+RUZhdWNWY2t3QkhQRUZZeW95VHVVbWFqTTJYZ0FXWW1uZkJGVVZYelVtYmtNbU5KYkJUdXdWZHIueFBuOGxiandCSFN3MWEyQWhUa3dWWWdNV1ltbmZCQ2dW
+WHhFMVh6VWxiNW52SVM4bFl6d0JIUGdWWHp3QkhTa21hemdWWXprMVhtbmZCcDdoQkpMUlBNMENVNElXWXJ3bFMxbnZIVlVsYnkwU0x2LlNMdm52SEU0Rllv
+RWxhOHZWWnpRR2Frb3ZIdDBWT3diaUJpejFiODMxYXRVbEJpejFiOHp6YWpjRVpyb3ZIc01XT1BrRmNpZzFVSkxSYXkweVB6SUdhQW92SHNNV09DUW1icklq
+Qml6MWI4YlRYelVsQml6MWI4WFVZcjgxWG9RV2RKTFJheTBDVHhVMWJ5VW1ia292SHNNV09LVVZkRjhGYXI4MWNKTFJheTB5UmtrbVF1d0ZhdWNtTEpMUmF5
+MFNQclFXWXg0Vlh6VWxCaXoxYjhIVVh0UTFhc292SHNNV09TUVdYaXNsVXVrMVhrb3ZIc01XT0FRelRSRWlCaXoxYjhERFFTSWtMSkxSYXkwQ1NGOFRMSkxS
+YXkwQ1NGOGpMSkxoYTEwaUxKTFJhMTB5UWdRV1lKTFJhMTBTUERNa1R3bnZIaTBWT3NFVlp0b3ZQaThEYjhEQ0x2M0JMdm52SENnbGJ5RVNPd252SGkwVk9Q
+TXpheFVsQk0wRFV3ekNVNElXWXJ3bE5SVTFiSnpUU1NFU093blBTTVFUTDhUQ0x0LkNMSnpUU1ZNVUw4LmlCTTBqVURFU093LmlLdi5pQk0wRFV4ekNVNElX
+WXJ3bE5TVW1YVjhGYUp6VFNTSVNPd1BpQk0wRFF4elNLMC5pS3YuaUJNMGpVU0lTT3ZuUFNNWUVReHpDTHQuQ0xKTGtQZ01XWThQaUJTY1dadGNWT3YzQkx2
+bnZUVElXWm0wU0xKLkVUeDhsWjguaUJQWXphclFWT3ZuLlRGa0ZhazBTTEpialFvd1ZZOEhpQkdNMFhnd1ZZOC5pQkNnRlNna1dPdm52VDBJbWJPMENMSkhV
+WTEwU0wxanlNMW4uU0VRVE92M0JMdm4uVEFjVFE4LmlCUEUxWWtNMlN0MENMSkx6YXhVbFM4TGlCU3dWWmlVVk96blBVSTgwYXYwQ0xKelRaamtWUDhUaUJN
+a0ZZb0FVTzFuLlFGOEZhajB5TUpMRGN4d1ZQOEhpQkNRbWJySVRPd0RpQkdNMFhTVUZjOC5pQkNnMVNDMGlMSnZqUUUwQ0xKTFRZdDBDTEp6emF0OFZSdDBD
+TEpMeFhzMGlVQ01qQlY4Vlppa2xhbTBTTEp6emFqVVZPdm4uVHVJR2NnMFRPdm4uVHVJR2NnMENMdC5DTEouMGF4UVdYeHpTS3pIaUt2LmlCUElVWHRjVlk4
+RENMdjNCTHZuLlRCMENMSi5rUEQwQ0xKUGpibFFXT3duUFNUVW1hUzBDTEp6RFUwNGxTOGZpQk1RVWN0UVVPNG4uVXhNR2I4RGlMSi5rYm84bGI4LmlCTVUy
+UHVJV1k4LmlCQzhsYXpVamE4RGlCUjR6YXpVVk92bmZUVlVGYTguaUJpTFZhOFRqU1ZFaUJBUTJaOFhDTXQuQ0xKUFRZaTB5TTAzQkx2bnZUME1XTzBMaUt2
+LmlCRklVT3YzQkx2bmZUa3dWTzBmaUt2LmlCVlVGYThmQ0x0LkNMSkhVU3VRVk92M0JMdm4uU2dJVllyMFNMdm4uVXhrMVk4LmlCaUxWYThUalNWSWlCQVEy
+WjguaUt2LmlCRFUxWDhUeUx0LkNMSkxVY3kwU0wxM0JMdm5mUVIwQ0x0LkNMSkhVWXIwU00zM0JMdm5mVWt3Vk93LkNMdC5DTEpIVVN1UVZPdy5pS3YuaUJM
+RWxYa3dWT3dEaUJUSVdabTBDTEpMeFhzMENTRjhUTEpMVWR0TVZPeW4uVXhrMVk4TGlCV0VsY2swaU1KLkVaeVVWT3YzQkx2bi5UdXdWWHgwQ0xKUERhNDB5
+TTAzQkx2bi5RTU1VTDhiaUJEMERRd3pDTHQuQ0xKSFVYelVWT3MuaUt6LmlCRjB6VHd6eU1KWFRTREVTT3czaE12bnZIaTBWT0xZelN4bnZUNDQxWDhYaUJU
+SVdabTB5TEpiVVgxVVZPd24uVG5NV1k4LmlLdi5pQlA4RmFnSVdPdm4uUXJrV093LkNMdC5DTEpQVFNTRVNPd24uUU1RVEw4LmlLdi5pQlJFRmNrMENMdC5D
+TEpYVFNTRVNPMm5mUU1RVEw4VGlLdi5pQmlMVmE4UFVkeFVGYXJvdlRuQVdMOERpSzJQaUJUMHpUeE1WTDguaUJUMERRdlFXTDh6Qkx0LmlNSkxFWnZJU094
+M0JMdm4uVTA0Vll4enlNdC5DTEpYVFp0VWxMOERTTnQuQ0xKUFVTU0kyWHh6Q05KUFVTREFHY3h6U0t2M0JNdm4uVFdRRGJ6MHlMMDNCTHZuLlRXTWtiaTBT
+THluLlFrUVdjdFVWT3YzQkx2bnZUNDQxWDguaUt2LmlCVlEyYUQweUx0LkNMSkhVU29FU08wbmZUTWtsTDhEaUJGSVRadDBDTEozemFvTVdZOERpS3YuaUJP
+TTJYVjhGYXd6U0t3LkNMdC5DTEo3emJpWTBhcklTT3NMU010VENMSkxVY2hZMGFyMFNLMS5pS3YuaUJOTVdZVjhGYTh6Qk52M0JMdm5mVE1ZMGFyMFNLdy5D
+THQuQ0xKWGpQVjhGYTh6Qk0wM0JMdm5mVUNZVGF1UVZPdm5mVUNZRFR1d1ZPd252UDBRMmFsWVZPM0hpS3YuaUJGMHpUeE1WTDhEQ01KWFRTREFHY3d6U012
+M0JMdm5mUU1Na2JpSVNPMW5mUU1RRGJ6SVNPeC5pS3YuaUJLVVZkRjhGYThQU0x0LkNMSkhVWXkwQ015M0JMdm5QUzNNRWI4LmlLdi5pQk1nMlR2TWtiaTBD
+TEpEalRTSTJYOC5pQkFJRVFrTUdjOC5pQkFJRVF2UVdPMS5pSzAuaUJBSVVTdVFWT3ZudkhpMFZPVk1UUHduZlVDRVRPd25QUHpRMlQ4RGlCaUxWYThMRFp4
+TVdMSlBVZHZVVk93bmZUZ1FXWThMQ010LkNMSlBUWXZRR1o4TENMdC5DTEpiVVl6MENNeTNCTHZuZkJKbmZCSjd4S2ZMVVlpUVdadTRGSGw4bGJmVDJZcmtH
+SGk4VmF2SVdZeU1XWWpBaFhvNFZYeGtHSERFRmNnb3ZLdS5CUU80eklUQUJVT1UwUEhBQlVIa3pUSm4uSWpQQkl3amlMem52T21RMVlpVWxha0lsTmtFVlhn
+RVZYZ0VsTmdFVlhoRVZYZ0VsTmdFVlhna1ZYakFtTmdFVlhnRVZYa0VsTmdFVlhnVVZYa0VsTmdFVlhna1ZYa0VsTkpEVlhnRTFaZ1VWWDVEVlhnRVZhZ1VW
+WDVEVlhnRTFhZ1VWWDVEVlg1VDFYNVRsWDVMVlg1UFZYNWJsWDVQMVg1ZlZYNURWWTVIVlg1TEZiNVRWWTVUbEJzb2lZaW9pWWpveVlwb3lZc29DWmxvU1pn
+b1NYaW9TWG9vU1hzb2lYa29pWG9vaVhzb3lYa0VSYnlFek1LMHpZdmNGWUZFMFJFUUZaRDh6WXZJMFl1b3ZZa2dGWW1RbFFIY2xZblFWUHhMQ013SVdQMnp6
+WWxjbGFSZzFYUFlEUUdNMWFtazFRSEVUTXZEbWJBY1NMd0lXUDIubWF2OEZidkVUWGhRVVhqa1RYSlhWWG1FRlpVRWxaZ3NWWHJZVVh0RTFhZ0FtUmhJbFhp
+SUZZV0lsWWhjbFhuZ2tYcEkxWmh3VlZoNGxYdUlGYkRNbFhpTTFYam8wWGxNMVlpZzFYb01sQnBNMVppdzFYc01sYWk4MVJFUWxYR1FGWWpVRllsUTFZamdG
+WW9RbFpqc0ZZclFWYXdrVFB3LkNUczRWUUFFMmJBY1NZcUlVVFBZell1UWpTRmdsWkFvZkx6VFNiU0VUTHlmU2J5RWpMMUxTYnhFRE15UFdjMWNHZDRvV2JB
+UVVQMFBXUHlQV2MxY0dkNG9XUHhMVFB3bnpQQUVDUUNFVExFTVRQd1RWWENFVExKWFZYQ0VUTG1FMVBBRUNSQ0VUTFNNVFB3alZaQ0VUTHBFMVBBRWlab01U
+UHdyVlhDRVRMcWsxUEFFQ2FnTVRQd3ZWWkNFVExzRTFQQUVTYW9NVFB3M2xCZ01UUHczVlpDRVRMdUUxUEFFeWFvTVRQdy5XWENFVEx2azFQQUlpUEFFU1JC
+RVRMVUlUUHdYa1BBRWlSQkVUTFdJVFB3ZmtQQUVTVkJFVExESVRQd25mVkJFVExpa2xQQUV5WHNJVFB3VGpQQUVDWWtJVFB3UFZaQkVUTGowbFBBRVNZZ0lU
+UHd2alBBRVNZb0lUUHd6alBBRWlZZ0lUUHdYVllCRVRMbGtsUEpEVExsMGxQQUV5WWdJVFB3YlZZQkVUTG1rbFBBRVNUQkVUTEhJVFB3ZlZZQkVUTG5rbFBB
+RUNac0lUUHdMa1BBRVNaaUlUUHdqVllCRVRMb2NsUEFFaUJva2xQQUVTWnFJVFB3alZhQkVUTG84bFBBRWlaZ0lUUHduMVhCRVRMcFVsUEFFaVptSVRQd25W
+WkJFVExwc2xQQUVpWnNJVFB3bjFhQkVUTHFFbFBBb1BMcU1sUEFFeVprSVRQd3IxWUJFVExxa2xQQUV5WnFJVFB3clZhQkVUTHE4bFBBRUNhZ0lUUHd2MVhC
+RVRMclVsUEFFQ2FtSVRQd3ZWWkJFVExyc2xQSkRUTHIwbFBBRUNhdUlUUHd6VlhCRVRMc01sUEFFU2FrSVRQd3oxWUJFVExza2xQQUVTYXFJVFB3elZhQkVU
+THM4bFBBRWlhZ0lUUHczMVhCRVRMdFVsQkJFVEx0Y2xQQUVpYW9JVFB3MzFaQkVUTHQwbFBBRWlhdUlUUHc3VlhCRVRMdU1sUEFFeWFrSVRQdzcxWUJFVEx1
+a2xQQUV5YXFJVFB3N1ZhQkVUTHVvdmFCRVRMdkVsUEFFQ2JpSVRQdy5XWUJFVEx2Y2xQQUVDYm9JVFB3LjJaQkVUTHYwbFBBRUNidUlUYkRFVEx2TERTTzRE
+UWpJVlB4VFNiREVUTHZMRFNKN2pTRGNUUHhUU08zUENOelhpQi4uLjwvSUVkaXRDb250cm9sbGVyPjwvVlNUM1BsdWdpblN0YXRlPgA=
+   </Chunk>
+  </Data>
+ </Plugin>
+
+ <!-- x42 Instrument Tuner -->
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>x42 Instrument Tuner</Name>
+   <URI>http://gareus.org/oss/lv2/tuna#one</URI>
+  </Info>
+
+  <Data>
+   <Active>Yes</Active>
+   <Volume>0.5797794</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1</Options>
+
+   <Parameter>
+    <Index>0</Index>
+    <Name>Mode</Name>
+    <Symbol>mode</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>1</Index>
+    <Name>Tuning A440</Name>
+    <Symbol>tuning</Symbol>
+    <Value>440</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+
+ <!-- MDA Piano -->
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>MDA Piano</Name>
+   <URI>http://drobilla.net/plugins/mda/Piano</URI>
+  </Info>
+
+  <Data>
+   <Active>No</Active>
+   <Volume>0.7478676</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f0</Options>
+
+   <Parameter>
+    <Index>0</Index>
+    <Name>Envelope Decay</Name>
+    <Symbol>env_decay</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>1</Index>
+    <Name>Envelope Release</Name>
+    <Symbol>env_release</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>2</Index>
+    <Name>Hardness Offset</Name>
+    <Symbol>hardness_offset</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>3</Index>
+    <Name>Velocity to Hardness</Name>
+    <Symbol>vel_to_hardness</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>4</Index>
+    <Name>Muffling Filter</Name>
+    <Symbol>muffling_filter</Symbol>
+    <Value>0.802999973297119</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>5</Index>
+    <Name>Velocity to Muffling</Name>
+    <Symbol>vel_to_muffling</Symbol>
+    <Value>0.250999987125397</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>6</Index>
+    <Name>Velocity Sensitivity</Name>
+    <Symbol>vel_sensitivity</Symbol>
+    <Value>0.375999987125397</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>7</Index>
+    <Name>Stereo Width</Name>
+    <Symbol>stereo_width</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>8</Index>
+    <Name>Polyphony</Name>
+    <Symbol>polyphony</Symbol>
+    <Value>0.330000013113022</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>9</Index>
+    <Name>Fine Tuning</Name>
+    <Symbol>fine_tuning</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>10</Index>
+    <Name>Random Detuning</Name>
+    <Symbol>random_detuning</Symbol>
+    <Value>0.24600000679493</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>11</Index>
+    <Name>Stretch Tuning</Name>
+    <Symbol>stretch_tuning</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+
+ <!-- Odin2 -->
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>Odin2</Name>
+   <URI>https://thewavewarden.com/odin2</URI>
+  </Info>
+
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+
+   <Parameter>
+    <Index>2</Index>
+    <Name>Osc1 Octave</Name>
+    <Symbol>osc1_octave</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>3</Index>
+    <Name>Osc1 Semitones</Name>
+    <Symbol>osc1_semitones</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>4</Index>
+    <Name>Osc1 Finetune</Name>
+    <Symbol>osc1_finetune</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>5</Index>
+    <Name>Osc1 Volume</Name>
+    <Symbol>osc1_volume</Symbol>
+    <Value>0.705333352088928</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>6</Index>
+    <Name>Osc1 Reset</Name>
+    <Symbol>osc1_reset</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>7</Index>
+    <Name>Osc1 Wavetble Position</Name>
+    <Symbol>osc1_wavetble_position</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>8</Index>
+    <Name>Osc1 Detune</Name>
+    <Symbol>osc1_detune</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>9</Index>
+    <Name>Osc1 Position Modulation</Name>
+    <Symbol>osc1_position_modulation</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>10</Index>
+    <Name>Osc1 Multi Position</Name>
+    <Symbol>osc1_multi_position</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>11</Index>
+    <Name>Osc1 Wavetable Spread</Name>
+    <Symbol>osc1_wavetable_spread</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>12</Index>
+    <Name>Osc1 PulseWidth</Name>
+    <Symbol>osc1_pulsewidth</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>13</Index>
+    <Name>Osc1 Drift</Name>
+    <Symbol>osc1_drift</Symbol>
+    <Value>0.403999984264374</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>14</Index>
+    <Name>Osc1 Vector X</Name>
+    <Symbol>osc1_vector_x</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>15</Index>
+    <Name>Osc1 Vector Y</Name>
+    <Symbol>osc1_vector_y</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>16</Index>
+    <Name>Osc1 Arpeggiator Speed</Name>
+    <Symbol>osc1_arpeggiator_speed</Symbol>
+    <Value>0.557143747806549</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>17</Index>
+    <Name>Osc1 Step1</Name>
+    <Symbol>osc1_step1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>18</Index>
+    <Name>Osc1 Step2</Name>
+    <Symbol>osc1_step2</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>19</Index>
+    <Name>Osc1 Step3</Name>
+    <Symbol>osc1_step3</Symbol>
+    <Value>0.791666686534882</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>20</Index>
+    <Name>Osc1 Arpeggiator On</Name>
+    <Symbol>osc1_arpeggiator_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>21</Index>
+    <Name>Osc1 Step3 On</Name>
+    <Symbol>osc1_step3_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>22</Index>
+    <Name>Osc1 Chipnoise</Name>
+    <Symbol>osc1_chipnoise</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>23</Index>
+    <Name>Osc1 Exponential FM</Name>
+    <Symbol>osc1_exponential_fm</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>24</Index>
+    <Name>Osc1 FM/PM amount</Name>
+    <Symbol>osc1_fm_pm_amount</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>25</Index>
+    <Name>Osc1 Noise Lowpass</Name>
+    <Symbol>osc1_noise_lowpass</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>26</Index>
+    <Name>Osc1 Noise Highpass</Name>
+    <Symbol>osc1_noise_highpass</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>27</Index>
+    <Name>Osc2 Octave</Name>
+    <Symbol>osc2_octave</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>28</Index>
+    <Name>Osc2 Semitones</Name>
+    <Symbol>osc2_semitones</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>29</Index>
+    <Name>Osc2 Finetune</Name>
+    <Symbol>osc2_finetune</Symbol>
+    <Value>0.532000005245209</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>30</Index>
+    <Name>Osc2 Volume</Name>
+    <Symbol>osc2_volume</Symbol>
+    <Value>0.617333352565765</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>31</Index>
+    <Name>Osc2 Reset</Name>
+    <Symbol>osc2_reset</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>32</Index>
+    <Name>Osc2 Sync</Name>
+    <Symbol>osc2_sync</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>33</Index>
+    <Name>Osc2 Wavetable Position</Name>
+    <Symbol>osc2_wavetable_position</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>34</Index>
+    <Name>Osc2 Detune</Name>
+    <Symbol>osc2_detune</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>35</Index>
+    <Name>Osc2 Position Modulation</Name>
+    <Symbol>osc2_position_modulation</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>36</Index>
+    <Name>Osc2 Multi Position</Name>
+    <Symbol>osc2_multi_position</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>37</Index>
+    <Name>Osc2 Wavetable Spread</Name>
+    <Symbol>osc2_wavetable_spread</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>38</Index>
+    <Name>Osc2 PulseWidth</Name>
+    <Symbol>osc2_pulsewidth</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>39</Index>
+    <Name>Osc2 Drift</Name>
+    <Symbol>osc2_drift</Symbol>
+    <Value>0.123999997973442</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>40</Index>
+    <Name>Osc2 Vector X</Name>
+    <Symbol>osc2_vector_x</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>41</Index>
+    <Name>Osc2 Vector Y</Name>
+    <Symbol>osc2_vector_y</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>42</Index>
+    <Name>Osc2 Arpeggiator Speed</Name>
+    <Symbol>osc2_arpeggiator_speed</Symbol>
+    <Value>0.557143747806549</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>43</Index>
+    <Name>Osc2 Step1</Name>
+    <Symbol>osc2_step1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>44</Index>
+    <Name>Osc2 Step2</Name>
+    <Symbol>osc2_step2</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>45</Index>
+    <Name>Osc2 Step3</Name>
+    <Symbol>osc2_step3</Symbol>
+    <Value>0.791666686534882</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>46</Index>
+    <Name>Osc2 Arpeggiator On</Name>
+    <Symbol>osc2_arpeggiator_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>47</Index>
+    <Name>Osc2 Step3 On</Name>
+    <Symbol>osc2_step3_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>48</Index>
+    <Name>Osc2 Chipnoise</Name>
+    <Symbol>osc2_chipnoise</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>49</Index>
+    <Name>Osc2 Exponential FM</Name>
+    <Symbol>osc2_exponential_fm</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>50</Index>
+    <Name>Osc2 FM/PM amount</Name>
+    <Symbol>osc2_fm_pm_amount</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>51</Index>
+    <Name>Osc2 Noise Lowpass</Name>
+    <Symbol>osc2_noise_lowpass</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>52</Index>
+    <Name>Osc2 Noise Highpass</Name>
+    <Symbol>osc2_noise_highpass</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>53</Index>
+    <Name>Osc3 Octave</Name>
+    <Symbol>osc3_octave</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>54</Index>
+    <Name>Osc3 Semitones</Name>
+    <Symbol>osc3_semitones</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>55</Index>
+    <Name>Osc3 Finetune</Name>
+    <Symbol>osc3_finetune</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>56</Index>
+    <Name>Osc3 Volume</Name>
+    <Symbol>osc3_volume</Symbol>
+    <Value>0.833333313465118</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>57</Index>
+    <Name>Osc3 Reset</Name>
+    <Symbol>osc3_reset</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>58</Index>
+    <Name>Osc3 Sync</Name>
+    <Symbol>osc3_sync</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>59</Index>
+    <Name>Osc3 Wavetable Position</Name>
+    <Symbol>osc3_wavetable_position</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>60</Index>
+    <Name>Osc3 Detune</Name>
+    <Symbol>osc3_detune</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>61</Index>
+    <Name>Osc3 Position Modulation</Name>
+    <Symbol>osc3_position_modulation</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>62</Index>
+    <Name>Osc3 Multi Position</Name>
+    <Symbol>osc3_multi_position</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>63</Index>
+    <Name>Osc3 Wavetable Spread</Name>
+    <Symbol>osc3_wavetable_spread</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>64</Index>
+    <Name>Osc3 PulseWidth</Name>
+    <Symbol>osc3_pulsewidth</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>65</Index>
+    <Name>Osc3 Drift</Name>
+    <Symbol>osc3_drift</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>66</Index>
+    <Name>Osc3 Vector X</Name>
+    <Symbol>osc3_vector_x</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>67</Index>
+    <Name>Osc3 Vector Y</Name>
+    <Symbol>osc3_vector_y</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>68</Index>
+    <Name>Osc3 Arpeggiator Speed</Name>
+    <Symbol>osc3_arpeggiator_speed</Symbol>
+    <Value>0.557143747806549</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>69</Index>
+    <Name>Osc3 Step1</Name>
+    <Symbol>osc3_step1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>70</Index>
+    <Name>Osc3 Step2</Name>
+    <Symbol>osc3_step2</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>71</Index>
+    <Name>Osc3 Step3</Name>
+    <Symbol>osc3_step3</Symbol>
+    <Value>0.791666686534882</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>72</Index>
+    <Name>Osc3 Arpeggiator On</Name>
+    <Symbol>osc3_arpeggiator_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>73</Index>
+    <Name>Osc3 Step3 On</Name>
+    <Symbol>osc3_step3_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>74</Index>
+    <Name>Osc3 Chipnoise</Name>
+    <Symbol>osc3_chipnoise</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>75</Index>
+    <Name>Osc3 Exponential FM</Name>
+    <Symbol>osc3_exponential_fm</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>76</Index>
+    <Name>Osc3 FM/PM amount</Name>
+    <Symbol>osc3_fm_pm_amount</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>77</Index>
+    <Name>Osc3 Noise Lowpass</Name>
+    <Symbol>osc3_noise_lowpass</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>78</Index>
+    <Name>Osc3 Noise Highpass</Name>
+    <Symbol>osc3_noise_highpass</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>79</Index>
+    <Name>Filter1 Osc1 Input</Name>
+    <Symbol>filter1_osc1_input</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>80</Index>
+    <Name>Filter1 Osc2 Input</Name>
+    <Symbol>filter1_osc2_input</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>81</Index>
+    <Name>Filter1 Osc3 Input</Name>
+    <Symbol>filter1_osc3_input</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>82</Index>
+    <Name>Filter1 Velocity Amount</Name>
+    <Symbol>filter1_velocity_amount</Symbol>
+    <Value>0.444000035524368</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>83</Index>
+    <Name>Filter1 Envelope Amount</Name>
+    <Symbol>filter1_envelope_amount</Symbol>
+    <Value>0.727361261844635</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>84</Index>
+    <Name>Filter1 Keyboard Follow</Name>
+    <Symbol>filter1_keyboard_follow</Symbol>
+    <Value>0.368000000715256</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>85</Index>
+    <Name>Filter1 Gain</Name>
+    <Symbol>filter1_gain</Symbol>
+    <Value>0.833333313465118</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>86</Index>
+    <Name>Filter1 Frequency</Name>
+    <Symbol>filter1_frequency</Symbol>
+    <Value>0.245641052722931</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>87</Index>
+    <Name>Filter1 Resonance</Name>
+    <Symbol>filter1_resonance</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>88</Index>
+    <Name>Filter1 Saturation</Name>
+    <Symbol>filter1_saturation</Symbol>
+    <Value>0.480000019073486</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>89</Index>
+    <Name>Filter1 SEM Transition</Name>
+    <Symbol>filter1_sem_transition</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>90</Index>
+    <Name>Filter1 Formant Transition</Name>
+    <Symbol>filter1_formant_transition</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>91</Index>
+    <Name>Filter1 RingMod Amount</Name>
+    <Symbol>filter1_ringmod_amount</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>92</Index>
+    <Name>Filter2 Osc1 Input</Name>
+    <Symbol>filter2_osc1_input</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>93</Index>
+    <Name>Filter2 Osc2 Input</Name>
+    <Symbol>filter2_osc2_input</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>94</Index>
+    <Name>Filter2 Osc3 Input</Name>
+    <Symbol>filter2_osc3_input</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>95</Index>
+    <Name>Filter2 Filter1 Input</Name>
+    <Symbol>filter2_filter1_input</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>96</Index>
+    <Name>Filter2 Velocity Amount</Name>
+    <Symbol>filter2_velocity_amount</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>97</Index>
+    <Name>Filter2 Envelope Amount</Name>
+    <Symbol>filter2_envelope_amount</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>98</Index>
+    <Name>Filter2 Keyboard Follow</Name>
+    <Symbol>filter2_keyboard_follow</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>99</Index>
+    <Name>Filter2 Gain</Name>
+    <Symbol>filter2_gain</Symbol>
+    <Value>0.833333313465118</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>100</Index>
+    <Name>Filter2 Frequency</Name>
+    <Symbol>filter2_frequency</Symbol>
+    <Value>0.561070501804352</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>101</Index>
+    <Name>Filter2 Resonance</Name>
+    <Symbol>filter2_resonance</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>102</Index>
+    <Name>Filter2 Saturation</Name>
+    <Symbol>filter2_saturation</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>103</Index>
+    <Name>Filter2 SEM Transition</Name>
+    <Symbol>filter2_sem_transition</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>104</Index>
+    <Name>Filter2 Formant Transition</Name>
+    <Symbol>filter2_formant_transition</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>105</Index>
+    <Name>Filter2 RingMod Amount</Name>
+    <Symbol>filter2_ringmod_amount</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>106</Index>
+    <Name>Filter3 Velocity Amount</Name>
+    <Symbol>filter3_velocity_amount</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>107</Index>
+    <Name>Filter3 Envelope Amount</Name>
+    <Symbol>filter3_envelope_amount</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>108</Index>
+    <Name>Filter3 Keyboard Follow</Name>
+    <Symbol>filter3_keyboard_follow</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>109</Index>
+    <Name>Filter3 Gain</Name>
+    <Symbol>filter3_gain</Symbol>
+    <Value>0.833333313465118</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>110</Index>
+    <Name>Filter3 Frequency</Name>
+    <Symbol>filter3_frequency</Symbol>
+    <Value>0.561070501804352</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>111</Index>
+    <Name>Filter3 Resonance</Name>
+    <Symbol>filter3_resonance</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>112</Index>
+    <Name>Filter3 Saturation</Name>
+    <Symbol>filter3_saturation</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>113</Index>
+    <Name>Filter3 SEM Transition</Name>
+    <Symbol>filter3_sem_transition</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>114</Index>
+    <Name>Filter3 Formant Transition</Name>
+    <Symbol>filter3_formant_transition</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>115</Index>
+    <Name>Filter3 RingMod Amount</Name>
+    <Symbol>filter3_ringmod_amount</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>116</Index>
+    <Name>Amplifier Velocity</Name>
+    <Symbol>amplifier_velocity</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>117</Index>
+    <Name>Amplifier Panorama</Name>
+    <Symbol>amplifier_panorama</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>118</Index>
+    <Name>Amplifier Gain</Name>
+    <Symbol>amplifier_gain</Symbol>
+    <Value>0.60228568315506</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>119</Index>
+    <Name>Distortion Boost</Name>
+    <Symbol>distortion_boost</Symbol>
+    <Value>0.300000011920929</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>120</Index>
+    <Name>Distortion DryWet</Name>
+    <Symbol>distortion_drywet</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>121</Index>
+    <Name>AmpEnv Attack</Name>
+    <Symbol>ampenv_attack</Symbol>
+    <Value>0.43157896399498</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>122</Index>
+    <Name>AmpEnv Decay</Name>
+    <Symbol>ampenv_decay</Symbol>
+    <Value>0.821052610874176</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>123</Index>
+    <Name>AmpEnv Sustain</Name>
+    <Symbol>ampenv_sustain</Symbol>
+    <Value>0.631578922271729</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>124</Index>
+    <Name>AmpEnv Release</Name>
+    <Symbol>ampenv_release</Symbol>
+    <Value>0.431578934192657</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>125</Index>
+    <Name>AmpEnv Loop</Name>
+    <Symbol>ampenv_loop</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>126</Index>
+    <Name>FilterEnv Attack</Name>
+    <Symbol>filterenv_attack</Symbol>
+    <Value>0.578947365283966</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>127</Index>
+    <Name>FilterEnv Decay</Name>
+    <Symbol>filterenv_decay</Symbol>
+    <Value>0.800000011920929</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>128</Index>
+    <Name>FilterEnv Sustain</Name>
+    <Symbol>filterenv_sustain</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>129</Index>
+    <Name>FilterEnv Release</Name>
+    <Symbol>filterenv_release</Symbol>
+    <Value>0.473684221506119</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>130</Index>
+    <Name>FilterEnv Loop</Name>
+    <Symbol>filterenv_loop</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>131</Index>
+    <Name>ModEnv Attack</Name>
+    <Symbol>modenv_attack</Symbol>
+    <Value>0.121201537549496</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>132</Index>
+    <Name>ModEnv Decay</Name>
+    <Symbol>modenv_decay</Symbol>
+    <Value>0.46749421954155</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>133</Index>
+    <Name>ModEnv Sustain</Name>
+    <Symbol>modenv_sustain</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>134</Index>
+    <Name>ModEnv Release</Name>
+    <Symbol>modenv_release</Symbol>
+    <Value>0.121201537549496</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>135</Index>
+    <Name>ModEnv Loop</Name>
+    <Symbol>modenv_loop</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>136</Index>
+    <Name>GlobalEnv Attack</Name>
+    <Symbol>globalenv_attack</Symbol>
+    <Value>0.121201537549496</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>137</Index>
+    <Name>GlobalEnv Decay</Name>
+    <Symbol>globalenv_decay</Symbol>
+    <Value>0.500000357627869</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>138</Index>
+    <Name>GlobalEnv Sustain</Name>
+    <Symbol>globalenv_sustain</Symbol>
+    <Value>0.67095273733139</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>139</Index>
+    <Name>GlobalEnv Release</Name>
+    <Symbol>globalenv_release</Symbol>
+    <Value>0.121201537549496</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>140</Index>
+    <Name>GlobalEnv Loop</Name>
+    <Symbol>globalenv_loop</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>141</Index>
+    <Name>LFO1 Reset</Name>
+    <Symbol>lfo1_reset</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>142</Index>
+    <Name>LFO1 Frequency</Name>
+    <Symbol>lfo1_frequency</Symbol>
+    <Value>0.520078957080841</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>143</Index>
+    <Name>LFO2 Reset</Name>
+    <Symbol>lfo2_reset</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>144</Index>
+    <Name>LFO2 Frequency</Name>
+    <Symbol>lfo2_frequency</Symbol>
+    <Value>0.400078982114792</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>145</Index>
+    <Name>LFO3 Reset</Name>
+    <Symbol>lfo3_reset</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>146</Index>
+    <Name>LFO3 Frequency</Name>
+    <Symbol>lfo3_frequency</Symbol>
+    <Value>0.400078982114792</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>147</Index>
+    <Name>LFO4 Reset</Name>
+    <Symbol>lfo4_reset</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>148</Index>
+    <Name>LFO4 Frequency</Name>
+    <Symbol>lfo4_frequency</Symbol>
+    <Value>0.400078982114792</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>149</Index>
+    <Name>Filter1 To Amplifier</Name>
+    <Symbol>filter1_to_amplifier</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>150</Index>
+    <Name>Filter2 To Amplifier</Name>
+    <Symbol>filter2_to_amplifier</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>151</Index>
+    <Name>Glide</Name>
+    <Symbol>glide</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>152</Index>
+    <Name>Master</Name>
+    <Symbol>master</Symbol>
+    <Value>0.633548378944397</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>153</Index>
+    <Name>Modwheel</Name>
+    <Symbol>modwheel</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>154</Index>
+    <Name>Pitchbend</Name>
+    <Symbol>pitchbend</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>155</Index>
+    <Name>XY Pad X</Name>
+    <Symbol>xy_pad_x</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>156</Index>
+    <Name>XY Pad Y</Name>
+    <Symbol>xy_pad_y</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>157</Index>
+    <Name>Delay PingPong</Name>
+    <Symbol>delay_pingpong</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>158</Index>
+    <Name>Delay Time</Name>
+    <Symbol>delay_time</Symbol>
+    <Value>0.499999910593033</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>159</Index>
+    <Name>Delay Feedback</Name>
+    <Symbol>delay_feedback</Symbol>
+    <Value>0.701208710670471</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>160</Index>
+    <Name>Delay Highpass Frequency</Name>
+    <Symbol>delay_highpass_frequency</Symbol>
+    <Value>0.247999995946884</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>161</Index>
+    <Name>Delay Ducking</Name>
+    <Symbol>delay_ducking</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>162</Index>
+    <Name>Delay Dry</Name>
+    <Symbol>delay_dry</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>163</Index>
+    <Name>Delay Wet</Name>
+    <Symbol>delay_wet</Symbol>
+    <Value>0.771442174911499</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>164</Index>
+    <Name>Delay On</Name>
+    <Symbol>delay_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>165</Index>
+    <Name>Reverb PreDelay</Name>
+    <Symbol>reverb_predelay</Symbol>
+    <Value>0.333333343267441</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>166</Index>
+    <Name>Reverb EQ Gain</Name>
+    <Symbol>reverb_eq_gain</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>167</Index>
+    <Name>Reverb EQ Freq</Name>
+    <Symbol>reverb_eq_freq</Symbol>
+    <Value>0.549100518226624</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>168</Index>
+    <Name>Reverb DryWet</Name>
+    <Symbol>reverb_drywet</Symbol>
+    <Value>0.378929138183594</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>169</Index>
+    <Name>Reverb Mid Hall</Name>
+    <Symbol>reverb_mid_hall</Symbol>
+    <Value>0.142857149243355</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>170</Index>
+    <Name>Reverb High Freq Damp</Name>
+    <Symbol>reverb_high_freq_damp</Symbol>
+    <Value>0.668740332126617</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>171</Index>
+    <Name>Reverb On</Name>
+    <Symbol>reverb_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>172</Index>
+    <Name>Phaser Reset</Name>
+    <Symbol>phaser_reset</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>173</Index>
+    <Name>Phaser On</Name>
+    <Symbol>phaser_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>174</Index>
+    <Name>Phaser Frequency</Name>
+    <Symbol>phaser_frequency</Symbol>
+    <Value>0.733014047145844</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>175</Index>
+    <Name>Phaser Feedback</Name>
+    <Symbol>phaser_feedback</Symbol>
+    <Value>0.25</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>176</Index>
+    <Name>Phaser Rate</Name>
+    <Symbol>phaser_rate</Symbol>
+    <Value>0.378177523612976</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>177</Index>
+    <Name>Phaser Amount</Name>
+    <Symbol>phaser_amount</Symbol>
+    <Value>0.300000011920929</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>178</Index>
+    <Name>Phaser DryWet</Name>
+    <Symbol>phaser_drywet</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>179</Index>
+    <Name>Flanger Reset</Name>
+    <Symbol>flanger_reset</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>180</Index>
+    <Name>Flanger On</Name>
+    <Symbol>flanger_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>181</Index>
+    <Name>Flanger Rate</Name>
+    <Symbol>flanger_rate</Symbol>
+    <Value>0.32666152715683</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>182</Index>
+    <Name>Flanger Feedback</Name>
+    <Symbol>flanger_feedback</Symbol>
+    <Value>0.799999952316284</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>183</Index>
+    <Name>Flanger Amount</Name>
+    <Symbol>flanger_amount</Symbol>
+    <Value>0.300000011920929</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>184</Index>
+    <Name>Flanger DryWet</Name>
+    <Symbol>flanger_drywet</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>185</Index>
+    <Name>Chorus Reset</Name>
+    <Symbol>chorus_reset</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>186</Index>
+    <Name>Chorus On</Name>
+    <Symbol>chorus_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>187</Index>
+    <Name>Chorus Rate</Name>
+    <Symbol>chorus_rate</Symbol>
+    <Value>0.214661508798599</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>188</Index>
+    <Name>Chorus Amount</Name>
+    <Symbol>chorus_amount</Symbol>
+    <Value>0.736000001430511</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>189</Index>
+    <Name>Chorus Feedback</Name>
+    <Symbol>chorus_feedback</Symbol>
+    <Value>0.344999998807907</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>190</Index>
+    <Name>Chorus DryWet</Name>
+    <Symbol>chorus_drywet</Symbol>
+    <Value>0.359999924898148</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>191</Index>
+    <Name>Unison Detune</Name>
+    <Symbol>unison_detune</Symbol>
+    <Value>0.0851483643054962</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>192</Index>
+    <Name>Unison Width</Name>
+    <Symbol>unison_width</Symbol>
+    <Value>0.0680000111460686</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>193</Index>
+    <Name>Arp Step 1 On</Name>
+    <Symbol>arp_step_1_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>194</Index>
+    <Name>Arp Step 2 On</Name>
+    <Symbol>arp_step_2_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>195</Index>
+    <Name>Arp Step 3 On</Name>
+    <Symbol>arp_step_3_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>196</Index>
+    <Name>Arp Step 4 On</Name>
+    <Symbol>arp_step_4_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>197</Index>
+    <Name>Arp Step 5 On</Name>
+    <Symbol>arp_step_5_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>198</Index>
+    <Name>Arp Step 6 On</Name>
+    <Symbol>arp_step_6_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>199</Index>
+    <Name>Arp Step 7 On</Name>
+    <Symbol>arp_step_7_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>200</Index>
+    <Name>Arp Step 8 On</Name>
+    <Symbol>arp_step_8_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>201</Index>
+    <Name>Arp Step 9 On</Name>
+    <Symbol>arp_step_9_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>202</Index>
+    <Name>Arp Step 10 On</Name>
+    <Symbol>arp_step_10_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>203</Index>
+    <Name>Arp Step 11 On</Name>
+    <Symbol>arp_step_11_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>204</Index>
+    <Name>Arp Step 12 On</Name>
+    <Symbol>arp_step_12_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>205</Index>
+    <Name>Arp Step 13 On</Name>
+    <Symbol>arp_step_13_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>206</Index>
+    <Name>Arp Step 14 On</Name>
+    <Symbol>arp_step_14_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>207</Index>
+    <Name>Arp Step 15 On</Name>
+    <Symbol>arp_step_15_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>208</Index>
+    <Name>Arp Step 16 On</Name>
+    <Symbol>arp_step_16_on</Symbol>
+    <Value>1</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>209</Index>
+    <Name>Arp Step 1 Mod 1</Name>
+    <Symbol>arp_step_1_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>210</Index>
+    <Name>Arp Step 2 Mod 1</Name>
+    <Symbol>arp_step_2_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>211</Index>
+    <Name>Arp Step 3 Mod 1</Name>
+    <Symbol>arp_step_3_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>212</Index>
+    <Name>Arp Step 4 Mod 1</Name>
+    <Symbol>arp_step_4_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>213</Index>
+    <Name>Arp Step 5 Mod 1</Name>
+    <Symbol>arp_step_5_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>214</Index>
+    <Name>Arp Step 6 Mod 1</Name>
+    <Symbol>arp_step_6_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>215</Index>
+    <Name>Arp Step 7 Mod 1</Name>
+    <Symbol>arp_step_7_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>216</Index>
+    <Name>Arp Step 8 Mod 1</Name>
+    <Symbol>arp_step_8_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>217</Index>
+    <Name>Arp Step 9 Mod 1</Name>
+    <Symbol>arp_step_9_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>218</Index>
+    <Name>Arp Step 10 Mod 1</Name>
+    <Symbol>arp_step_10_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>219</Index>
+    <Name>Arp Step 11 Mod 1</Name>
+    <Symbol>arp_step_11_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>220</Index>
+    <Name>Arp Step 12 Mod 1</Name>
+    <Symbol>arp_step_12_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>221</Index>
+    <Name>Arp Step 13 Mod 1</Name>
+    <Symbol>arp_step_13_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>222</Index>
+    <Name>Arp Step 14 Mod 1</Name>
+    <Symbol>arp_step_14_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>223</Index>
+    <Name>Arp Step 15 Mod 1</Name>
+    <Symbol>arp_step_15_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>224</Index>
+    <Name>Arp Step 16 Mod 1</Name>
+    <Symbol>arp_step_16_mod_1</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>225</Index>
+    <Name>Arp Step 1 Mod 2</Name>
+    <Symbol>arp_step_1_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>226</Index>
+    <Name>Arp Step 2 Mod 2</Name>
+    <Symbol>arp_step_2_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>227</Index>
+    <Name>Arp Step 3 Mod 2</Name>
+    <Symbol>arp_step_3_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>228</Index>
+    <Name>Arp Step 4 Mod 2</Name>
+    <Symbol>arp_step_4_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>229</Index>
+    <Name>Arp Step 5 Mod 2</Name>
+    <Symbol>arp_step_5_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>230</Index>
+    <Name>Arp Step 6 Mod 2</Name>
+    <Symbol>arp_step_6_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>231</Index>
+    <Name>Arp Step 7 Mod 2</Name>
+    <Symbol>arp_step_7_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>232</Index>
+    <Name>Arp Step 8 Mod 2</Name>
+    <Symbol>arp_step_8_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>233</Index>
+    <Name>Arp Step 9 Mod 2</Name>
+    <Symbol>arp_step_9_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>234</Index>
+    <Name>Arp Step 10 Mod 2</Name>
+    <Symbol>arp_step_10_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>235</Index>
+    <Name>Arp Step 11 Mod 2</Name>
+    <Symbol>arp_step_11_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>236</Index>
+    <Name>Arp Step 12 Mod 2</Name>
+    <Symbol>arp_step_12_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>237</Index>
+    <Name>Arp Step 13 Mod 2</Name>
+    <Symbol>arp_step_13_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>238</Index>
+    <Name>Arp Step 14 Mod 2</Name>
+    <Symbol>arp_step_14_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>239</Index>
+    <Name>Arp Step 15 Mod 2</Name>
+    <Symbol>arp_step_15_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>240</Index>
+    <Name>Arp Step 16 Mod 2</Name>
+    <Symbol>arp_step_16_mod_2</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>241</Index>
+    <Name>Arp Step 1 Transpose</Name>
+    <Symbol>arp_step_1_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>242</Index>
+    <Name>Arp Step 2 Transpose</Name>
+    <Symbol>arp_step_2_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>243</Index>
+    <Name>Arp Step 3 Transpose</Name>
+    <Symbol>arp_step_3_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>244</Index>
+    <Name>Arp Step 4 Transpose</Name>
+    <Symbol>arp_step_4_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>245</Index>
+    <Name>Arp Step 5 Transpose</Name>
+    <Symbol>arp_step_5_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>246</Index>
+    <Name>Arp Step 6 Transpose</Name>
+    <Symbol>arp_step_6_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>247</Index>
+    <Name>Arp Step 7 Transpose</Name>
+    <Symbol>arp_step_7_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>248</Index>
+    <Name>Arp Step 8 Transpose</Name>
+    <Symbol>arp_step_8_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>249</Index>
+    <Name>Arp Step 9 Transpose</Name>
+    <Symbol>arp_step_9_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>250</Index>
+    <Name>Arp Step 10 Transpose</Name>
+    <Symbol>arp_step_10_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>251</Index>
+    <Name>Arp Step 11 Transpose</Name>
+    <Symbol>arp_step_11_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>252</Index>
+    <Name>Arp Step 12 Transpose</Name>
+    <Symbol>arp_step_12_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>253</Index>
+    <Name>Arp Step 13 Transpose</Name>
+    <Symbol>arp_step_13_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>254</Index>
+    <Name>Arp Step 14 Transpose</Name>
+    <Symbol>arp_step_14_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>255</Index>
+    <Name>Arp Step 15 Transpose</Name>
+    <Symbol>arp_step_15_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>256</Index>
+    <Name>Arp Step 16 Transpose</Name>
+    <Symbol>arp_step_16_transpose</Symbol>
+    <Value>0.5</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>257</Index>
+    <Name>Arp Mod Transpose</Name>
+    <Symbol>arp_mod_transpose</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>258</Index>
+    <Name>Arpeggiator On</Name>
+    <Symbol>arpeggiator_on</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>259</Index>
+    <Name>Arpeggiator OneShot</Name>
+    <Symbol>arpeggiator_oneshot</Symbol>
+    <Value>0</Value>
+   </Parameter>
+
+   <CustomData>
+    <Type>http://lv2plug.in/ns/ext/atom#Chunk</Type>
+    <Key>urn:juce:stateBinary</Key>
+    <Value>
+VkMyIaK/AAA8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYtOCI/PiA8T2Rpbj48UEFSQU0gaWQ9ImFtcF9nYWluIiB2YWx1ZT0iLTQuNzA0MDAwNDczMDIyNDYxIi8+PFBBUkFNIGlkPSJhbXBfcGFuIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJhbXBfdmVsb2NpdHkiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImFycF9tb2RfdHJhbnNwb3NlIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJhcnBfb24iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImFycF9vbmVfc2hvdCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iY2hvcnVzX2Ftb3VudCIgdmFsdWU9IjAuNzM2MDAwMDAxNDMwNTExNSIvPjxQQVJBTSBpZD0iY2hvcnVzX2RyeXdldCIgdmFsdWU9IjAuMzU5OTk5OTI0ODk4MTQ3NiIvPjxQQVJBTSBpZD0iY2hvcnVzX2ZlZWRiYWNrIiB2YWx1ZT0iLTAuMzEwMDAwMDAyMzg0MTg1OCIvPjxQQVJBTSBpZD0iY2hvcnVzX29uIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJjaG9ydXNfcmF0ZSIgdmFsdWU9IjAuMDYzNzA1NzcyMTYxNDgzNzYiLz48UEFSQU0gaWQ9ImNob3J1c19yZXNldCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZGVsYXlfZHJ5IiB2YWx1ZT0iMS4wIi8+PFBBUkFNIGlkPSJkZWxheV9kdWNraW5nIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJkZWxheV9mZWVkYmFjayIgdmFsdWU9IjAuNTM5ODExNjExMTc1NTM3MSIvPjxQQVJBTSBpZD0iZGVsYXlfaHAiIHZhbHVlPSIxNDcuNzg2NzI3OTA1MjczNCIvPjxQQVJBTSBpZD0iZGVsYXlfb24iIHZhbHVlPSIxLjAiLz48UEFSQU0gaWQ9ImRlbGF5X3Bpbmdwb25nIiB2YWx1ZT0iMS4wIi8+PFBBUkFNIGlkPSJkZWxheV90aW1lIiB2YWx1ZT0iMS4wIi8+PFBBUkFNIGlkPSJkZWxheV93ZXQiIHZhbHVlPSIwLjYzNzE2MjE0ODk1MjQ4NDEiLz48UEFSQU0gaWQ9ImRpc3RfYm9vc3QiIHZhbHVlPSIwLjMwMDAwMDAxMTkyMDkyOSIvPjxQQVJBTSBpZD0iZGlzdF9kcnl3ZXQiIHZhbHVlPSIxLjAiLz48UEFSQU0gaWQ9ImVudjFfYXR0YWNrIiB2YWx1ZT0iMC42MTM2MDA4NTAxMDUyODU2Ii8+PFBBUkFNIGlkPSJlbnYxX2RlY2F5IiB2YWx1ZT0iNS4xOTM2Nzk4MDk1NzAzMTIiLz48UEFSQU0gaWQ9ImVudjFfbG9vcCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZW52MV9yZWxlYXNlIiB2YWx1ZT0iMC42MTM2MDA3MzA4OTU5OTYxIi8+PFBBUkFNIGlkPSJlbnYxX3N1c3RhaW4iIHZhbHVlPSIwLjQ1MDE0MjMyMzk3MDc5NDciLz48UEFSQU0gaWQ9ImVudjJfYXR0YWNrIiB2YWx1ZT0iMS42MjcxMTU4NDU2ODAyMzciLz48UEFSQU0gaWQ9ImVudjJfZGVjYXkiIHZhbHVlPSI0Ljc2NDIzNzQwMzg2OTYyOSIvPjxQQVJBTSBpZD0iZW52Ml9sb29wIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJlbnYyX3JlbGVhc2UiIHZhbHVlPSIwLjgzNTcwMTgyMzIzNDU1ODEiLz48UEFSQU0gaWQ9ImVudjJfc3VzdGFpbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZW52M19hdHRhY2siIHZhbHVlPSIwLjAwOTk5OTk5OTc3NjQ4MjU4MiIvPjxQQVJBTSBpZD0iZW52M19kZWNheSIgdmFsdWU9IjAuODAwMDAwMDExOTIwOTI5Ii8+PFBBUkFNIGlkPSJlbnYzX2xvb3AiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImVudjNfcmVsZWFzZSIgdmFsdWU9IjAuMDA5OTk5OTk5Nzc2NDgyNTgyIi8+PFBBUkFNIGlkPSJlbnYzX3N1c3RhaW4iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImVudjRfYXR0YWNrIiB2YWx1ZT0iMC4wMDk5OTk5OTk3NzY0ODI1ODIiLz48UEFSQU0gaWQ9ImVudjRfZGVjYXkiIHZhbHVlPSIwLjk5OTk5OTg4MDc5MDcxMDQiLz48UEFSQU0gaWQ9ImVudjRfbG9vcCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZW52NF9yZWxlYXNlIiB2YWx1ZT0iMC4wMDk5OTk5OTk3NzY0ODI1ODIiLz48UEFSQU0gaWQ9ImVudjRfc3VzdGFpbiIgdmFsdWU9IjAuNSIvPjxQQVJBTSBpZD0iZmlsMV9lbnYiIHZhbHVlPSIwLjQ1NDcyMjUyMzY4OTI3Ii8+PFBBUkFNIGlkPSJmaWwxX2Zvcm1hbnRfdHJhbnNpdGlvbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZmlsMV9mcmVxIiB2YWx1ZT0iOTIuNzQ0MzU0MjQ4MDQ2ODgiLz48UEFSQU0gaWQ9ImZpbDFfZ2FpbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZmlsMV9rYmQiIHZhbHVlPSIwLjM2ODAwMDAwMDcxNTI1NTciLz48UEFSQU0gaWQ9ImZpbDFfb3NjMSIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0iZmlsMV9vc2MyIiB2YWx1ZT0iMS4wIi8+PFBBUkFNIGlkPSJmaWwxX29zYzMiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImZpbDFfcmVzIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJmaWwxX3JpbmdfbW9kX2Ftb3VudCIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0iZmlsMV9zYXR1cmF0aW9uIiB2YWx1ZT0iMC40ODAwMDAwMTkwNzM0ODYzIi8+PFBBUkFNIGlkPSJmaWwxX3NlbV90cmFuc2l0aW9uIiB2YWx1ZT0iLTEuMCIvPjxQQVJBTSBpZD0iZmlsMV90b19hbXAiIHZhbHVlPSIxLjAiLz48UEFSQU0gaWQ9ImZpbDFfdmVsIiB2YWx1ZT0iMC40NDQwMDAwMzU1MjQzNjgzIi8+PFBBUkFNIGlkPSJmaWwyX2VudiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZmlsMl9maWwxIiB2YWx1ZT0iMS4wIi8+PFBBUkFNIGlkPSJmaWwyX2Zvcm1hbnRfdHJhbnNpdGlvbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZmlsMl9mcmVxIiB2YWx1ZT0iMjAwMC4wMDAzNjYyMTA5MzgiLz48UEFSQU0gaWQ9ImZpbDJfZ2FpbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZmlsMl9rYmQiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImZpbDJfb3NjMSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZmlsMl9vc2MyIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJmaWwyX29zYzMiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImZpbDJfcmVzIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJmaWwyX3JpbmdfbW9kX2Ftb3VudCIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0iZmlsMl9zYXR1cmF0aW9uIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJmaWwyX3NlbV90cmFuc2l0aW9uIiB2YWx1ZT0iLTEuMCIvPjxQQVJBTSBpZD0iZmlsMl90b19hbXAiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImZpbDJfdmVsIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJmaWwzX2VudiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZmlsM19mb3JtYW50X3RyYW5zaXRpb24iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImZpbDNfZnJlcSIgdmFsdWU9IjIwMDAuMDAwMzY2MjEwOTM4Ii8+PFBBUkFNIGlkPSJmaWwzX2dhaW4iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImZpbDNfa2JkIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJmaWwzX3JlcyIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZmlsM19yaW5nX21vZF9hbW91bnQiIHZhbHVlPSIxLjAiLz48UEFSQU0gaWQ9ImZpbDNfc2F0dXJhdGlvbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZmlsM19zZW1fdHJhbnNpdGlvbiIgdmFsdWU9Ii0xLjAiLz48UEFSQU0gaWQ9ImZpbDNfdmVsIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJmbGFuZ2VyX2Ftb3VudCIgdmFsdWU9IjAuMzAwMDAwMDExOTIwOTI5Ii8+PFBBUkFNIGlkPSJmbGFuZ2VyX2RyeXdldCIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0iZmxhbmdlcl9mZWVkYmFjayIgdmFsdWU9IjAuNTk5OTk5OTA0NjMyNTY4NCIvPjxQQVJBTSBpZD0iZmxhbmdlcl9vbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0iZmxhbmdlcl9yYXRlIiB2YWx1ZT0iMC4xNTAwMDAwMjA4NjE2MjU3Ii8+PFBBUkFNIGlkPSJmbGFuZ2VyX3Jlc2V0IiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJnbGlkZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ibGZvMV9mcmVxIiB2YWx1ZT0iMy42NTM1NDY1NzE3MzE1NjciLz48UEFSQU0gaWQ9ImxmbzFfcmVzZXQiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9ImxmbzJfZnJlcSIgdmFsdWU9IjEuMDAwMDAwMzU3NjI3ODY5Ii8+PFBBUkFNIGlkPSJsZm8yX3Jlc2V0IiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJsZm8zX2ZyZXEiIHZhbHVlPSIxLjAwMDAwMDM1NzYyNzg2OSIvPjxQQVJBTSBpZD0ibGZvM19yZXNldCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ibGZvNF9mcmVxIiB2YWx1ZT0iMS4wMDAwMDAzNTc2Mjc4NjkiLz48UEFSQU0gaWQ9ImxmbzRfcmVzZXQiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im1hc3RlciIgdmFsdWU9Ii0xMC43MjAwMDEyMjA3MDMxMiIvPjxQQVJBTSBpZD0ibW9kd2hlZWwiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzFfYXJwX29uIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MxX2FycF9zcGVlZCIgdmFsdWU9IjIwLjAiLz48UEFSQU0gaWQ9Im9zYzFfY2hpcG5vaXNlIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MxX2RldHVuZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMV9kcmlmdCIgdmFsdWU9IjAuNDAzOTk5OTg0MjY0MzczOCIvPjxQQVJBTSBpZD0ib3NjMV9leHBfZm0iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzFfZmluZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMV9mbSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMV9ocCIgdmFsdWU9IjgwLjAiLz48UEFSQU0gaWQ9Im9zYzFfbHAiIHZhbHVlPSIxODAwMC4wIi8+PFBBUkFNIGlkPSJvc2MxX211bHRpX3Bvc2l0aW9uIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MxX29jdCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMV9wb3NfbW9kIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MxX3Bvc2l0aW9uIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MxX3B1bHNld2lkdGgiIHZhbHVlPSIwLjUiLz48UEFSQU0gaWQ9Im9zYzFfcmVzZXQiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzFfc2VtaSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMV9zcHJlYWQiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzFfc3RlcF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MxX3N0ZXBfMiIgdmFsdWU9IjEyLjAiLz48UEFSQU0gaWQ9Im9zYzFfc3RlcF8zIiB2YWx1ZT0iNy4wIi8+PFBBUkFNIGlkPSJvc2MxX3N0ZXBfM19vbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMV92ZWNfeCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMV92ZWNfeSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMV92b2wiIHZhbHVlPSItOS4yMTU5OTk2MDMyNzE0ODQiLz48UEFSQU0gaWQ9Im9zYzJfYXJwX29uIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MyX2FycF9zcGVlZCIgdmFsdWU9IjIwLjAiLz48UEFSQU0gaWQ9Im9zYzJfY2hpcG5vaXNlIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MyX2RldHVuZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMl9kcmlmdCIgdmFsdWU9IjAuMTIzOTk5OTk3OTczNDQyMSIvPjxQQVJBTSBpZD0ib3NjMl9leHBfZm0iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzJfZmluZSIgdmFsdWU9IjMuMjAwMDAwNzYyOTM5NDUzIi8+PFBBUkFNIGlkPSJvc2MyX2ZtIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MyX2hwIiB2YWx1ZT0iODAuMCIvPjxQQVJBTSBpZD0ib3NjMl9scCIgdmFsdWU9IjE4MDAwLjAiLz48UEFSQU0gaWQ9Im9zYzJfbXVsdGlfcG9zaXRpb24iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzJfb2N0IiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MyX3Bvc19tb2QiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzJfcG9zaXRpb24iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzJfcHVsc2V3aWR0aCIgdmFsdWU9IjAuNSIvPjxQQVJBTSBpZD0ib3NjMl9yZXNldCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMl9zZW1pIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MyX3NwcmVhZCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjMl9zdGVwXzEiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzJfc3RlcF8yIiB2YWx1ZT0iMTIuMCIvPjxQQVJBTSBpZD0ib3NjMl9zdGVwXzMiIHZhbHVlPSI3LjAiLz48UEFSQU0gaWQ9Im9zYzJfc3RlcF8zX29uIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MyX3N5bmMiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzJfdmVjX3giIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzJfdmVjX3kiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzJfdm9sIiB2YWx1ZT0iLTE1LjU1MTk5ODEzODQyNzczIi8+PFBBUkFNIGlkPSJvc2MzX2FycF9vbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjM19hcnBfc3BlZWQiIHZhbHVlPSIyMC4wIi8+PFBBUkFNIGlkPSJvc2MzX2NoaXBub2lzZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjM19kZXR1bmUiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzNfZHJpZnQiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzNfZXhwX2ZtIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MzX2ZpbmUiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzNfZm0iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzNfaHAiIHZhbHVlPSI4MC4wIi8+PFBBUkFNIGlkPSJvc2MzX2xwIiB2YWx1ZT0iMTgwMDAuMCIvPjxQQVJBTSBpZD0ib3NjM19tdWx0aV9wb3NpdGlvbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjM19vY3QiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzNfcG9zX21vZCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjM19wb3NpdGlvbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjM19wdWxzZXdpZHRoIiB2YWx1ZT0iMC41Ii8+PFBBUkFNIGlkPSJvc2MzX3Jlc2V0IiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MzX3NlbWkiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzNfc3ByZWFkIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJvc2MzX3N0ZXBfMSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjM19zdGVwXzIiIHZhbHVlPSIxMi4wIi8+PFBBUkFNIGlkPSJvc2MzX3N0ZXBfMyIgdmFsdWU9IjcuMCIvPjxQQVJBTSBpZD0ib3NjM19zdGVwXzNfb24iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9Im9zYzNfc3luYyIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjM192ZWNfeCIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjM192ZWNfeSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ib3NjM192b2wiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InBoYXNlcl9kcnl3ZXQiIHZhbHVlPSIxLjAiLz48UEFSQU0gaWQ9InBoYXNlcl9mZWVkYmFjayIgdmFsdWU9IjAuMjUiLz48UEFSQU0gaWQ9InBoYXNlcl9mcmVxIiB2YWx1ZT0iMzk5OS45OTk3NTU4NTkzNzUiLz48UEFSQU0gaWQ9InBoYXNlcl9tb2QiIHZhbHVlPSIwLjMwMDAwMDAxMTkyMDkyOSIvPjxQQVJBTSBpZD0icGhhc2VyX29uIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJwaGFzZXJfcmF0ZSIgdmFsdWU9IjAuMjUwMDAwMDU5NjA0NjQ0OCIvPjxQQVJBTSBpZD0icGhhc2VyX3Jlc2V0IiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJwaXRjaGJlbmQiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InJldl9kZWxheSIgdmFsdWU9IjQwLjAiLz48UEFSQU0gaWQ9InJldl9kcnl3ZXQiIHZhbHVlPSIwLjI1Ii8+PFBBUkFNIGlkPSJyZXZfZXFmcmVxIiB2YWx1ZT0iMTAwMC4wMDAxODMxMDU0NjkiLz48UEFSQU0gaWQ9InJldl9lcWdhaW4iIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InJldl9oZl9kYW1wIiB2YWx1ZT0iNjAwMC4wMDA5NzY1NjI1Ii8+PFBBUkFNIGlkPSJyZXZfbWlkX2hhbGwiIHZhbHVlPSIyLjAiLz48UEFSQU0gaWQ9InJldmVyYl9vbiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF8wX21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzBfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfMF9vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF8wX3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF8xMF9tb2RfMSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF8xMF9tb2RfMiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF8xMF9vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF8xMF90cmFuc3Bvc2UiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfMTFfbW9kXzEiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfMTFfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfMTFfb24iIHZhbHVlPSIxLjAiLz48UEFSQU0gaWQ9InN0ZXBfMTFfdHJhbnNwb3NlIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzEyX21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzEyX21vZF8yIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzEyX29uIiB2YWx1ZT0iMS4wIi8+PFBBUkFNIGlkPSJzdGVwXzEyX3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF8xM19tb2RfMSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF8xM19tb2RfMiIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF8xM19vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF8xM190cmFuc3Bvc2UiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfMTRfbW9kXzEiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfMTRfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfMTRfb24iIHZhbHVlPSIxLjAiLz48UEFSQU0gaWQ9InN0ZXBfMTRfdHJhbnNwb3NlIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzE1X21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzE1X21vZF8yIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzE1X29uIiB2YWx1ZT0iMS4wIi8+PFBBUkFNIGlkPSJzdGVwXzE1X3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF8xX21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzFfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfMV9vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF8xX3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF8yX21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzJfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfMl9vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF8yX3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF8zX21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzNfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfM19vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF8zX3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF80X21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzRfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfNF9vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF80X3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF81X21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzVfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfNV9vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF81X3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF82X21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzZfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfNl9vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF82X3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF83X21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzdfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfN19vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF83X3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF84X21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzhfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfOF9vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF84X3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0ic3RlcF85X21vZF8xIiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJzdGVwXzlfbW9kXzIiIHZhbHVlPSIwLjAiLz48UEFSQU0gaWQ9InN0ZXBfOV9vbiIgdmFsdWU9IjEuMCIvPjxQQVJBTSBpZD0ic3RlcF85X3RyYW5zcG9zZSIgdmFsdWU9IjAuMCIvPjxQQVJBTSBpZD0idW5pc29uX2RldHVuZSIgdmFsdWU9IjAuMDA0MzUwMTQ2NzQ0NDAwMjYzIi8+PFBBUkFNIGlkPSJ1bmlzb25fd2lkdGgiIHZhbHVlPSIwLjA2ODAwMDAxMTE0NjA2ODU3Ii8+PFBBUkFNIGlkPSJ4eV94IiB2YWx1ZT0iMC4wIi8+PFBBUkFNIGlkPSJ4eV95IiB2YWx1ZT0iMC4wIi8+PGRyYXcgb3NjMV93YXZlZHJhd192YWx1ZXNfMD0iMC4wIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xPSIwLjAyOTI5NDY1Mjg2NDMzNjk3IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18yPSIwLjA1ODU1ODI1OTE1OTMyNjU1IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zPSIwLjA4Nzc1OTgwNzcwNTg3OTIxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180PSIwLjExNjg2ODM1NDM4MDEzMDgiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzU9IjAuMTQ1ODUzMDQyNjAyNTM5MSIgb3NjMV93YXZlZHJhd192YWx1ZXNfNj0iMC4xNzQ2ODMxNjg1MzA0NjQyIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc183PSIwLjIwMzMyODE3NzMzMjg3ODEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzg9IjAuMjMxNzU3NzAwNDQzMjY3OCIgb3NjMV93YXZlZHJhd192YWx1ZXNfOT0iMC4yNTk5NDE2MDc3MTM2OTkzIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMD0iMC4yODc4NTAwNTIxMTgzMDE0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMT0iMC4zMTU0NTM0Mzk5NTA5NDMiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEyPSIwLjM0MjcyMjUzNTEzMzM2MTgiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEzPSIwLjM2OTYyODQyOTQxMjg0MTgiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE0PSIwLjM5NjE0MjU3MjE2NDUzNTUiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE1PSIwLjQyMjIzNjkxOTQwMzA3NjIiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE2PSIwLjQ0Nzg4MzgxNDU3MzI4OCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTc9IjAuNDczMDU2MDQ4MTU0ODMwOSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTg9IjAuNDk3NzI2OTQ3MDY5MTY4MSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTk9IjAuNTIxODcwMzc0Njc5NTY1NCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMjA9IjAuNTQ1NDYwNzYwNTkzNDE0MyIgb3NjMV93YXZlZHJhd192YWx1ZXNfMjE9IjAuNTY4NDczMTAwNjYyMjMxNCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMjI9IjAuNTkwODgyOTU2OTgxNjU4OSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMjM9IjAuNjEyNjY2NjY2NTA3NzIwOSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMjQ9IjAuNjMzODAxMTAyNjM4MjQ0NiIgb3NjMV93YXZlZHJhd192YWx1ZXNfMjU9IjAuNjU0MjYzNzk0NDIyMTQ5NyIgb3NjMV93YXZlZHJhd192YWx1ZXNfMjY9IjAuNjc0MDMzMTY0OTc4MDI3MyIgb3NjMV93YXZlZHJhd192YWx1ZXNfMjc9IjAuNjkzMDg4MjMzNDcwOTE2NyIgb3NjMV93YXZlZHJhd192YWx1ZXNfMjg9IjAuNzExNDA4NzkzOTI2MjM5IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18yOT0iMC43Mjg5NzU0MTUyMjk3OTc0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zMD0iMC43NDU3Njk1MDA3MzI0MjE5IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zMT0iMC43NjE3NzMyODgyNDk5Njk1IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zMj0iMC43NzY5Njk3MzA4NTQwMzQ0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zMz0iMC43OTEzNDI3OTQ4OTUxNzIxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zND0iMC44MDQ4NzcyMjE1ODQzMjAxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zNT0iMC44MTc1NTg3MDU4MDY3MzIyIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zNj0iMC44MjkzNzM3MTczMDgwNDQ0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zNz0iMC44NDAzMDk4NTgzMjIxNDM2IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zOD0iMC44NTAzNTU0NDYzMzg2NTM2IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18zOT0iMC44NTk0OTk4NzE3MzA4MDQ0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180MD0iMC44Njc3MzM0MTg5NDE0OTc4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180MT0iMC44NzUwNDczODU2OTI1OTY0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180Mj0iMC44ODE0MzM5NjM3NzU2MzQ4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180Mz0iMC44ODY4ODY0Nzc0NzAzOTc5IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180ND0iMC44OTEzOTkxNDUxMjYzNDI4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180NT0iMC44OTQ5NjcwNzkxNjI1OTc3IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180Nj0iMC44OTc1ODY1ODQwOTExODY1IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180Nz0iMC44OTkyNTQ5MTgwOTg0NDk3IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180OD0iMC44OTk5NzAxNzM4MzU3NTQ0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc180OT0iMC44OTk3MzE3NTUyNTY2NTI4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc181MD0iMC44OTg1Mzk3ODE1NzA0MzQ2IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc181MT0iMC44OTYzOTU2MjM2ODM5Mjk0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc181Mj0iMC44OTMzMDE0MjczNjQzNDk0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc181Mz0iMC44ODkyNjA1OTAwNzY0NDY1IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc181ND0iMC44ODQyNzc0MDMzNTQ2NDQ4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc181NT0iMC44NzgzNTcwNTI4MDMwMzk2IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc181Nj0iMC44NzE1MDU4NTY1MTM5NzcxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc181Nz0iMC44NjM3MzEwMjY2NDk0NzUxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc181OD0iMC44NTUwNDA5MDc4NTk4MDIyIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc181OT0iMC44NDU0NDQ2MTk2NTU2MDkxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc182MD0iMC44MzQ5NTI0MTQwMzU3OTcxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc182MT0iMC44MjM1NzUzMTc4NTk2NDk3IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc182Mj0iMC44MTEzMjU0MzA4NzAwNTYyIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc182Mz0iMC43OTgyMTU4MDY0ODQyMjI0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc182ND0iMC43ODQyNjAxNTM3NzA0NDY4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc182NT0iMC43Njk0NzM0MzM0OTQ1Njc5IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc182Nj0iMC43NTM4NzEyNjIwNzM1MTY4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc182Nz0iMC43Mzc0NzAxNDk5OTM4OTY1IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc182OD0iMC43MjAyODc1NjE0MTY2MjYiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzY5PSIwLjcwMjM0MTU1NjU0OTA3MjMiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzcwPSIwLjY4MzY1MTI2ODQ4MjIwODMiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzcxPSIwLjY2NDIzNjQ4NTk1ODA5OTQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzcyPSIwLjY0NDExNzc3MjU3OTE5MzEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzczPSIwLjYyMzMxNjQ2NjgwODMxOTEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzc0PSIwLjYwMTg1NDU2Mjc1OTM5OTQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzc1PSIwLjU3OTc1NDgyOTQwNjczODMiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzc2PSIwLjU1NzA0MDc1MDk4MDM3NzIiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzc3PSIwLjUzMzczNjI4ODU0NzUxNTkiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzc4PSIwLjUwOTg2NjIzNzY0MDM4MDkiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzc5PSIwLjQ4NTQ1NTgxMTAyMzcxMjIiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzgwPSIwLjQ2MDUzMDkzNjcxNzk4NzEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzgxPSIwLjQzNTExODAxOTU4MDg0MTEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzgyPSIwLjQwOTI0Mzk3MTEwOTM5MDMiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzgzPSIwLjM4MjkzNjIzOTI0MjU1MzciIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzg0PSIwLjM1NjIyMjY1OTM0OTQ0MTUiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzg1PSIwLjMyOTEzMTYwMzI0MDk2NjgiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzg2PSIwLjMwMTY5MTcxMDk0ODk0NDEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzg3PSIwLjI3MzkzMjEyOTE0NDY2ODYiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzg4PSIwLjI0NTg4MjIyODAxNjg1MzMiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzg5PSIwLjIxNzU3MTc2NTE4NDQwMjUiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzkwPSIwLjE4OTAzMDcyMTc4MzYzOCIgb3NjMV93YXZlZHJhd192YWx1ZXNfOTE9IjAuMTYwMjg5MzQ3MTcxNzgzNCIgb3NjMV93YXZlZHJhd192YWx1ZXNfOTI9IjAuMTMxMzc4MDk5MzIyMzE5IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc185Mz0iMC4xMDIzMjc2MzczNzQ0MDExIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc185ND0iMC4wNzMxNjg3MjQ3NzUzMTQzMyIgb3NjMV93YXZlZHJhd192YWx1ZXNfOTU9IjAuMDQzOTMyMjc3NzA5MjQ1NjgiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzk2PSIwLjAxNDY0OTI2NzMwODQxMzk4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc185Nz0iLTAuMDE0NjQ5MjY3MzA4NDEzOTgiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzk4PSItMC4wNDM5MzIyNzc3MDkyNDU2OCIgb3NjMV93YXZlZHJhd192YWx1ZXNfOTk9Ii0wLjA3MzE2ODcyNDc3NTMxNDMzIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMDA9Ii0wLjEwMjMyNzYzNzM3NDQwMTEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEwMT0iLTAuMTMxMzc4MDk5MzIyMzE5IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMDI9Ii0wLjE2MDI4OTM0NzE3MTc4MzQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEwMz0iLTAuMTg5MDMwNzIxNzgzNjM4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMDQ9Ii0wLjIxNzU3MTc2NTE4NDQwMjUiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEwNT0iLTAuMjQ1ODgyMjI4MDE2ODUzMyIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTA2PSItMC4yNzM5MzIxMjkxNDQ2Njg2IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMDc9Ii0wLjMwMTY5MTcxMDk0ODk0NDEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEwOD0iLTAuMzI5MTMxNjAzMjQwOTY2OCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTA5PSItMC4zNTYyMjI2NTkzNDk0NDE1IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMTA9Ii0wLjM4MjkzNjIzOTI0MjU1MzciIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzExMT0iLTAuNDA5MjQzOTcxMTA5MzkwMyIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTEyPSItMC40MzUxMTgwMTk1ODA4NDExIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMTM9Ii0wLjQ2MDUzMDkzNjcxNzk4NzEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzExND0iLTAuNDg1NDU1ODExMDIzNzEyMiIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTE1PSItMC41MDk4NjYyMzc2NDAzODA5IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMTY9Ii0wLjUzMzczNjI4ODU0NzUxNTkiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzExNz0iLTAuNTU3MDQwNzUwOTgwMzc3MiIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTE4PSItMC41Nzk3NTQ4Mjk0MDY3MzgzIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMTk9Ii0wLjYwMTg1NDU2Mjc1OTM5OTQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEyMD0iLTAuNjIzMzE2NDY2ODA4MzE5MSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTIxPSItMC42NDQxMTc3NzI1NzkxOTMxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMjI9Ii0wLjY2NDIzNjQ4NTk1ODA5OTQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEyMz0iLTAuNjgzNjUxMjY4NDgyMjA4MyIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTI0PSItMC43MDIzNDE1NTY1NDkwNzIzIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMjU9Ii0wLjcyMDI4NzU2MTQxNjYyNiIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTI2PSItMC43Mzc0NzAxNDk5OTM4OTY1IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMjc9Ii0wLjc1Mzg3MTI2MjA3MzUxNjgiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEyOD0iLTAuNzY5NDczNDMzNDk0NTY3OSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTI5PSItMC43ODQyNjAxNTM3NzA0NDY4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMzA9Ii0wLjc5ODIxNTgwNjQ4NDIyMjQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEzMT0iLTAuODExMzI1NDMwODcwMDU2MiIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTMyPSItMC44MjM1NzUzMTc4NTk2NDk3IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMzM9Ii0wLjgzNDk1MjQxNDAzNTc5NzEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEzND0iLTAuODQ1NDQ0NjE5NjU1NjA5MSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTM1PSItMC44NTUwNDA5MDc4NTk4MDIyIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMzY9Ii0wLjg2MzczMTAyNjY0OTQ3NTEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzEzNz0iLTAuODcxNTA1ODU2NTEzOTc3MSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTM4PSItMC44NzgzNTcwNTI4MDMwMzk2IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xMzk9Ii0wLjg4NDI3NzQwMzM1NDY0NDgiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE0MD0iLTAuODg5MjYwNTkwMDc2NDQ2NSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTQxPSItMC44OTMzMDE0MjczNjQzNDk0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNDI9Ii0wLjg5NjM5NTYyMzY4MzkyOTQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE0Mz0iLTAuODk4NTM5NzgxNTcwNDM0NiIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTQ0PSItMC44OTk3MzE3NTUyNTY2NTI4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNDU9Ii0wLjg5OTk3MDE3MzgzNTc1NDQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE0Nj0iLTAuODk5MjU0OTE4MDk4NDQ5NyIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTQ3PSItMC44OTc1ODY1ODQwOTExODY1IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNDg9Ii0wLjg5NDk2NzA3OTE2MjU5NzciIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE0OT0iLTAuODkxMzk5MTQ1MTI2MzQyOCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTUwPSItMC44ODY4ODY0Nzc0NzAzOTc5IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNTE9Ii0wLjg4MTQzMzk2Mzc3NTYzNDgiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE1Mj0iLTAuODc1MDQ3Mzg1NjkyNTk2NCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTUzPSItMC44Njc3MzM0MTg5NDE0OTc4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNTQ9Ii0wLjg1OTQ5OTg3MTczMDgwNDQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE1NT0iLTAuODUwMzU1NDQ2MzM4NjUzNiIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTU2PSItMC44NDAzMDk4NTgzMjIxNDM2IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNTc9Ii0wLjgyOTM3MzcxNzMwODA0NDQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE1OD0iLTAuODE3NTU4NzA1ODA2NzMyMiIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTU5PSItMC44MDQ4NzcyMjE1ODQzMjAxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNjA9Ii0wLjc5MTM0Mjc5NDg5NTE3MjEiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE2MT0iLTAuNzc2OTY5NzMwODU0MDM0NCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTYyPSItMC43NjE3NzMyODgyNDk5Njk1IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNjM9Ii0wLjc0NTc2OTUwMDczMjQyMTkiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE2ND0iLTAuNzI4OTc1NDE1MjI5Nzk3NCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTY1PSItMC43MTE0MDg3OTM5MjYyMzkiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE2Nj0iLTAuNjkzMDg4MjMzNDcwOTE2NyIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTY3PSItMC42NzQwMzMxNjQ5NzgwMjczIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNjg9Ii0wLjY1NDI2Mzc5NDQyMjE0OTciIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE2OT0iLTAuNjMzODAxMTAyNjM4MjQ0NiIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTcwPSItMC42MTI2NjY2NjY1MDc3MjA5IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNzE9Ii0wLjU5MDg4Mjk1Njk4MTY1ODkiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE3Mj0iLTAuNTY4NDczMTAwNjYyMjMxNCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTczPSItMC41NDU0NjA3NjA1OTM0MTQzIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNzQ9Ii0wLjUyMTg3MDM3NDY3OTU2NTQiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE3NT0iLTAuNDk3NzI2OTQ3MDY5MTY4MSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTc2PSItMC40NzMwNTYwNDgxNTQ4MzA5IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNzc9Ii0wLjQ0Nzg4MzgxNDU3MzI4OCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTc4PSItMC40MjIyMzY5MTk0MDMwNzYyIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xNzk9Ii0wLjM5NjE0MjU3MjE2NDUzNTUiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE4MD0iLTAuMzY5NjI4NDI5NDEyODQxOCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTgxPSItMC4zNDI3MjI1MzUxMzMzNjE4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xODI9Ii0wLjMxNTQ1MzQzOTk1MDk0MyIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTgzPSItMC4yODc4NTAwNTIxMTgzMDE0IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xODQ9Ii0wLjI1OTk0MTYwNzcxMzY5OTMiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE4NT0iLTAuMjMxNzU3NzAwNDQzMjY3OCIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTg2PSItMC4yMDMzMjgxNzczMzI4NzgxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xODc9Ii0wLjE3NDY4MzE2ODUzMDQ2NDIiIG9zYzFfd2F2ZWRyYXdfdmFsdWVzXzE4OD0iLTAuMTQ1ODUzMDQyNjAyNTM5MSIgb3NjMV93YXZlZHJhd192YWx1ZXNfMTg5PSItMC4xMTY4NjgzNTQzODAxMzA4IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xOTA9Ii0wLjA4Nzc1OTgwNzcwNTg3OTIxIiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xOTE9Ii0wLjA1ODU1ODI1OTE1OTMyNjU1IiBvc2MxX3dhdmVkcmF3X3ZhbHVlc18xOTI9Ii0wLjAyOTI5NDY1Mjg2NDMzNjk3IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18wPSIwLjAiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE9IjAuMDI5Mjk0NjUyODY0MzM2OTciIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzI9IjAuMDU4NTU4MjU5MTU5MzI2NTUiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzM9IjAuMDg3NzU5ODA3NzA1ODc5MjEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQ9IjAuMTE2ODY4MzU0MzgwMTMwOCIgb3NjMl93YXZlZHJhd192YWx1ZXNfNT0iMC4xNDU4NTMwNDI2MDI1MzkxIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc182PSIwLjE3NDY4MzE2ODUzMDQ2NDIiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzc9IjAuMjAzMzI4MTc3MzMyODc4MSIgb3NjMl93YXZlZHJhd192YWx1ZXNfOD0iMC4yMzE3NTc3MDA0NDMyNjc4IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc185PSIwLjI1OTk0MTYwNzcxMzY5OTMiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEwPSIwLjI4Nzg1MDA1MjExODMwMTQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzExPSIwLjMxNTQ1MzQzOTk1MDk0MyIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTI9IjAuMzQyNzIyNTM1MTMzMzYxOCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTM9IjAuMzY5NjI4NDI5NDEyODQxOCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTQ9IjAuMzk2MTQyNTcyMTY0NTM1NSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTU9IjAuNDIyMjM2OTE5NDAzMDc2MiIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTY9IjAuNDQ3ODgzODE0NTczMjg4IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNz0iMC40NzMwNTYwNDgxNTQ4MzA5IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xOD0iMC40OTc3MjY5NDcwNjkxNjgxIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xOT0iMC41MjE4NzAzNzQ2Nzk1NjU0IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18yMD0iMC41NDU0NjA3NjA1OTM0MTQzIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18yMT0iMC41Njg0NzMxMDA2NjIyMzE0IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18yMj0iMC41OTA4ODI5NTY5ODE2NTg5IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18yMz0iMC42MTI2NjY2NjY1MDc3MjA5IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18yND0iMC42MzM4MDExMDI2MzgyNDQ2IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18yNT0iMC42NTQyNjM3OTQ0MjIxNDk3IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18yNj0iMC42NzQwMzMxNjQ5NzgwMjczIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18yNz0iMC42OTMwODgyMzM0NzA5MTY3IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18yOD0iMC43MTE0MDg3OTM5MjYyMzkiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzI5PSIwLjcyODk3NTQxNTIyOTc5NzQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzMwPSIwLjc0NTc2OTUwMDczMjQyMTkiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzMxPSIwLjc2MTc3MzI4ODI0OTk2OTUiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzMyPSIwLjc3Njk2OTczMDg1NDAzNDQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzMzPSIwLjc5MTM0Mjc5NDg5NTE3MjEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzM0PSIwLjgwNDg3NzIyMTU4NDMyMDEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzM1PSIwLjgxNzU1ODcwNTgwNjczMjIiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzM2PSIwLjgyOTM3MzcxNzMwODA0NDQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzM3PSIwLjg0MDMwOTg1ODMyMjE0MzYiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzM4PSIwLjg1MDM1NTQ0NjMzODY1MzYiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzM5PSIwLjg1OTQ5OTg3MTczMDgwNDQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQwPSIwLjg2NzczMzQxODk0MTQ5NzgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQxPSIwLjg3NTA0NzM4NTY5MjU5NjQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQyPSIwLjg4MTQzMzk2Mzc3NTYzNDgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQzPSIwLjg4Njg4NjQ3NzQ3MDM5NzkiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQ0PSIwLjg5MTM5OTE0NTEyNjM0MjgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQ1PSIwLjg5NDk2NzA3OTE2MjU5NzciIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQ2PSIwLjg5NzU4NjU4NDA5MTE4NjUiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQ3PSIwLjg5OTI1NDkxODA5ODQ0OTciIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQ4PSIwLjg5OTk3MDE3MzgzNTc1NDQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzQ5PSIwLjg5OTczMTc1NTI1NjY1MjgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzUwPSIwLjg5ODUzOTc4MTU3MDQzNDYiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzUxPSIwLjg5NjM5NTYyMzY4MzkyOTQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzUyPSIwLjg5MzMwMTQyNzM2NDM0OTQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzUzPSIwLjg4OTI2MDU5MDA3NjQ0NjUiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzU0PSIwLjg4NDI3NzQwMzM1NDY0NDgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzU1PSIwLjg3ODM1NzA1MjgwMzAzOTYiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzU2PSIwLjg3MTUwNTg1NjUxMzk3NzEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzU3PSIwLjg2MzczMTAyNjY0OTQ3NTEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzU4PSIwLjg1NTA0MDkwNzg1OTgwMjIiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzU5PSIwLjg0NTQ0NDYxOTY1NTYwOTEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzYwPSIwLjgzNDk1MjQxNDAzNTc5NzEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzYxPSIwLjgyMzU3NTMxNzg1OTY0OTciIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzYyPSIwLjgxMTMyNTQzMDg3MDA1NjIiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzYzPSIwLjc5ODIxNTgwNjQ4NDIyMjQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzY0PSIwLjc4NDI2MDE1Mzc3MDQ0NjgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzY1PSIwLjc2OTQ3MzQzMzQ5NDU2NzkiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzY2PSIwLjc1Mzg3MTI2MjA3MzUxNjgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzY3PSIwLjczNzQ3MDE0OTk5Mzg5NjUiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzY4PSIwLjcyMDI4NzU2MTQxNjYyNiIgb3NjMl93YXZlZHJhd192YWx1ZXNfNjk9IjAuNzAyMzQxNTU2NTQ5MDcyMyIgb3NjMl93YXZlZHJhd192YWx1ZXNfNzA9IjAuNjgzNjUxMjY4NDgyMjA4MyIgb3NjMl93YXZlZHJhd192YWx1ZXNfNzE9IjAuNjY0MjM2NDg1OTU4MDk5NCIgb3NjMl93YXZlZHJhd192YWx1ZXNfNzI9IjAuNjQ0MTE3NzcyNTc5MTkzMSIgb3NjMl93YXZlZHJhd192YWx1ZXNfNzM9IjAuNjIzMzE2NDY2ODA4MzE5MSIgb3NjMl93YXZlZHJhd192YWx1ZXNfNzQ9IjAuNjAxODU0NTYyNzU5Mzk5NCIgb3NjMl93YXZlZHJhd192YWx1ZXNfNzU9IjAuNTc5NzU0ODI5NDA2NzM4MyIgb3NjMl93YXZlZHJhd192YWx1ZXNfNzY9IjAuNTU3MDQwNzUwOTgwMzc3MiIgb3NjMl93YXZlZHJhd192YWx1ZXNfNzc9IjAuNTMzNzM2Mjg4NTQ3NTE1OSIgb3NjMl93YXZlZHJhd192YWx1ZXNfNzg9IjAuNTA5ODY2MjM3NjQwMzgwOSIgb3NjMl93YXZlZHJhd192YWx1ZXNfNzk9IjAuNDg1NDU1ODExMDIzNzEyMiIgb3NjMl93YXZlZHJhd192YWx1ZXNfODA9IjAuNDYwNTMwOTM2NzE3OTg3MSIgb3NjMl93YXZlZHJhd192YWx1ZXNfODE9IjAuNDM1MTE4MDE5NTgwODQxMSIgb3NjMl93YXZlZHJhd192YWx1ZXNfODI9IjAuNDA5MjQzOTcxMTA5MzkwMyIgb3NjMl93YXZlZHJhd192YWx1ZXNfODM9IjAuMzgyOTM2MjM5MjQyNTUzNyIgb3NjMl93YXZlZHJhd192YWx1ZXNfODQ9IjAuMzU2MjIyNjU5MzQ5NDQxNSIgb3NjMl93YXZlZHJhd192YWx1ZXNfODU9IjAuMzI5MTMxNjAzMjQwOTY2OCIgb3NjMl93YXZlZHJhd192YWx1ZXNfODY9IjAuMzAxNjkxNzEwOTQ4OTQ0MSIgb3NjMl93YXZlZHJhd192YWx1ZXNfODc9IjAuMjczOTMyMTI5MTQ0NjY4NiIgb3NjMl93YXZlZHJhd192YWx1ZXNfODg9IjAuMjQ1ODgyMjI4MDE2ODUzMyIgb3NjMl93YXZlZHJhd192YWx1ZXNfODk9IjAuMjE3NTcxNzY1MTg0NDAyNSIgb3NjMl93YXZlZHJhd192YWx1ZXNfOTA9IjAuMTg5MDMwNzIxNzgzNjM4IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc185MT0iMC4xNjAyODkzNDcxNzE3ODM0IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc185Mj0iMC4xMzEzNzgwOTkzMjIzMTkiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzkzPSIwLjEwMjMyNzYzNzM3NDQwMTEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzk0PSIwLjA3MzE2ODcyNDc3NTMxNDMzIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc185NT0iMC4wNDM5MzIyNzc3MDkyNDU2OCIgb3NjMl93YXZlZHJhd192YWx1ZXNfOTY9IjAuMDE0NjQ5MjY3MzA4NDEzOTgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzk3PSItMC4wMTQ2NDkyNjczMDg0MTM5OCIgb3NjMl93YXZlZHJhd192YWx1ZXNfOTg9Ii0wLjA0MzkzMjI3NzcwOTI0NTY4IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc185OT0iLTAuMDczMTY4NzI0Nzc1MzE0MzMiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEwMD0iLTAuMTAyMzI3NjM3Mzc0NDAxMSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTAxPSItMC4xMzEzNzgwOTkzMjIzMTkiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEwMj0iLTAuMTYwMjg5MzQ3MTcxNzgzNCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTAzPSItMC4xODkwMzA3MjE3ODM2MzgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEwND0iLTAuMjE3NTcxNzY1MTg0NDAyNSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTA1PSItMC4yNDU4ODIyMjgwMTY4NTMzIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMDY9Ii0wLjI3MzkzMjEyOTE0NDY2ODYiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEwNz0iLTAuMzAxNjkxNzEwOTQ4OTQ0MSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTA4PSItMC4zMjkxMzE2MDMyNDA5NjY4IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMDk9Ii0wLjM1NjIyMjY1OTM0OTQ0MTUiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzExMD0iLTAuMzgyOTM2MjM5MjQyNTUzNyIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTExPSItMC40MDkyNDM5NzExMDkzOTAzIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMTI9Ii0wLjQzNTExODAxOTU4MDg0MTEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzExMz0iLTAuNDYwNTMwOTM2NzE3OTg3MSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTE0PSItMC40ODU0NTU4MTEwMjM3MTIyIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMTU9Ii0wLjUwOTg2NjIzNzY0MDM4MDkiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzExNj0iLTAuNTMzNzM2Mjg4NTQ3NTE1OSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTE3PSItMC41NTcwNDA3NTA5ODAzNzcyIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMTg9Ii0wLjU3OTc1NDgyOTQwNjczODMiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzExOT0iLTAuNjAxODU0NTYyNzU5Mzk5NCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTIwPSItMC42MjMzMTY0NjY4MDgzMTkxIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMjE9Ii0wLjY0NDExNzc3MjU3OTE5MzEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEyMj0iLTAuNjY0MjM2NDg1OTU4MDk5NCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTIzPSItMC42ODM2NTEyNjg0ODIyMDgzIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMjQ9Ii0wLjcwMjM0MTU1NjU0OTA3MjMiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEyNT0iLTAuNzIwMjg3NTYxNDE2NjI2IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMjY9Ii0wLjczNzQ3MDE0OTk5Mzg5NjUiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEyNz0iLTAuNzUzODcxMjYyMDczNTE2OCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTI4PSItMC43Njk0NzM0MzM0OTQ1Njc5IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMjk9Ii0wLjc4NDI2MDE1Mzc3MDQ0NjgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEzMD0iLTAuNzk4MjE1ODA2NDg0MjIyNCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTMxPSItMC44MTEzMjU0MzA4NzAwNTYyIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMzI9Ii0wLjgyMzU3NTMxNzg1OTY0OTciIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEzMz0iLTAuODM0OTUyNDE0MDM1Nzk3MSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTM0PSItMC44NDU0NDQ2MTk2NTU2MDkxIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMzU9Ii0wLjg1NTA0MDkwNzg1OTgwMjIiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEzNj0iLTAuODYzNzMxMDI2NjQ5NDc1MSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTM3PSItMC44NzE1MDU4NTY1MTM5NzcxIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xMzg9Ii0wLjg3ODM1NzA1MjgwMzAzOTYiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzEzOT0iLTAuODg0Mjc3NDAzMzU0NjQ0OCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTQwPSItMC44ODkyNjA1OTAwNzY0NDY1IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNDE9Ii0wLjg5MzMwMTQyNzM2NDM0OTQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE0Mj0iLTAuODk2Mzk1NjIzNjgzOTI5NCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTQzPSItMC44OTg1Mzk3ODE1NzA0MzQ2IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNDQ9Ii0wLjg5OTczMTc1NTI1NjY1MjgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE0NT0iLTAuODk5OTcwMTczODM1NzU0NCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTQ2PSItMC44OTkyNTQ5MTgwOTg0NDk3IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNDc9Ii0wLjg5NzU4NjU4NDA5MTE4NjUiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE0OD0iLTAuODk0OTY3MDc5MTYyNTk3NyIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTQ5PSItMC44OTEzOTkxNDUxMjYzNDI4IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNTA9Ii0wLjg4Njg4NjQ3NzQ3MDM5NzkiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE1MT0iLTAuODgxNDMzOTYzNzc1NjM0OCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTUyPSItMC44NzUwNDczODU2OTI1OTY0IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNTM9Ii0wLjg2NzczMzQxODk0MTQ5NzgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE1ND0iLTAuODU5NDk5ODcxNzMwODA0NCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTU1PSItMC44NTAzNTU0NDYzMzg2NTM2IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNTY9Ii0wLjg0MDMwOTg1ODMyMjE0MzYiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE1Nz0iLTAuODI5MzczNzE3MzA4MDQ0NCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTU4PSItMC44MTc1NTg3MDU4MDY3MzIyIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNTk9Ii0wLjgwNDg3NzIyMTU4NDMyMDEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE2MD0iLTAuNzkxMzQyNzk0ODk1MTcyMSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTYxPSItMC43NzY5Njk3MzA4NTQwMzQ0IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNjI9Ii0wLjc2MTc3MzI4ODI0OTk2OTUiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE2Mz0iLTAuNzQ1NzY5NTAwNzMyNDIxOSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTY0PSItMC43Mjg5NzU0MTUyMjk3OTc0IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNjU9Ii0wLjcxMTQwODc5MzkyNjIzOSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTY2PSItMC42OTMwODgyMzM0NzA5MTY3IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNjc9Ii0wLjY3NDAzMzE2NDk3ODAyNzMiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE2OD0iLTAuNjU0MjYzNzk0NDIyMTQ5NyIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTY5PSItMC42MzM4MDExMDI2MzgyNDQ2IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNzA9Ii0wLjYxMjY2NjY2NjUwNzcyMDkiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE3MT0iLTAuNTkwODgyOTU2OTgxNjU4OSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTcyPSItMC41Njg0NzMxMDA2NjIyMzE0IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNzM9Ii0wLjU0NTQ2MDc2MDU5MzQxNDMiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE3ND0iLTAuNTIxODcwMzc0Njc5NTY1NCIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTc1PSItMC40OTc3MjY5NDcwNjkxNjgxIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNzY9Ii0wLjQ3MzA1NjA0ODE1NDgzMDkiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE3Nz0iLTAuNDQ3ODgzODE0NTczMjg4IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xNzg9Ii0wLjQyMjIzNjkxOTQwMzA3NjIiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE3OT0iLTAuMzk2MTQyNTcyMTY0NTM1NSIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTgwPSItMC4zNjk2Mjg0Mjk0MTI4NDE4IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xODE9Ii0wLjM0MjcyMjUzNTEzMzM2MTgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE4Mj0iLTAuMzE1NDUzNDM5OTUwOTQzIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xODM9Ii0wLjI4Nzg1MDA1MjExODMwMTQiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE4ND0iLTAuMjU5OTQxNjA3NzEzNjk5MyIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTg1PSItMC4yMzE3NTc3MDA0NDMyNjc4IiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xODY9Ii0wLjIwMzMyODE3NzMzMjg3ODEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE4Nz0iLTAuMTc0NjgzMTY4NTMwNDY0MiIgb3NjMl93YXZlZHJhd192YWx1ZXNfMTg4PSItMC4xNDU4NTMwNDI2MDI1MzkxIiBvc2MyX3dhdmVkcmF3X3ZhbHVlc18xODk9Ii0wLjExNjg2ODM1NDM4MDEzMDgiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE5MD0iLTAuMDg3NzU5ODA3NzA1ODc5MjEiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE5MT0iLTAuMDU4NTU4MjU5MTU5MzI2NTUiIG9zYzJfd2F2ZWRyYXdfdmFsdWVzXzE5Mj0iLTAuMDI5Mjk0NjUyODY0MzM2OTciIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzA9IjAuMCIgb3NjM193YXZlZHJhd192YWx1ZXNfMT0iMC4wMjkyOTQ2NTI4NjQzMzY5NyIgb3NjM193YXZlZHJhd192YWx1ZXNfMj0iMC4wNTg1NTgyNTkxNTkzMjY1NSIgb3NjM193YXZlZHJhd192YWx1ZXNfMz0iMC4wODc3NTk4MDc3MDU4NzkyMSIgb3NjM193YXZlZHJhd192YWx1ZXNfND0iMC4xMTY4NjgzNTQzODAxMzA4IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc181PSIwLjE0NTg1MzA0MjYwMjUzOTEiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzY9IjAuMTc0NjgzMTY4NTMwNDY0MiIgb3NjM193YXZlZHJhd192YWx1ZXNfNz0iMC4yMDMzMjgxNzczMzI4NzgxIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184PSIwLjIzMTc1NzcwMDQ0MzI2NzgiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzk9IjAuMjU5OTQxNjA3NzEzNjk5MyIgb3NjM193YXZlZHJhd192YWx1ZXNfMTA9IjAuMjg3ODUwMDUyMTE4MzAxNCIgb3NjM193YXZlZHJhd192YWx1ZXNfMTE9IjAuMzE1NDUzNDM5OTUwOTQzIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMj0iMC4zNDI3MjI1MzUxMzMzNjE4IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMz0iMC4zNjk2Mjg0Mjk0MTI4NDE4IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xND0iMC4zOTYxNDI1NzIxNjQ1MzU1IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNT0iMC40MjIyMzY5MTk0MDMwNzYyIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNj0iMC40NDc4ODM4MTQ1NzMyODgiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE3PSIwLjQ3MzA1NjA0ODE1NDgzMDkiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE4PSIwLjQ5NzcyNjk0NzA2OTE2ODEiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE5PSIwLjUyMTg3MDM3NDY3OTU2NTQiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzIwPSIwLjU0NTQ2MDc2MDU5MzQxNDMiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzIxPSIwLjU2ODQ3MzEwMDY2MjIzMTQiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzIyPSIwLjU5MDg4Mjk1Njk4MTY1ODkiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzIzPSIwLjYxMjY2NjY2NjUwNzcyMDkiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzI0PSIwLjYzMzgwMTEwMjYzODI0NDYiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzI1PSIwLjY1NDI2Mzc5NDQyMjE0OTciIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzI2PSIwLjY3NDAzMzE2NDk3ODAyNzMiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzI3PSIwLjY5MzA4ODIzMzQ3MDkxNjciIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzI4PSIwLjcxMTQwODc5MzkyNjIzOSIgb3NjM193YXZlZHJhd192YWx1ZXNfMjk9IjAuNzI4OTc1NDE1MjI5Nzk3NCIgb3NjM193YXZlZHJhd192YWx1ZXNfMzA9IjAuNzQ1NzY5NTAwNzMyNDIxOSIgb3NjM193YXZlZHJhd192YWx1ZXNfMzE9IjAuNzYxNzczMjg4MjQ5OTY5NSIgb3NjM193YXZlZHJhd192YWx1ZXNfMzI9IjAuNzc2OTY5NzMwODU0MDM0NCIgb3NjM193YXZlZHJhd192YWx1ZXNfMzM9IjAuNzkxMzQyNzk0ODk1MTcyMSIgb3NjM193YXZlZHJhd192YWx1ZXNfMzQ9IjAuODA0ODc3MjIxNTg0MzIwMSIgb3NjM193YXZlZHJhd192YWx1ZXNfMzU9IjAuODE3NTU4NzA1ODA2NzMyMiIgb3NjM193YXZlZHJhd192YWx1ZXNfMzY9IjAuODI5MzczNzE3MzA4MDQ0NCIgb3NjM193YXZlZHJhd192YWx1ZXNfMzc9IjAuODQwMzA5ODU4MzIyMTQzNiIgb3NjM193YXZlZHJhd192YWx1ZXNfMzg9IjAuODUwMzU1NDQ2MzM4NjUzNiIgb3NjM193YXZlZHJhd192YWx1ZXNfMzk9IjAuODU5NDk5ODcxNzMwODA0NCIgb3NjM193YXZlZHJhd192YWx1ZXNfNDA9IjAuODY3NzMzNDE4OTQxNDk3OCIgb3NjM193YXZlZHJhd192YWx1ZXNfNDE9IjAuODc1MDQ3Mzg1NjkyNTk2NCIgb3NjM193YXZlZHJhd192YWx1ZXNfNDI9IjAuODgxNDMzOTYzNzc1NjM0OCIgb3NjM193YXZlZHJhd192YWx1ZXNfNDM9IjAuODg2ODg2NDc3NDcwMzk3OSIgb3NjM193YXZlZHJhd192YWx1ZXNfNDQ9IjAuODkxMzk5MTQ1MTI2MzQyOCIgb3NjM193YXZlZHJhd192YWx1ZXNfNDU9IjAuODk0OTY3MDc5MTYyNTk3NyIgb3NjM193YXZlZHJhd192YWx1ZXNfNDY9IjAuODk3NTg2NTg0MDkxMTg2NSIgb3NjM193YXZlZHJhd192YWx1ZXNfNDc9IjAuODk5MjU0OTE4MDk4NDQ5NyIgb3NjM193YXZlZHJhd192YWx1ZXNfNDg9IjAuODk5OTcwMTczODM1NzU0NCIgb3NjM193YXZlZHJhd192YWx1ZXNfNDk9IjAuODk5NzMxNzU1MjU2NjUyOCIgb3NjM193YXZlZHJhd192YWx1ZXNfNTA9IjAuODk4NTM5NzgxNTcwNDM0NiIgb3NjM193YXZlZHJhd192YWx1ZXNfNTE9IjAuODk2Mzk1NjIzNjgzOTI5NCIgb3NjM193YXZlZHJhd192YWx1ZXNfNTI9IjAuODkzMzAxNDI3MzY0MzQ5NCIgb3NjM193YXZlZHJhd192YWx1ZXNfNTM9IjAuODg5MjYwNTkwMDc2NDQ2NSIgb3NjM193YXZlZHJhd192YWx1ZXNfNTQ9IjAuODg0Mjc3NDAzMzU0NjQ0OCIgb3NjM193YXZlZHJhd192YWx1ZXNfNTU9IjAuODc4MzU3MDUyODAzMDM5NiIgb3NjM193YXZlZHJhd192YWx1ZXNfNTY9IjAuODcxNTA1ODU2NTEzOTc3MSIgb3NjM193YXZlZHJhd192YWx1ZXNfNTc9IjAuODYzNzMxMDI2NjQ5NDc1MSIgb3NjM193YXZlZHJhd192YWx1ZXNfNTg9IjAuODU1MDQwOTA3ODU5ODAyMiIgb3NjM193YXZlZHJhd192YWx1ZXNfNTk9IjAuODQ1NDQ0NjE5NjU1NjA5MSIgb3NjM193YXZlZHJhd192YWx1ZXNfNjA9IjAuODM0OTUyNDE0MDM1Nzk3MSIgb3NjM193YXZlZHJhd192YWx1ZXNfNjE9IjAuODIzNTc1MzE3ODU5NjQ5NyIgb3NjM193YXZlZHJhd192YWx1ZXNfNjI9IjAuODExMzI1NDMwODcwMDU2MiIgb3NjM193YXZlZHJhd192YWx1ZXNfNjM9IjAuNzk4MjE1ODA2NDg0MjIyNCIgb3NjM193YXZlZHJhd192YWx1ZXNfNjQ9IjAuNzg0MjYwMTUzNzcwNDQ2OCIgb3NjM193YXZlZHJhd192YWx1ZXNfNjU9IjAuNzY5NDczNDMzNDk0NTY3OSIgb3NjM193YXZlZHJhd192YWx1ZXNfNjY9IjAuNzUzODcxMjYyMDczNTE2OCIgb3NjM193YXZlZHJhd192YWx1ZXNfNjc9IjAuNzM3NDcwMTQ5OTkzODk2NSIgb3NjM193YXZlZHJhd192YWx1ZXNfNjg9IjAuNzIwMjg3NTYxNDE2NjI2IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc182OT0iMC43MDIzNDE1NTY1NDkwNzIzIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc183MD0iMC42ODM2NTEyNjg0ODIyMDgzIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc183MT0iMC42NjQyMzY0ODU5NTgwOTk0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc183Mj0iMC42NDQxMTc3NzI1NzkxOTMxIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc183Mz0iMC42MjMzMTY0NjY4MDgzMTkxIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc183ND0iMC42MDE4NTQ1NjI3NTkzOTk0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc183NT0iMC41Nzk3NTQ4Mjk0MDY3MzgzIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc183Nj0iMC41NTcwNDA3NTA5ODAzNzcyIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc183Nz0iMC41MzM3MzYyODg1NDc1MTU5IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc183OD0iMC41MDk4NjYyMzc2NDAzODA5IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc183OT0iMC40ODU0NTU4MTEwMjM3MTIyIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184MD0iMC40NjA1MzA5MzY3MTc5ODcxIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184MT0iMC40MzUxMTgwMTk1ODA4NDExIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184Mj0iMC40MDkyNDM5NzExMDkzOTAzIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184Mz0iMC4zODI5MzYyMzkyNDI1NTM3IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184ND0iMC4zNTYyMjI2NTkzNDk0NDE1IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184NT0iMC4zMjkxMzE2MDMyNDA5NjY4IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184Nj0iMC4zMDE2OTE3MTA5NDg5NDQxIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184Nz0iMC4yNzM5MzIxMjkxNDQ2Njg2IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184OD0iMC4yNDU4ODIyMjgwMTY4NTMzIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc184OT0iMC4yMTc1NzE3NjUxODQ0MDI1IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc185MD0iMC4xODkwMzA3MjE3ODM2MzgiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzkxPSIwLjE2MDI4OTM0NzE3MTc4MzQiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzkyPSIwLjEzMTM3ODA5OTMyMjMxOSIgb3NjM193YXZlZHJhd192YWx1ZXNfOTM9IjAuMTAyMzI3NjM3Mzc0NDAxMSIgb3NjM193YXZlZHJhd192YWx1ZXNfOTQ9IjAuMDczMTY4NzI0Nzc1MzE0MzMiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzk1PSIwLjA0MzkzMjI3NzcwOTI0NTY4IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc185Nj0iMC4wMTQ2NDkyNjczMDg0MTM5OCIgb3NjM193YXZlZHJhd192YWx1ZXNfOTc9Ii0wLjAxNDY0OTI2NzMwODQxMzk4IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc185OD0iLTAuMDQzOTMyMjc3NzA5MjQ1NjgiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzk5PSItMC4wNzMxNjg3MjQ3NzUzMTQzMyIgb3NjM193YXZlZHJhd192YWx1ZXNfMTAwPSItMC4xMDIzMjc2MzczNzQ0MDExIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMDE9Ii0wLjEzMTM3ODA5OTMyMjMxOSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTAyPSItMC4xNjAyODkzNDcxNzE3ODM0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMDM9Ii0wLjE4OTAzMDcyMTc4MzYzOCIgb3NjM193YXZlZHJhd192YWx1ZXNfMTA0PSItMC4yMTc1NzE3NjUxODQ0MDI1IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMDU9Ii0wLjI0NTg4MjIyODAxNjg1MzMiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzEwNj0iLTAuMjczOTMyMTI5MTQ0NjY4NiIgb3NjM193YXZlZHJhd192YWx1ZXNfMTA3PSItMC4zMDE2OTE3MTA5NDg5NDQxIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMDg9Ii0wLjMyOTEzMTYwMzI0MDk2NjgiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzEwOT0iLTAuMzU2MjIyNjU5MzQ5NDQxNSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTEwPSItMC4zODI5MzYyMzkyNDI1NTM3IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMTE9Ii0wLjQwOTI0Mzk3MTEwOTM5MDMiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzExMj0iLTAuNDM1MTE4MDE5NTgwODQxMSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTEzPSItMC40NjA1MzA5MzY3MTc5ODcxIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMTQ9Ii0wLjQ4NTQ1NTgxMTAyMzcxMjIiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzExNT0iLTAuNTA5ODY2MjM3NjQwMzgwOSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTE2PSItMC41MzM3MzYyODg1NDc1MTU5IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMTc9Ii0wLjU1NzA0MDc1MDk4MDM3NzIiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzExOD0iLTAuNTc5NzU0ODI5NDA2NzM4MyIgb3NjM193YXZlZHJhd192YWx1ZXNfMTE5PSItMC42MDE4NTQ1NjI3NTkzOTk0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMjA9Ii0wLjYyMzMxNjQ2NjgwODMxOTEiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzEyMT0iLTAuNjQ0MTE3NzcyNTc5MTkzMSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTIyPSItMC42NjQyMzY0ODU5NTgwOTk0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMjM9Ii0wLjY4MzY1MTI2ODQ4MjIwODMiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzEyND0iLTAuNzAyMzQxNTU2NTQ5MDcyMyIgb3NjM193YXZlZHJhd192YWx1ZXNfMTI1PSItMC43MjAyODc1NjE0MTY2MjYiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzEyNj0iLTAuNzM3NDcwMTQ5OTkzODk2NSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTI3PSItMC43NTM4NzEyNjIwNzM1MTY4IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMjg9Ii0wLjc2OTQ3MzQzMzQ5NDU2NzkiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzEyOT0iLTAuNzg0MjYwMTUzNzcwNDQ2OCIgb3NjM193YXZlZHJhd192YWx1ZXNfMTMwPSItMC43OTgyMTU4MDY0ODQyMjI0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMzE9Ii0wLjgxMTMyNTQzMDg3MDA1NjIiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzEzMj0iLTAuODIzNTc1MzE3ODU5NjQ5NyIgb3NjM193YXZlZHJhd192YWx1ZXNfMTMzPSItMC44MzQ5NTI0MTQwMzU3OTcxIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMzQ9Ii0wLjg0NTQ0NDYxOTY1NTYwOTEiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzEzNT0iLTAuODU1MDQwOTA3ODU5ODAyMiIgb3NjM193YXZlZHJhd192YWx1ZXNfMTM2PSItMC44NjM3MzEwMjY2NDk0NzUxIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xMzc9Ii0wLjg3MTUwNTg1NjUxMzk3NzEiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzEzOD0iLTAuODc4MzU3MDUyODAzMDM5NiIgb3NjM193YXZlZHJhd192YWx1ZXNfMTM5PSItMC44ODQyNzc0MDMzNTQ2NDQ4IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNDA9Ii0wLjg4OTI2MDU5MDA3NjQ0NjUiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE0MT0iLTAuODkzMzAxNDI3MzY0MzQ5NCIgb3NjM193YXZlZHJhd192YWx1ZXNfMTQyPSItMC44OTYzOTU2MjM2ODM5Mjk0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNDM9Ii0wLjg5ODUzOTc4MTU3MDQzNDYiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE0ND0iLTAuODk5NzMxNzU1MjU2NjUyOCIgb3NjM193YXZlZHJhd192YWx1ZXNfMTQ1PSItMC44OTk5NzAxNzM4MzU3NTQ0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNDY9Ii0wLjg5OTI1NDkxODA5ODQ0OTciIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE0Nz0iLTAuODk3NTg2NTg0MDkxMTg2NSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTQ4PSItMC44OTQ5NjcwNzkxNjI1OTc3IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNDk9Ii0wLjg5MTM5OTE0NTEyNjM0MjgiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE1MD0iLTAuODg2ODg2NDc3NDcwMzk3OSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTUxPSItMC44ODE0MzM5NjM3NzU2MzQ4IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNTI9Ii0wLjg3NTA0NzM4NTY5MjU5NjQiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE1Mz0iLTAuODY3NzMzNDE4OTQxNDk3OCIgb3NjM193YXZlZHJhd192YWx1ZXNfMTU0PSItMC44NTk0OTk4NzE3MzA4MDQ0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNTU9Ii0wLjg1MDM1NTQ0NjMzODY1MzYiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE1Nj0iLTAuODQwMzA5ODU4MzIyMTQzNiIgb3NjM193YXZlZHJhd192YWx1ZXNfMTU3PSItMC44MjkzNzM3MTczMDgwNDQ0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNTg9Ii0wLjgxNzU1ODcwNTgwNjczMjIiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE1OT0iLTAuODA0ODc3MjIxNTg0MzIwMSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTYwPSItMC43OTEzNDI3OTQ4OTUxNzIxIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNjE9Ii0wLjc3Njk2OTczMDg1NDAzNDQiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE2Mj0iLTAuNzYxNzczMjg4MjQ5OTY5NSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTYzPSItMC43NDU3Njk1MDA3MzI0MjE5IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNjQ9Ii0wLjcyODk3NTQxNTIyOTc5NzQiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE2NT0iLTAuNzExNDA4NzkzOTI2MjM5IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNjY9Ii0wLjY5MzA4ODIzMzQ3MDkxNjciIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE2Nz0iLTAuNjc0MDMzMTY0OTc4MDI3MyIgb3NjM193YXZlZHJhd192YWx1ZXNfMTY4PSItMC42NTQyNjM3OTQ0MjIxNDk3IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNjk9Ii0wLjYzMzgwMTEwMjYzODI0NDYiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE3MD0iLTAuNjEyNjY2NjY2NTA3NzIwOSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTcxPSItMC41OTA4ODI5NTY5ODE2NTg5IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNzI9Ii0wLjU2ODQ3MzEwMDY2MjIzMTQiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE3Mz0iLTAuNTQ1NDYwNzYwNTkzNDE0MyIgb3NjM193YXZlZHJhd192YWx1ZXNfMTc0PSItMC41MjE4NzAzNzQ2Nzk1NjU0IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xNzU9Ii0wLjQ5NzcyNjk0NzA2OTE2ODEiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE3Nj0iLTAuNDczMDU2MDQ4MTU0ODMwOSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTc3PSItMC40NDc4ODM4MTQ1NzMyODgiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE3OD0iLTAuNDIyMjM2OTE5NDAzMDc2MiIgb3NjM193YXZlZHJhd192YWx1ZXNfMTc5PSItMC4zOTYxNDI1NzIxNjQ1MzU1IiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xODA9Ii0wLjM2OTYyODQyOTQxMjg0MTgiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE4MT0iLTAuMzQyNzIyNTM1MTMzMzYxOCIgb3NjM193YXZlZHJhd192YWx1ZXNfMTgyPSItMC4zMTU0NTM0Mzk5NTA5NDMiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE4Mz0iLTAuMjg3ODUwMDUyMTE4MzAxNCIgb3NjM193YXZlZHJhd192YWx1ZXNfMTg0PSItMC4yNTk5NDE2MDc3MTM2OTkzIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xODU9Ii0wLjIzMTc1NzcwMDQ0MzI2NzgiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE4Nj0iLTAuMjAzMzI4MTc3MzMyODc4MSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTg3PSItMC4xNzQ2ODMxNjg1MzA0NjQyIiBvc2MzX3dhdmVkcmF3X3ZhbHVlc18xODg9Ii0wLjE0NTg1MzA0MjYwMjUzOTEiIG9zYzNfd2F2ZWRyYXdfdmFsdWVzXzE4OT0iLTAuMTE2ODY4MzU0MzgwMTMwOCIgb3NjM193YXZlZHJhd192YWx1ZXNfMTkwPSItMC4wODc3NTk4MDc3MDU4NzkyMSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTkxPSItMC4wNTg1NTgyNTkxNTkzMjY1NSIgb3NjM193YXZlZHJhd192YWx1ZXNfMTkyPSItMC4wMjkyOTQ2NTI4NjQzMzY5NyIgb3NjMV9jaGlwZHJhd192YWx1ZXNfMD0iMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzE9IjAuODc1IiBvc2MxX2NoaXBkcmF3X3ZhbHVlc18yPSIwLjg3NSIgb3NjMV9jaGlwZHJhd192YWx1ZXNfMz0iMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzQ9IjAuODc1IiBvc2MxX2NoaXBkcmF3X3ZhbHVlc181PSIwLjg3NSIgb3NjMV9jaGlwZHJhd192YWx1ZXNfNj0iMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzc9IjAuODc1IiBvc2MxX2NoaXBkcmF3X3ZhbHVlc184PSIwLjg3NSIgb3NjMV9jaGlwZHJhd192YWx1ZXNfOT0iMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzEwPSIwLjg3NSIgb3NjMV9jaGlwZHJhd192YWx1ZXNfMTE9IjAuODc1IiBvc2MxX2NoaXBkcmF3X3ZhbHVlc18xMj0iMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzEzPSIwLjg3NSIgb3NjMV9jaGlwZHJhd192YWx1ZXNfMTQ9IjAuODc1IiBvc2MxX2NoaXBkcmF3X3ZhbHVlc18xNT0iMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzE2PSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzE3PSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzE4PSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzE5PSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzIwPSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzIxPSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzIyPSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzIzPSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzI0PSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzI1PSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzI2PSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzI3PSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzI4PSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzI5PSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzMwPSItMC44NzUiIG9zYzFfY2hpcGRyYXdfdmFsdWVzXzMxPSItMC44NzUiIG9zYzJfY2hpcGRyYXdfdmFsdWVzXzA9IjAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18xPSIwLjg3NSIgb3NjMl9jaGlwZHJhd192YWx1ZXNfMj0iMC44NzUiIG9zYzJfY2hpcGRyYXdfdmFsdWVzXzM9IjAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc180PSIwLjg3NSIgb3NjMl9jaGlwZHJhd192YWx1ZXNfNT0iMC44NzUiIG9zYzJfY2hpcGRyYXdfdmFsdWVzXzY9IjAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc183PSIwLjg3NSIgb3NjMl9jaGlwZHJhd192YWx1ZXNfOD0iMC44NzUiIG9zYzJfY2hpcGRyYXdfdmFsdWVzXzk9IjAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18xMD0iMC44NzUiIG9zYzJfY2hpcGRyYXdfdmFsdWVzXzExPSIwLjg3NSIgb3NjMl9jaGlwZHJhd192YWx1ZXNfMTI9IjAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18xMz0iMC44NzUiIG9zYzJfY2hpcGRyYXdfdmFsdWVzXzE0PSIwLjg3NSIgb3NjMl9jaGlwZHJhd192YWx1ZXNfMTU9IjAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18xNj0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18xNz0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18xOD0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18xOT0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18yMD0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18yMT0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18yMj0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18yMz0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18yND0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18yNT0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18yNj0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18yNz0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18yOD0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18yOT0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18zMD0iLTAuODc1IiBvc2MyX2NoaXBkcmF3X3ZhbHVlc18zMT0iLTAuODc1IiBvc2MzX2NoaXBkcmF3X3ZhbHVlc18wPSIwLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMT0iMC44NzUiIG9zYzNfY2hpcGRyYXdfdmFsdWVzXzI9IjAuODc1IiBvc2MzX2NoaXBkcmF3X3ZhbHVlc18zPSIwLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfND0iMC44NzUiIG9zYzNfY2hpcGRyYXdfdmFsdWVzXzU9IjAuODc1IiBvc2MzX2NoaXBkcmF3X3ZhbHVlc182PSIwLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfNz0iMC44NzUiIG9zYzNfY2hpcGRyYXdfdmFsdWVzXzg9IjAuODc1IiBvc2MzX2NoaXBkcmF3X3ZhbHVlc185PSIwLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMTA9IjAuODc1IiBvc2MzX2NoaXBkcmF3X3ZhbHVlc18xMT0iMC44NzUiIG9zYzNfY2hpcGRyYXdfdmFsdWVzXzEyPSIwLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMTM9IjAuODc1IiBvc2MzX2NoaXBkcmF3X3ZhbHVlc18xND0iMC44NzUiIG9zYzNfY2hpcGRyYXdfdmFsdWVzXzE1PSIwLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMTY9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMTc9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMTg9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMTk9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMjA9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMjE9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMjI9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMjM9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMjQ9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMjU9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMjY9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMjc9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMjg9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMjk9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMzA9Ii0wLjg3NSIgb3NjM19jaGlwZHJhd192YWx1ZXNfMzE9Ii0wLjg3NSIgb3NjMV9zcGVjZHJhd192YWx1ZXNfMD0iMS4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xPSIwLjAiIG9zYzFfc3BlY2RyYXdfdmFsdWVzXzI9IjAuMCIgb3NjMV9zcGVjZHJhd192YWx1ZXNfMz0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc180PSIwLjAiIG9zYzFfc3BlY2RyYXdfdmFsdWVzXzU9IjAuMCIgb3NjMV9zcGVjZHJhd192YWx1ZXNfNj0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc183PSIwLjAiIG9zYzFfc3BlY2RyYXdfdmFsdWVzXzg9IjAuMCIgb3NjMV9zcGVjZHJhd192YWx1ZXNfOT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xMD0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xMT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xMj0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xMz0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xND0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xNT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xNj0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xNz0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xOD0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18xOT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18yMD0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18yMT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18yMj0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18yMz0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18yND0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18yNT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18yNj0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18yNz0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18yOD0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18yOT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18zMD0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18zMT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18zMj0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18zMz0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18zND0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18zNT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18zNj0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18zNz0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18zOD0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc18zOT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc180MD0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc180MT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc180Mj0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc180Mz0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc180ND0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc180NT0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc180Nj0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc180Nz0iMC4wIiBvc2MxX3NwZWNkcmF3X3ZhbHVlc180OD0iMC4wIiBvc2MyX3NwZWNkcmF3X3ZhbHVlc18wPSIxLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzE9IjAuMCIgb3NjMl9zcGVjZHJhd192YWx1ZXNfMj0iMC4wIiBvc2MyX3NwZWNkcmF3X3ZhbHVlc18zPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzQ9IjAuMCIgb3NjMl9zcGVjZHJhd192YWx1ZXNfNT0iMC4wIiBvc2MyX3NwZWNkcmF3X3ZhbHVlc182PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzc9IjAuMCIgb3NjMl9zcGVjZHJhd192YWx1ZXNfOD0iMC4wIiBvc2MyX3NwZWNkcmF3X3ZhbHVlc185PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzEwPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzExPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzEyPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzEzPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzE0PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzE1PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzE2PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzE3PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzE4PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzE5PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzIwPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzIxPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzIyPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzIzPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzI0PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzI1PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzI2PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzI3PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzI4PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzI5PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzMwPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzMxPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzMyPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzMzPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzM0PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzM1PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzM2PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzM3PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzM4PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzM5PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzQwPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzQxPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzQyPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzQzPSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzQ0PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzQ1PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzQ2PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzQ3PSIwLjAiIG9zYzJfc3BlY2RyYXdfdmFsdWVzXzQ4PSIwLjAiIG9zYzNfc3BlY2RyYXdfdmFsdWVzXzA9IjEuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMT0iMC4wIiBvc2MzX3NwZWNkcmF3X3ZhbHVlc18yPSIwLjAiIG9zYzNfc3BlY2RyYXdfdmFsdWVzXzM9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfND0iMC4wIiBvc2MzX3NwZWNkcmF3X3ZhbHVlc181PSIwLjAiIG9zYzNfc3BlY2RyYXdfdmFsdWVzXzY9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfNz0iMC4wIiBvc2MzX3NwZWNkcmF3X3ZhbHVlc184PSIwLjAiIG9zYzNfc3BlY2RyYXdfdmFsdWVzXzk9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMTA9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMTE9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMTI9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMTM9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMTQ9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMTU9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMTY9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMTc9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMTg9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMTk9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMjA9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMjE9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMjI9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMjM9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMjQ9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMjU9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMjY9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMjc9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMjg9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMjk9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMzA9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMzE9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMzI9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMzM9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMzQ9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMzU9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMzY9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMzc9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMzg9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfMzk9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfNDA9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfNDE9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfNDI9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfNDM9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfNDQ9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfNDU9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfNDY9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfNDc9IjAuMCIgb3NjM19zcGVjZHJhd192YWx1ZXNfNDg9IjAuMCIvPjxmeCBkZWxheV9zeW5jdGltZV9udW1lcmF0b3I9IjAiIGRlbGF5X3N5bmN0aW1lX2Rlbm9taW5hdG9yPSIyIiBwaGFzZXJfc3luY3RpbWVfbnVtZXJhdG9yPSIyIiBwaGFzZXJfc3luY3RpbWVfZGVub21pbmF0b3I9IjUiIGZsYW5nZXJfc3luY3RpbWVfbnVtZXJhdG9yPSIyIiBmbGFuZ2VyX3N5bmN0aW1lX2Rlbm9taW5hdG9yPSI1IiBjaG9ydXNfc3luY3RpbWVfbnVtZXJhdG9yPSIyIiBjaG9ydXNfc3luY3RpbWVfZGVub21pbmF0b3I9IjUiIGRlbGF5X3NlbGVjdGVkPSIxLjAiIHBoYXNlcl9zZWxlY3RlZD0iMC4wIiBmbGFuZ2VyX3NlbGVjdGVkPSIwLjAiIGNob3J1c19zZWxlY3RlZD0iMC4wIiByZXZlcmJfc2VsZWN0ZWQ9IjAiIGRlbGF5X3Bvc2l0aW9uPSIwLjAiIHBoYXNlcl9wb3NpdGlvbj0iMS4wIiBjaG9ydXNfcG9zaXRpb249IjIuMCIgZmxhbmdlcl9wb3NpdGlvbj0iMy4wIiByZXZlcmJfcG9zaXRpb249IjQuMCIgZGVsYXlfc3luYz0iMS4wIiBwaGFzZXJfc3luYz0iMCIgZmxhbmdlcl9zeW5jPSIwIiBjaG9ydXNfc3luYz0iMCIvPjxsZm8gbGZvMV9zeW5jdGltZV9udW1lcmF0b3I9IjIiIGxmbzFfc3luY3RpbWVfZGVub21pbmF0b3I9IjUiIGxmbzJfc3luY3RpbWVfbnVtZXJhdG9yPSIyIiBsZm8yX3N5bmN0aW1lX2Rlbm9taW5hdG9yPSI1IiBsZm8zX3N5bmN0aW1lX251bWVyYXRvcj0iMiIgbGZvM19zeW5jdGltZV9kZW5vbWluYXRvcj0iNSIgbGZvNF9zeW5jdGltZV9udW1lcmF0b3I9IjIiIGxmbzRfc3luY3RpbWVfZGVub21pbmF0b3I9IjUiIGxmb19sZWZ0X3NlbGVjdGVkPSIxIiBsZm9fcmlnaHRfc2VsZWN0ZWQ9IjEiIGxmbzFfd2F2ZT0iMCIgbGZvMl93YXZlPSIwIiBsZm8zX3dhdmU9IjAiIGxmbzRfd2F2ZT0iMCIgbGZvMV9zeW5jPSIwIiBsZm8yX3N5bmM9IjAiIGxmbzNfc3luYz0iMCIgbGZvNF9zeW5jPSIwIi8+PG1pc2MgbGVnYXRvPSIxIiBkaXN0X2FsZ289IjEiIEJQTT0iMTIwIiBlbnZfbGVmdF9zZWxlY3RlZD0iMSIgZW52X3JpZ2h0X3NlbGVjdGVkPSIxIiBmaWwxX3R5cGU9IjMiIGZpbDJfdHlwZT0iMSIgZmlsM190eXBlPSIxIiBwYXRjaF9uYW1lPSJWYW5nQnJhc3MgKE1XLEFUKSIgdmVyc2lvbl9taW5vcj0iMyIgdmVyc2lvbl9wYXRjaD0iNCIgcGF0Y2hfbWlncmF0aW9uX3ZlcnNpb249IjUiIGRpc3Rfb249IjAiIGZpbDFfY29tYl9wb2xhcml0eT0iMCIgZmlsMl9jb21iX3BvbGFyaXR5PSIwIiBmaWwzX2NvbWJfcG9sYXJpdHk9IjAiIGZpbDFfdm93ZWxfbGVmdD0iMCIgZmlsMl92b3dlbF9sZWZ0PSIwIiBmaWwzX3Zvd2VsX2xlZnQ9IjAiIGZpbDFfdm93ZWxfcmlnaHQ9IjIiIGZpbDJfdm93ZWxfcmlnaHQ9IjIiIGZpbDNfdm93ZWxfcmlnaHQ9IjIiIHVuaXNvbl92b2ljZXM9IjEiIHBpdGNoYmVuZF9hbW91bnQ9IjIiIGN1cnJlbnRfcGF0Y2hfZmlsZW5hbWU9IkluaXQgUGF0Y2giIGN1cnJlbnRfcGF0Y2hfZGlyZWN0b3J5PSIvaG9tZS9nZXJhbGQvRG9jdW1lbnRzIiBhcnBfc3luY3RpbWVfbnVtZXJhdG9yPSIxIiBhcnBfc3luY3RpbWVfZGVub21pbmF0b3I9IjUiIGFycF9vY3RhdmVzPSIyIiBhcnBfZGlyZWN0aW9uPSIxMCIgYXJwX3N0ZXBzPSIxNiIgYXJwX2dhdGU9IjUwIiBhcnBfbW9kX3NlbGVjdGVkPSIxMCIgcHJlc2V0X3NvdW5kYmFua19zZWxlY3RlZD0iU3RhdGljIEZhY3RvcnkgUHJlc2V0cyIgcHJlc2V0X2NhdGVnb3J5X3NlbGVjdGVkPSJQYWRzIiBwcmVzZXRfcGF0Y2hfc2VsZWN0ZWQ9IkZfQV9DX1RfT19SX1lWYW5nQnJhc3MgKE1XLEFUKSBbUGhvdG9uaWNdIi8+PG1vZCBzb3VyY2Vfcm93XzA9IjMwMCIgc291cmNlX3Jvd18xPSI0MDIiIHNvdXJjZV9yb3dfMj0iNDA1IiBzb3VyY2Vfcm93XzM9IjQwNSIgc291cmNlX3Jvd180PSI0MDUiIHNvdXJjZV9yb3dfNT0iNDA5IiBzb3VyY2Vfcm93XzY9IjAiIHNvdXJjZV9yb3dfNz0iMCIgc291cmNlX3Jvd184PSIwIiBkZXN0XzFfcm93XzA9IjMiIGRlc3RfMV9yb3dfMT0iNjUxIiBkZXN0XzFfcm93XzI9IjYwMSIgZGVzdF8xX3Jvd18zPSI0IiBkZXN0XzFfcm93XzQ9IjYxMSIgZGVzdF8xX3Jvd181PSIzMDEiIGRlc3RfMV9yb3dfNj0iMCIgZGVzdF8xX3Jvd183PSIwIiBkZXN0XzFfcm93Xzg9IjAiIGRlc3RfMl9yb3dfMD0iMCIgZGVzdF8yX3Jvd18xPSIwIiBkZXN0XzJfcm93XzI9IjAiIGRlc3RfMl9yb3dfMz0iMCIgZGVzdF8yX3Jvd180PSIwIiBkZXN0XzJfcm93XzU9IjkwMCIgZGVzdF8yX3Jvd182PSIwIiBkZXN0XzJfcm93Xzc9IjAiIGRlc3RfMl9yb3dfOD0iMCIgc2NhbGVfcm93XzA9IjQwMiIgc2NhbGVfcm93XzE9IjAiIHNjYWxlX3Jvd18yPSIwIiBzY2FsZV9yb3dfMz0iMCIgc2NhbGVfcm93XzQ9IjAiIHNjYWxlX3Jvd181PSIwIiBzY2FsZV9yb3dfNj0iMCIgc2NhbGVfcm93Xzc9IjAiIHNjYWxlX3Jvd184PSIwIiBhbW91bnRfMF9yb3dfMD0iMC4wNzkxOTk5OTk1NzA4NDY1NiIgYW1vdW50XzFfcm93XzA9IjAuMCIgYW1vdW50XzJfcm93XzA9IjEuMCIgYW1vdW50XzBfcm93XzE9IjAuNTM0NjAwMDE5NDU0OTU2MSIgYW1vdW50XzFfcm93XzE9IjAiIGFtb3VudF8yX3Jvd18xPSIwIiBhbW91bnRfMF9yb3dfMj0iLTAuNjMzNTk5OTk2NTY2NzcyNSIgYW1vdW50XzFfcm93XzI9IjAiIGFtb3VudF8yX3Jvd18yPSIwIiBhbW91bnRfMF9yb3dfMz0iMS4wIiBhbW91bnRfMV9yb3dfMz0iMCIgYW1vdW50XzJfcm93XzM9IjAiIGFtb3VudF8wX3Jvd180PSItMC40ODE4MDAwMTk3NDEwNTgzIiBhbW91bnRfMV9yb3dfND0iMCIgYW1vdW50XzJfcm93XzQ9IjAiIGFtb3VudF8wX3Jvd181PSIwLjg3NzgwMDA0NzM5NzYxMzUiIGFtb3VudF8xX3Jvd181PSIwLjYwNzIwMDAyNjUxMjE0NiIgYW1vdW50XzJfcm93XzU9IjAiIGFtb3VudF8wX3Jvd182PSIwIiBhbW91bnRfMV9yb3dfNj0iMCIgYW1vdW50XzJfcm93XzY9IjAiIGFtb3VudF8wX3Jvd183PSIwIiBhbW91bnRfMV9yb3dfNz0iMCIgYW1vdW50XzJfcm93Xzc9IjAiIGFtb3VudF8wX3Jvd184PSIwIiBhbW91bnRfMV9yb3dfOD0iMCIgYW1vdW50XzJfcm93Xzg9IjAiLz48b3NjIG9zYzFfYW5hbG9nX3dhdmU9IjAiIG9zYzJfYW5hbG9nX3dhdmU9IjAiIG9zYzNfYW5hbG9nX3dhdmU9IjAiIG9zYzFfdHlwZT0iMiIgb3NjMl90eXBlPSIyIiBvc2MzX3R5cGU9IjEiIG9zYzFfd2F2ZXRhYmxlPSIxLjAiIG9zYzJfd2F2ZXRhYmxlPSIxLjAiIG9zYzNfd2F2ZXRhYmxlPSIxLjAiIG9zYzFfdmVjX2E9IjEwMS4wIiBvc2MyX3ZlY19hPSIxMDEuMCIgb3NjM192ZWNfYT0iMTAxLjAiIG9zYzFfdmVjX2I9IjEwMi4wIiBvc2MyX3ZlY19iPSIxMDIuMCIgb3NjM192ZWNfYj0iMTAyLjAiIG9zYzFfdmVjX2M9IjEwMy4wIiBvc2MyX3ZlY19jPSIxMDMuMCIgb3NjM192ZWNfYz0iMTAzLjAiIG9zYzFfdmVjX2Q9IjEwNC4wIiBvc2MyX3ZlY19kPSIxMDQuMCIgb3NjM192ZWNfZD0iMTA0LjAiIG9zYzFfY2hpcHdhdmU9IjEuMCIgb3NjMl9jaGlwd2F2ZT0iMS4wIiBvc2MzX2NoaXB3YXZlPSIxLjAiIG9zYzFfbW9kdWxhdG9yX3dhdmU9IjEuMCIgb3NjMl9tb2R1bGF0b3Jfd2F2ZT0iMS4wIiBvc2MzX21vZHVsYXRvcl93YXZlPSIxLjAiIG9zYzFfY2Fycmllcl93YXZlPSIxLjAiIG9zYzJfY2Fycmllcl93YXZlPSIxLjAiIG9zYzNfY2Fycmllcl93YXZlPSIxLjAiIG9zYzFfbW9kX3NvdXJjZT0iMS4wIiBvc2MyX21vZF9zb3VyY2U9IjEuMCIgb3NjM19tb2Rfc291cmNlPSIxLjAiIG9zYzFfY2Fycmllcl9yYXRpbz0iMyIgb3NjMl9jYXJyaWVyX3JhdGlvPSIxLjAiIG9zYzNfY2Fycmllcl9yYXRpbz0iMS4wIiBvc2MxX21vZHVsYXRvcl9yYXRpbz0iMyIgb3NjMl9tb2R1bGF0b3JfcmF0aW89IjEuMCIgb3NjM19tb2R1bGF0b3JfcmF0aW89IjEuMCIvPjxtaWRpX2xlYXJuLz48dHVuaW5nX3NjbCBkYXRhPSIhIGV2ZW4uc2NsJiMxMDshJiMxMDsxMiBub3RlIGV2ZW4gdGVtcGVyYW1lbnQmIzEwOyAxMiYjMTA7ISYjMTA7IDEwMC4wJiMxMDsgMjAwLjAmIzEwOyAzMDAuMCYjMTA7IDQwMC4wJiMxMDsgNTAwLjAmIzEwOyA2MDAuMCYjMTA7IDcwMC4wJiMxMDsgODAwLjAmIzEwOyA5MDAuMCYjMTA7IDEwMDAuMCYjMTA7IDExMDAuMCYjMTA7IDIvMSYjMTA7Ii8+PHR1bmluZ19rYm0gZGF0YT0iISBBdXRvbWF0aWNhbGx5IGdlbmVyYXRlZCBtYXBwaW5nLCB0dW5pbmcgbm90ZSA2MCB0byAyNjEuNjI2IGh6JiMxMDshJiMxMDshIFNpemUgb2YgTWFwJiMxMDswJiMxMDshIEZpcnN0IGFuZCBMYXN0IE1pZGkgTm90ZXMgdG8gbWFwIC0gbWFwIHRoZSBlbnRpcmUga2V5Ym9hcmQmIzEwOzAmIzEwOzEyNyYjMTA7ISBNaWRkbGUgbm90ZSB3aGVyZSB0aGUgZmlyc3QgZW50cnkgaW4gdGhlIHNjYWxlIGlzIG1hcHBlZC4mIzEwOzYwJiMxMDshIFJlZmVyZW5jZSBub3Qgd2hlcmUgZnJlcXVlbmN5IGlzIGZpeGVkJiMxMDs2MCYjMTA7ISBGcmVxdWVuY3kgZm9yIG1pZGkgbm90ZSA2MCYjMTA7MjYxLjYyNiYjMTA7ISBTY2FsZSBkZWdyZWUgZm9yIGZvcm1hbCBvY3RhdmUuIFRoaXMgaXMgYW0gZW1wdHkgbWFwcGluZyBzbzomIzEwOzAmIzEwOyEgTWFwcGluZy4gVGhpcyBpcyBhbiBlbXB0eSBtYXBwaW5nIHNvIGxpc3Qgbm8ga2V5cyYjMTA7Ii8+PC9PZGluPgA=
+    </Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+
+ <!-- Guitar Midi -->
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>Guitar Midi</Name>
+   <URI>http://github.com/geraldmwangi/GuitarMidi-LV2</URI>
+  </Info>
+
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1</Options>
+
+   <Parameter>
+    <Index>0</Index>
+    <Name>Input Gain (dB)</Name>
+    <Symbol>gain</Symbol>
+    <Value>28</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>1</Index>
+    <Name>Expressivity Range (dB)</Name>
+    <Symbol>expressivity</Symbol>
+    <Value>3</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>2</Index>
+    <Name>Onset Smoothing</Name>
+    <Symbol>onsetsmoothing</Symbol>
+    <Value>0.300000011920929</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>3</Index>
+    <Name>Offset Smoothing</Name>
+    <Symbol>offsetsmoothing</Symbol>
+    <Value>0.300000011920929</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>4</Index>
+    <Name>Onset Confidence Threshold</Name>
+    <Symbol>onsetconfthr</Symbol>
+    <Value>0.949999988079071</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>5</Index>
+    <Name>Offset Confidence Threshold</Name>
+    <Symbol>offsetconfthr</Symbol>
+    <Value>0.300000011920929</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>6</Index>
+    <Name>Onset Energy Threshold (dB)</Name>
+    <Symbol>onsetenthr</Symbol>
+    <Value>-11.9050006866455</Value>
+   </Parameter>
+
+   <Parameter>
+    <Index>7</Index>
+    <Name>Offset Energy Threshold (dB)</Name>
+    <Symbol>offsetenthr</Symbol>
+    <Value>-18</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+
+ <ExternalPatchbay>
+  <Connection>
+   <Source>U22 XT USB:capture_FL</Source>
+   <Target>U22 XT USB:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>U22 XT USB:capture_FL</Source>
+   <Target>x42 Instrument Tuner:Audio Input</Target>
+  </Connection>
+  <Connection>
+   <Source>U22 XT USB:capture_FL</Source>
+   <Target>Guitar Midi:In</Target>
+  </Connection>
+  <Connection>
+   <Source>U22 XT USB:capture_FL</Source>
+   <Target>Carla.166/Guitar Midi:In</Target>
+  </Connection>
+  <Connection>
+   <Source>U22 XT USB:capture_FR</Source>
+   <Target>U22 XT USB:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>U22 XT USB:capture_FR</Source>
+   <Target>x42 Instrument Tuner:Audio Input</Target>
+  </Connection>
+  <Connection>
+   <Source>U22 XT USB:capture_FR</Source>
+   <Target>BBC Meter (Mono):In</Target>
+  </Connection>
+  <Connection>
+   <Source>U22 XT USB:capture_FR</Source>
+   <Target>Guitar Midi:In</Target>
+  </Connection>
+  <Connection>
+   <Source>U22 XT USB:capture_FR</Source>
+   <Target>Carla.166/Guitar Midi:In</Target>
+  </Connection>
+  <Connection>
+   <Source>Firefox:output_FL</Source>
+   <Target>U22 XT USB:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>Firefox:output_FR</Source>
+   <Target>U22 XT USB:playback_FR</Target>
+  </Connection>
+  <Connection>
+   <Source>TyrellN6:output_1</Source>
+   <Target>U22 XT USB:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>TyrellN6:output_2</Source>
+   <Target>U22 XT USB:playback_FR</Target>
+  </Connection>
+  <Connection>
+   <Source>Cardinal Synth:Audio Output 1</Source>
+   <Target>U22 XT USB:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>Cardinal Synth:Audio Output 2</Source>
+   <Target>U22 XT USB:playback_FR</Target>
+  </Connection>
+  <Connection>
+   <Source>Firefox:output_FL-939</Source>
+   <Target>U22 XT USB:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>Firefox:output_FR-940</Source>
+   <Target>U22 XT USB:playback_FR</Target>
+  </Connection>
+  <Connection>
+   <Source>MDA Piano:Left Out</Source>
+   <Target>U22 XT USB:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>MDA Piano:Right Out</Source>
+   <Target>U22 XT USB:playback_FR</Target>
+  </Connection>
+  <Connection>
+   <Source>Odin2:Audio Output 1</Source>
+   <Target>U22 XT USB:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>Odin2:Audio Output 2</Source>
+   <Target>U22 XT USB:playback_FR</Target>
+  </Connection>
+  <Connection>
+   <Source>PipeWire ALSA [squeezelite]/ALSA Playback [squeezelite]:output_FL</Source>
+   <Target>SAMSUNG:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>PipeWire ALSA [squeezelite]/ALSA Playback [squeezelite]:output_FL</Source>
+   <Target>U22 XT USB:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>PipeWire ALSA [squeezelite]/ALSA Playback [squeezelite]:output_FR</Source>
+   <Target>SAMSUNG:playback_FR</Target>
+  </Connection>
+  <Connection>
+   <Source>PipeWire ALSA [squeezelite]/ALSA Playback [squeezelite]:output_FR</Source>
+   <Target>U22 XT USB:playback_FR</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Midi Through: Port-0 (capture)</Source>
+   <Target>MDA Piano:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Guitar Midi:MidiOut</Source>
+   <Target>Odin2:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Guitar Midi:MidiOut</Source>
+   <Target>MDA Piano:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Guitar Midi:MidiOut</Source>
+   <Target>TyrellN6:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Guitar Midi:MidiOut</Source>
+   <Target>Cardinal Synth:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Carla.166/Guitar Midi:MidiOut</Source>
+   <Target>Odin2:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Carla.166/Guitar Midi:MidiOut</Source>
+   <Target>MDA Piano:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Carla.166/Guitar Midi:MidiOut</Source>
+   <Target>TyrellN6:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Carla.166/Guitar Midi:MidiOut</Source>
+   <Target>Cardinal Synth:events-in</Target>
+  </Connection>
+  <Positions>
+   <Position x1="395" y1="742" x2="1233" y2="876">
+    <Name>U22 XT USB</Name>
+   </Position>
+   <Position x1="860" y1="1223">
+    <Name>Firefox</Name>
+   </Position>
+   <Position x1="1338" y1="1141">
+    <Name>PipeWire ALSA [squeezelite]/ALSA Playback [squeezelite]</Name>
+   </Position>
+   <Position x1="1072" y1="1473" x2="2053" y2="1422">
+    <Name>ThinkPad USB-C Dock Audio</Name>
+   </Position>
+   <Position x1="1945" y1="1914" x2="1991" y2="1348">
+    <Name>SAMSUNG</Name>
+   </Position>
+   <Position x1="538" y1="1289">
+    <Name>Guitar Midi</Name>
+   </Position>
+   <Position x1="250" y1="1578" x2="2032" y2="1043">
+    <Name>Midi-Bridge</Name>
+   </Position>
+   <Position x1="871" y1="824" x2="2675" y2="758">
+    <Name>BLE MIDI 1</Name>
+   </Position>
+   <Position x1="538" y1="1289" pluginId="5">
+    <Name>Carla.166/Guitar Midi</Name>
+   </Position>
+  </Positions>
+ </ExternalPatchbay>
+</CARLA-PROJECT>
