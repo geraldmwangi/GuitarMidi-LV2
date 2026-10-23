@@ -12,6 +12,7 @@ set(NUM_INFERENCE_THREADS "4" CACHE STRING "Number of threads to use for inferen
 message("Ring buffer size: ${RING_BUFFER_SIZE}")
 message("Number of inference threads: ${NUM_INFERENCE_THREADS}")
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 configure_file(include/guitarmidi/config.hpp.in include/guitarmidi/config.hpp)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
@@ -19,9 +20,16 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 include_directories(/usr/include)
 include_directories(include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../ext/zita-resampler-1.11.2/source)
 find_package(PkgConfig REQUIRED)
-find_library(ZITA_RESAMPLER_LIB zita-resampler)
-message("Found zita-resampler library: ${ZITA_RESAMPLER_LIB}")
+set(ZITA_SRC_DIR ../ext/zita-resampler-1.11.2/source/)
+
+set(ZITA_SRCS
+  ${ZITA_SRC_DIR}/cresampler.cc
+  ${ZITA_SRC_DIR}/resampler-table.cc
+  ${ZITA_SRC_DIR}/resampler.cc
+  ${ZITA_SRC_DIR}/vresampler.cc
+)
 #find_package(OpenMP REQUIRED)
 # pkg_check_modules(Pango REQUIRED pango)
 
@@ -77,7 +85,7 @@ add_subdirectory(
 
 set(SRC    src/fretboard.cpp src/fretboardrepresentation.cpp src/guitarnote.cpp src/logging.cpp src/filterbank.cpp src/guitarstring.cpp src/noteinferencer.cpp src/modelinferencer.cpp)
 
-add_library(guitarmidi_core STATIC ${SRC})
+add_library(guitarmidi_core STATIC ${SRC} ${ZITA_SRCS})
 set_target_properties(guitarmidi_core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
-target_link_libraries(guitarmidi_core PUBLIC tensorflow-lite  ${ZITA_RESAMPLER_LIB} )
+target_link_libraries(guitarmidi_core PUBLIC tensorflow-lite )

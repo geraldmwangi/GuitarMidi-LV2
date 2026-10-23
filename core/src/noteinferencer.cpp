@@ -14,6 +14,8 @@ namespace GuitarMidi
 
     NoteInferencer::NoteInferencer(GuitarMidiOutput *midioutput) : m_midioutput(midioutput)
     {
+        for (auto& note_on : m_note_on)
+            note_on.store(false, std::memory_order_relaxed);
     }
     bool NoteInferencer::initialize(const std::string &bundle_path)
     {
@@ -35,7 +37,8 @@ namespace GuitarMidi
         m_audiobuffer = input;
     }
     void NoteInferencer::getDebugData(float *smoothed_confidences, float *smoothed_energies,
-                                      float *momentary_confidences, float *momentary_energies) const
+                                      float *momentary_confidences, float *momentary_energies,
+                                      bool *note_on) const
     {
         for (int i = 0; i < NUM_NOTES; ++i)
         {
@@ -43,6 +46,8 @@ namespace GuitarMidi
             smoothed_energies[i] = smoothed_noteenergies[i];
             momentary_confidences[i] = m_momentary_confidences[i];
             momentary_energies[i] = m_momentary_noteenergies[i];
+            if (note_on != nullptr)
+                note_on[i] = m_note_on[i].load(std::memory_order_relaxed);
         }
     }
     void NoteInferencer::process(int nsamples,int pos)
@@ -55,7 +60,7 @@ namespace GuitarMidi
         int num_active_notes = 0;
         for (int h = 0; h < NUM_NOTES; h++)
         {
-            num_active_notes += m_note_on[h];
+            num_active_notes += m_note_on[h].load(std::memory_order_relaxed);
         }
         //num_active_notes=1;
         m_frames = 0;
@@ -107,7 +112,7 @@ namespace GuitarMidi
                 }
 
 
-                if (!m_note_on[i])
+                if (!m_note_on[i].load(std::memory_order_relaxed))
                 {
                     triggeron[i] = (smoothed_onsetoutput[i] > *m_onset_threshold && smoothed_noteenergies[i] > en_threshold);
 
@@ -132,10 +137,10 @@ namespace GuitarMidi
             {
                 if( smoothed_onsetoutput[i]> smoothed_onsetoutput[i+1])
                 {
-                    triggeroff[i+1] = m_note_on[i+1];
+                    triggeroff[i+1] = m_note_on[i+1].load(std::memory_order_relaxed);
                 }else
                 {
-                    triggeroff[i] = m_note_on[i];
+                    triggeroff[i] = m_note_on[i].load(std::memory_order_relaxed);
                 }
             }
         for (int i = 0; i < NUM_NOTES; i++)
@@ -146,13 +151,13 @@ namespace GuitarMidi
                 velocity = std::min(velocity, 127); // cap the velocity at 127
                 uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, (uint8_t)velocity};
                 m_midioutput->sendMidiMessage(midinote, pos);
-                m_note_on[i] = true;
+                m_note_on[i].store(true, std::memory_order_relaxed);
             }
             if (triggeroff[i] && m_note_on[i])
             {
                 uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x00};
                 m_midioutput->sendMidiMessage(midinote, pos);
-                m_note_on[i] = false;
+                m_note_on[i].store(false, std::memory_order_relaxed);
             }
         }
         // #ifdef WITH_AUDIO_OUTPUT

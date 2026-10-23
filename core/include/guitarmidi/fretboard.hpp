@@ -176,10 +176,11 @@ public:
 
     /** Copies the latest smoothed and momentary note debug values. */
     virtual void getNoteDebugData(float *smoothed_confidences, float *smoothed_energies,
-                                  float *momentary_confidences, float *momentary_energies) const
+                                  float *momentary_confidences, float *momentary_energies,
+                                  bool *note_on = nullptr) const
     {
         m_noteinferencer.getDebugData(smoothed_confidences, smoothed_energies,
-                                      momentary_confidences, momentary_energies);
+                                      momentary_confidences, momentary_energies, note_on);
     }
 
     /** Copies decimated signed waveform samples for every filter. */

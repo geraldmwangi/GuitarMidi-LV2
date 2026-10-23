@@ -5,9 +5,7 @@ include_directories(${PROJECT_BINARY_DIR}/core/include)
 include_directories(/usr/include)
 include_directories(include)
 include_directories(${PROJECT_SOURCE_DIR}/core/include)
-find_package(PkgConfig REQUIRED)
-find_library(ZITA_RESAMPLER_LIB zita-resampler)
-message("Found zita-resampler library: ${ZITA_RESAMPLER_LIB}")
+
 #find_package(OpenMP REQUIRED)
 # pkg_check_modules(Pango REQUIRED pango)
 

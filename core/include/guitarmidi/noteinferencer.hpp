@@ -17,6 +17,7 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
+#include <atomic>
 #include <memory>
 #include <guitarmidi/fretboard_api.hpp>
 #include <guitarmidi/common.hpp>
@@ -61,7 +62,7 @@ namespace GuitarMidi{
         //#ifdef WITH_AUDIO_OUTPUT
         int64_t m_frames=0;
         //#endif
-        bool m_note_on[NUM_NOTES]={false};
+        std::atomic<bool> m_note_on[NUM_NOTES];
         public:
         /** Creates a note inferencer connected to the supplied MIDI output. */
         NoteInferencer(GuitarMidiOutput *midioutput);
@@ -136,7 +137,8 @@ namespace GuitarMidi{
 
         /** Copies the latest smoothed and momentary confidence and energy values. */
         void getDebugData(float *smoothed_confidences, float *smoothed_energies,
-                  float *momentary_confidences, float *momentary_energies) const;
+                  float *momentary_confidences, float *momentary_energies,
+                  bool *note_on = nullptr) const;
 
 #ifdef WITH_AUDIO_OUTPUT
         float *audio_output;
