@@ -107,7 +107,7 @@ namespace GuitarMidi
                 }
 
 
-                if (!m_note_on[i] && i != (NUM_NOTES - 1))
+                if (!m_note_on[i])
                 {
                     triggeron[i] = (smoothed_onsetoutput[i] > *m_onset_threshold && smoothed_noteenergies[i] > en_threshold);
 
@@ -148,7 +148,7 @@ namespace GuitarMidi
                 m_midioutput->sendMidiMessage(midinote, pos);
                 m_note_on[i] = true;
             }
-            if (triggeroff[i])
+            if (triggeroff[i] && m_note_on[i])
             {
                 uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x00};
                 m_midioutput->sendMidiMessage(midinote, pos);
