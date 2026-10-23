@@ -107,7 +107,7 @@ namespace GuitarMidi
                 }
 
 
-                if (!m_note_on[i] && i != (NUM_NOTES - 1))
+                if (!m_note_on[i])
                 {
                     triggeron[i] = (smoothed_onsetoutput[i] > *m_onset_threshold && smoothed_noteenergies[i] > en_threshold);
 
