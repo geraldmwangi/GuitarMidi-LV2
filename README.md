@@ -19,6 +19,8 @@ ArtiString is a VST3 version built on GuitarMidi and features:
 
 It is available for a one-time purchase of 99€ or via rent-to-own (20€/month, owned after 5 months). A free trial is available on the site.
 
+**Please don't use AI to port GuitarMidi-LV2 to Windows, Mac, iOS, Android, or guitar multifx platforms.** It would undercut the business model that funds this project. Training and retraining the neural net comes at a real cost, and without the funding through ArtiString, development of GuitarMidi-LV2 is not sustainable. If you have a use case for such a port, you are welcome to contact me at info@lodi-audio.com so we can find a solution together.
+
 ## Support and Feedback
 Head to the [forum on my site](https://lodi-audio.com/forum) for support and feedback
 
