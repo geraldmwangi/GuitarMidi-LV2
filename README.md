@@ -6,9 +6,11 @@ It deploys a bank of butterworth bandpass filters to separate the polyphonic aud
 
 ## Licensing
 
-Project-authored source code and tooling are licensed under the GNU Lesser General Public License, version 2.0 or (at your option) any later version, unless a file carries a different notice. Third-party components retain their respective licenses.
+Project-authored plugin code outside [`python/`](python) is licensed under the GNU General Public License, version 3 any later version, unless a file carries a different notice. Third-party components retain their respective licenses.
 
 Project-authored material in [`python/`](python), including training code, notebooks, model architectures, weights, and converted models, is instead covered by the separate [GuitarMidi Neural-Network Non-Commercial License](python/LICENSE). It allows non-commercial use, modification, and redistribution; bars any use by or for a for-profit organization; and requires contributors to grant the Licensor exclusive commercial rights to their modifications. Third-party and dataset material is excluded and remains subject to its own terms. Confirm dataset rights before redistributing models or derived material.
+
+The installed LV2 bundle includes the GPLv3 and model non-commercial license texts.
 
 ## Demo and news
 Check out the demo at https://www.lodi-audio.com/plugins/guitarmidi. For general news on my work see https://www.lodi-audio.com

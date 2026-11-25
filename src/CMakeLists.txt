@@ -44,3 +44,10 @@ else()
 install(FILES ../manifest.ttl ../guitarmidi.ttl ../python/neuralnetmodelling/guitarmidi.tflite
         DESTINATION guitarmidi.lv2)
 endif()
+
+install(FILES ../LICENSE
+        DESTINATION guitarmidi.lv2
+        RENAME LICENSE-GPL-3.0)
+install(FILES ../python/LICENSE
+        DESTINATION guitarmidi.lv2
+        RENAME LICENSE-MODEL-NC)

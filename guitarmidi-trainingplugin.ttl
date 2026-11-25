@@ -24,7 +24,7 @@
             lv2:AmplifierPlugin ;
         lv2:project <http://lv2plug.in/ns/lv2> ;
         doap:name "Guitar Midi";
-        doap:license <https://spdx.org/licenses/LGPL-2.0-or-later.html> ;
+        doap:license <https://spdx.org/licenses/GPL-3.0-or-later.html> ;
         lv2:optionalFeature lv2:hardRTCapable ;
         lv2:port [
             a lv2:AudioPort ,

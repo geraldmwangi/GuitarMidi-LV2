@@ -1,20 +1,7 @@
 # GuitarMidi-LV2 Library
  # Copyright (C) 2026 Gerald Mwangi
- #
- # This program is free software; you can redistribute it and/or
- # modify it under the terms of the GNU Lesser General Public
- # License as published by the Free Software Foundation; either
- # version 2 of the License, or (at your option) any later version.
- #
- # This program is distributed in the hope that it will be useful,
- # but WITHOUT ANY WARRANTY; without even the implied warranty of
- # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- # Lesser General Public License for more details.
- #
- # You should have received a copy of the GNU Lesser General
- # Public License along with this program; if not, write to the
- # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- # Boston, MA  02110-1301  USA
+ # SPDX-License-Identifier: LicenseRef-GuitarMidi-NC-1.0
+ # See python/LICENSE for terms.
 num_overtones=3
 num_frets=12
 with open("guitarmidi-trainingplugin.ttl", "w") as file:
@@ -44,7 +31,7 @@ with open("guitarmidi-trainingplugin.ttl", "w") as file:
             lv2:AmplifierPlugin ;
         lv2:project <http://lv2plug.in/ns/lv2> ;
         doap:name "Guitar Midi";
-        doap:license <http://opensource.org/licenses/isc> ;
+        doap:license <https://spdx.org/licenses/GPL-3.0-or-later.html> ;
         lv2:optionalFeature lv2:hardRTCapable ;
         lv2:port [
             a lv2:AudioPort ,
