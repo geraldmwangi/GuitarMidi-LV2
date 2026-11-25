@@ -4,6 +4,12 @@
 A concept for guitar to midi as an lv2 plugin. GuitarMidi-LV2 analyses the signal of a guitar in standard tuning E A D g b e extracts the notes played.
 It deploys a bank of butterworth bandpass filters to separate the polyphonic audio into monophonic frequency segments, which are then analysed for multiple fundamental frequencies by a custom neural net.
 
+## Licensing
+
+Project-authored source code and tooling are licensed under the GNU Lesser General Public License, version 2.0 or (at your option) any later version, unless a file carries a different notice. Third-party components retain their respective licenses.
+
+Project-authored material in [`python/`](python), including training code, notebooks, model architectures, weights, and converted models, is instead covered by the separate [GuitarMidi Neural-Network Non-Commercial License](python/LICENSE). It allows non-commercial use, modification, and redistribution; bars any use by or for a for-profit organization; and requires contributors to grant the Licensor exclusive commercial rights to their modifications. Third-party and dataset material is excluded and remains subject to its own terms. Confirm dataset rights before redistributing models or derived material.
+
 ## Demo and news
 Check out the demo at https://www.lodi-audio.com/plugins/guitarmidi. For general news on my work see https://www.lodi-audio.com
 
@@ -119,6 +125,9 @@ cmake --build .
 cmake --install .
 ```
 * in ~/.lv2 you should see guitarmidi.lv2
+
+## Test harness
+The core ships a headless test harness that drives the processing pipeline (filterbank + model inference) over many samplerate/blocksize combinations, without a plugin host. Build it with `-DGUITARMIDI_BUILD_TEST_HARNESS=ON` and see [core/test/README.md](core/test/README.md) for usage.
 
 Point your lv2 host to ~/.lv2 (Ardour and Carla will autmatically search in this directory on debian based systems)
 

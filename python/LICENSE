@@ -1,0 +1,122 @@
+GUITARMIDI NEURAL-NETWORK NON-COMMERCIAL LICENSE
+Version 1.0
+SPDX-License-Identifier: LicenseRef-GuitarMidi-NC-1.0
+
+Licensor: Gerald Mwangi, solely for material that he owns or is authorized
+to license.
+
+This is a custom, restrictive license. It is not an open-source license and
+is not the GNU GPL or LGPL.
+
+1. Definitions
+
+"Licensed Materials" means project-authored source code, scripts, notebooks,
+documentation, model architectures, trained model files, weights and converted
+models in this directory, but only to the extent that the Licensor owns or
+controls the relevant rights. Material identified below as Excluded Material
+is not Licensed Material.
+
+"You" means an individual or legal entity exercising rights under this
+License.
+
+"Commercial Use" means any use by, for, or on behalf of a for-profit business
+or other for-profit organization, including internal research, evaluation,
+development or deployment, whether or not that use directly generates
+revenue. It also includes any use primarily intended to obtain commercial
+advantage or monetary compensation, including use in a paid product or
+service, consulting, advertising, resale, or a hosted service.
+
+"Non-commercial Use" means any use that is not Commercial Use and otherwise
+complies with this License.
+
+"Your Modifications" means original material that You create by modifying,
+adapting or incorporating Licensed Materials, to the extent that You own or
+control the rights in that original material.
+
+"Excluded Material" means third-party material, including datasets, audio,
+recordings, annotations, code, libraries and other material not owned or
+controlled by the Licensor, and any material accompanied by a separate
+license or notice.
+
+2. Non-commercial permission
+
+Subject to this License, the Licensor grants You a worldwide, royalty-free,
+non-exclusive, non-transferable permission to use, reproduce, modify and
+redistribute the Licensed Materials and Your Modifications solely for
+Non-commercial Use. This permission does not allow Commercial Use. Any
+Commercial Use requires a separate written license from the Licensor.
+
+For clarity, any use by or for a for-profit business or organization is
+Commercial Use, even if it is unpaid, internal, educational or research use.
+Non-commercial redistribution may not be sold, bundled with a paid product or
+service, or made subject to a fee other than a reasonable charge for the
+physical act of transferring a copy.
+
+3. Conditions on redistribution
+
+When redistributing Licensed Materials or a modified version, You must:
+
+ a. include this License and retain all applicable copyright, attribution and
+    license notices;
+ b. identify the material You changed and the date of the change, where
+    reasonably practicable; and
+ c. make the Licensed Materials and Your Modifications available to
+    recipients under this same License, without adding restrictions that
+    remove or limit the permissions it grants.
+
+Each recipient receives a direct permission from the Licensor under this
+License; You do not transfer or sublicense the Licensor's rights. You may not
+offer the Licensed Materials under different terms or imply that the Licensor
+endorses You or Your modifications.
+
+4. Exclusive commercial license-back for modifications
+
+As a condition of exercising the permission to create or distribute Your
+Modifications, You grant the Licensor an exclusive, worldwide, perpetual,
+irrevocable, royalty-free, transferable and sublicensable license to use,
+reproduce, modify, create derivative works from, distribute, offer, sell,
+commercially exploit and otherwise monetize Your Modifications, including
+their combination with the Licensed Materials. This grant applies only to
+rights in Your Modifications that You own or control; it does not transfer
+ownership of Your copyright. You retain the permission to use and redistribute
+Your Modifications for Non-commercial Use under this License, but You may not
+commercially exploit them or authorize another party to do so.
+
+You must ensure that each person contributing original material to Your
+Modifications grants the Licensor the same exclusive commercial license to
+that contribution before You distribute it. Do not contribute or distribute
+material for which You cannot make or obtain this grant.
+
+The Licensor may commercially exploit the Licensed Materials and Your
+Modifications, and may authorize others to do so. No Commercial Use by You or
+any party other than the Licensor or its authorized licensees is permitted
+unless separately authorized in writing by the Licensor.
+
+5. Excluded Material and other rights
+
+This License does not apply to Excluded Material and grants no rights to it.
+Excluded Material remains subject to its own terms, which may prohibit
+redistribution or impose additional conditions. In particular, this License
+does not grant rights to any training datasets or source recordings, nor does
+it establish that model files or outputs derived from such material may be
+redistributed. You are responsible for obtaining any additional permissions
+needed for Excluded Material.
+
+No patent, trademark, privacy, publicity or other rights are granted except
+for the limited copyright permissions stated above.
+
+6. Termination
+
+This License and the permissions it grants terminate automatically if You
+fail to comply with its terms. Your permissions are reinstated only if the
+Licensor expressly agrees in writing. Termination does not affect the
+Licensor's rights under the exclusive license-back granted in Section 4.
+
+7. Disclaimer
+
+THE LICENSED MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. TO THE
+MAXIMUM EXTENT PERMITTED BY LAW, THE LICENSOR WILL NOT BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM, OUT OF OR IN CONNECTION WITH
+THE LICENSED MATERIALS OR THIS LICENSE.
