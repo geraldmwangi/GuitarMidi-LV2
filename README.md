@@ -13,6 +13,20 @@ Project-authored material in [`python/`](python), including training code, noteb
 ## Demo and news
 Check out the demo at https://www.lodi-audio.com/plugins/guitarmidi. For general news on my work see https://www.lodi-audio.com
 
+## ArtiString — the commercial version
+If you want this technology on **Windows and Linux** with a vastly improved UX and preset support for various guitars, check out [ArtiString](https://www.lodi-audio.com/plugins/artistring) at www.lodi-audio.com.
+
+ArtiString is a VST3 version built on GuitarMidi and features:
+* Windows and Ubuntu (Linux) support
+* An intuitive, modern interface with a built-in piano roll to see and verify the detected notes in real time
+* Presets for various guitars
+* LED metering on the parameters to guide you when fine-tuning is needed
+* Low latency for real-time performance
+
+It is available for a one-time purchase of 99€ or via rent-to-own (20€/month, owned after 5 months). A free trial is available on the site.
+
+**Please don't use AI to port GuitarMidi-LV2 to Windows, Mac, iOS, Android, or guitar multifx platforms.** It would undercut the business model that funds this project. Training and retraining the neural net comes at a real cost, and without the funding through ArtiString, development of GuitarMidi-LV2 is not sustainable. If you have a use case for such a port, you are welcome to contact me at info@lodi-audio.com so we can find a solution together.
+
 ## Support and Feedback
 Head to the [forum on my site](https://lodi-audio.com/forum) for support and feedback
 
