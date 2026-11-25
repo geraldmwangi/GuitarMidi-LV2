@@ -48,7 +48,9 @@
         lv2:index 1 ;
         lv2:symbol "midiout" ;
         lv2:name "MidiOut"
-    ],[
+    ], [
+	# The control defaults below are documented in README.md under
+	# "Plugin Parameters"; keep the two in sync.
 		a lv2:InputPort, lv2:ControlPort ;
         lv2:index 2 ;
         lv2:symbol "gain" ;
