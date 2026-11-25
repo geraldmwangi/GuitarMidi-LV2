@@ -60,6 +60,7 @@ private:
     void process_resampled(int nsamples,int pos=0);
     /** Processes an audio block at the native sample rate. */
     void process_direct(int nsamples,int pos=0);
+    bool initializeFilterbank(int samplerate, int buffer_size);
 
 public:
     /**
@@ -158,6 +159,7 @@ public:
      * 
      */
     virtual bool initialize(const std::string& bundle_path,int samplerate,int buffer_size);
+    bool initializeFromBuffer(const char* model_data, std::size_t model_size, int samplerate, int buffer_size) override;
 
     /**
      * @brief finalize all filters and release allocated resources
@@ -177,10 +179,13 @@ public:
     /** Copies the latest smoothed and momentary note debug values. */
     virtual void getNoteDebugData(float *smoothed_confidences, float *smoothed_energies,
                                   float *momentary_confidences, float *momentary_energies,
-                                  bool *note_on = nullptr) const
+                                  bool *note_on = nullptr,
+                                  float *smoothed_offset_confidences = nullptr,
+                                  float *smoothed_offset_energies = nullptr) const
     {
         m_noteinferencer.getDebugData(smoothed_confidences, smoothed_energies,
-                                      momentary_confidences, momentary_energies, note_on);
+                                      momentary_confidences, momentary_energies, note_on,
+                                      smoothed_offset_confidences, smoothed_offset_energies);
     }
 
     /** Copies decimated signed waveform samples for every filter. */

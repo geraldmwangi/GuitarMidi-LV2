@@ -28,6 +28,7 @@ public:
     virtual void info(std::string info_message, va_list args) = 0;
     virtual void error(std::string error_message, va_list args) = 0;
     virtual void warn(std::string warn_message, va_list args) = 0;
+    virtual ~LoggingAPI() = default;
 };
 class LoggerSingleton
 {
@@ -75,8 +76,8 @@ public:
 };
 
 extern LoggerSingleton g_logger;
-// call this function to start a nanosecond-resolution timer
-struct timespec timer_start();
+// // call this function to start a nanosecond-resolution timer
+// struct timespec timer_start();
 
-// call this function to end a timer, returning nanoseconds elapsed as a long
-long timer_end(struct timespec start_time);
+// // call this function to end a timer, returning nanoseconds elapsed as a long
+// long timer_end(struct timespec start_time);

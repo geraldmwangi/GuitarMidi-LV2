@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301  USA
  */
 #include <guitarmidi/fretboard.hpp>
-#include <omp.h>
+
 
 using namespace GuitarMidi;
 
@@ -45,6 +45,20 @@ void FretBoard::setAudioInput(const float *input)
 
 
 bool FretBoard::initialize(const std::string &bundle_path, int samplerate, int buffer_size)
+{
+    if (!initializeFilterbank(samplerate, buffer_size))
+        return false;
+    return m_noteinferencer.initialize(bundle_path);
+}
+
+bool FretBoard::initializeFromBuffer(const char* model_data, std::size_t model_size, int samplerate, int buffer_size)
+{
+    if (!initializeFilterbank(samplerate, buffer_size))
+        return false;
+    return m_noteinferencer.initializeFromBuffer(model_data, model_size);
+}
+
+bool FretBoard::initializeFilterbank(int samplerate, int buffer_size)
 {
     //lv2_log_note(&g_logger, "Initializing FretBoard with samplerate %d and buffer size %d ", samplerate, buffer_size);
     g_logger.info("Initializing FretBoard with samplerate %d and buffer size %d ", samplerate, buffer_size);
@@ -78,7 +92,7 @@ bool FretBoard::initialize(const std::string &bundle_path, int samplerate, int b
     m_fretboard_rep = FretBoardRepresentation();
     m_filterbank.setup(m_fretboard_rep.get_filterrepresentations(), NATIVE_SAMPLERATE, buffer_size);
     m_noteinferencer.setAudioInputBuffer(m_filterbank.get_buffer());
-    return m_noteinferencer.initialize(bundle_path);
+    return true;
 }
 
 void FretBoard::finalize()

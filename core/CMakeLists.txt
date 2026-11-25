@@ -21,7 +21,7 @@ include_directories(/usr/include)
 include_directories(include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../ext/zita-resampler-1.11.2/source)
-find_package(PkgConfig REQUIRED)
+
 set(ZITA_SRC_DIR ../ext/zita-resampler-1.11.2/source/)
 
 set(ZITA_SRCS
@@ -89,3 +89,9 @@ add_library(guitarmidi_core STATIC ${SRC} ${ZITA_SRCS})
 set_target_properties(guitarmidi_core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 target_link_libraries(guitarmidi_core PUBLIC tensorflow-lite )
+
+option(GUITARMIDI_BUILD_TEST_HARNESS "Build the gmtest processing harness" OFF)
+if(GUITARMIDI_BUILD_TEST_HARNESS)
+  add_executable(gmtest test/gmtest.cpp)
+  target_link_libraries(gmtest PRIVATE guitarmidi_core pthread dl m)
+endif()

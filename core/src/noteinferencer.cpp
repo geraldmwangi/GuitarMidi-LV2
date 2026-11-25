@@ -26,6 +26,13 @@ namespace GuitarMidi
         // #endif
         return m_model.initialize(bundle_path);
     }
+    bool NoteInferencer::initializeFromBuffer(const char* model_data, std::size_t model_size)
+    {
+        if (m_midioutput)
+            m_midioutput->initializeSequence();
+        m_frames = 0;
+        return m_model.initializeFromBuffer(model_data, model_size);
+    }
     void NoteInferencer::finalize()
     {
         if (m_midioutput)
@@ -38,12 +45,17 @@ namespace GuitarMidi
     }
     void NoteInferencer::getDebugData(float *smoothed_confidences, float *smoothed_energies,
                                       float *momentary_confidences, float *momentary_energies,
-                                      bool *note_on) const
+                                      bool *note_on, float *smoothed_offset_confidences,
+                                      float *smoothed_offset_energies) const
     {
         for (int i = 0; i < NUM_NOTES; ++i)
         {
             smoothed_confidences[i] = smoothed_onsetoutput[i];
             smoothed_energies[i] = smoothed_noteenergies[i];
+            if (smoothed_offset_confidences != nullptr)
+                smoothed_offset_confidences[i] = smoothed_offsetoutput[i];
+            if (smoothed_offset_energies != nullptr)
+                smoothed_offset_energies[i] = smoothed_offsetnoteenergies[i];
             momentary_confidences[i] = m_momentary_confidences[i];
             momentary_energies[i] = m_momentary_noteenergies[i];
             if (note_on != nullptr)
@@ -149,13 +161,13 @@ namespace GuitarMidi
             {
                 int velocity = (int)(smoothed_noteenergies[i] / (gain * expressivity) * 127);
                 velocity = std::min(velocity, 127); // cap the velocity at 127
-                uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, (uint8_t)velocity};
+                uint8_t midinote[3] = {0x90, (uint8_t)(i + NOTE_OFFSET), (uint8_t)velocity};
                 m_midioutput->sendMidiMessage(midinote, pos);
                 m_note_on[i].store(true, std::memory_order_relaxed);
             }
             if (triggeroff[i] && m_note_on[i])
             {
-                uint8_t midinote[3] = {0x90, i + NOTE_OFFSET, 0x00};
+                uint8_t midinote[3] = {0x90, (uint8_t)(i + NOTE_OFFSET), 0x00};
                 m_midioutput->sendMidiMessage(midinote, pos);
                 m_note_on[i].store(false, std::memory_order_relaxed);
             }

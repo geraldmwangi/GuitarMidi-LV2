@@ -137,6 +137,11 @@ void FilterBank::reset()
 
 void FilterBank::process(int nsamples,int pos)
 {
+    if (m_current_buffer_offset + nsamples > m_filterbankbuffer.window_size)
+        m_current_buffer_offset = 0;
+    if (nsamples > m_filterbankbuffer.window_size)
+        nsamples = m_filterbankbuffer.window_size;
+
     float gain = powf(10.0f, *m_gain_db * 0.05f);
     for (int n = 0; n < nsamples; ++n)
     { 

@@ -9,9 +9,9 @@
             fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); \
             exit(1);                                                 \
         }
-    void GuitarMidi::ModelInferencer::inferencing_loop(const std::string& bundle_path)
+    void GuitarMidi::ModelInferencer::inferencing_loop(const std::string& bundle_path, const char* model_data, std::size_t model_size)
     {
-        if (!initialize_interpreter(bundle_path)) {
+        if (!initialize_interpreter(bundle_path, model_data, model_size)) {
             //lv2_log_error(&g_logger, "Failed to initialize interpreter.\n");
             g_logger.error("Failed to initialize interpreter.\n");
             m_initialization_promise.set_value(false);
@@ -24,7 +24,8 @@
             if (stop_thread) break;
 
 
-
+        audio_input_buffer.wait_for_new_data(stop_thread);
+        if (stop_thread) break;
         if (audio_input_buffer.has_new_data() && m_interpreter) {
                 float* input_buffer=m_interpreter->typed_input_tensor<float>(0);
                 audio_input_buffer.get_latest_data(input_buffer); // Assuming 1 frame of input
@@ -43,19 +44,25 @@
         }
     }
 
-    bool GuitarMidi::ModelInferencer::initialize_interpreter(const std::string &bundle_path)
+    bool GuitarMidi::ModelInferencer::initialize_interpreter(const std::string &bundle_path, const char* model_data, std::size_t model_size)
     {
-                        // Load model
-            std::string tflite_path = bundle_path + "/guitarmidi.tflite"; 
-            //lv2_log_note(&g_logger, "Loading model from: %s\n", tflite_path.c_str());
+        if (model_data != nullptr && model_size > 0)
+        {
+            g_logger.info("Loading model from embedded BinaryData\n");
+            m_model = FlatBufferModel::BuildFromBuffer(model_data, model_size);
+        }
+        else
+        {
+            std::string tflite_path = bundle_path + "/guitarmidi.tflite";
             g_logger.info("Loading model from: %s\n", tflite_path.c_str());
-            // check if file exists
             if (!std::filesystem::exists(tflite_path)) {
-                //lv2_log_error(&g_logger, "Model file not found: %s\n", tflite_path.c_str());
                 g_logger.error("Model file not found: %s\n", tflite_path.c_str());
                 return false;
             }
             m_model = FlatBufferModel::BuildFromFile(tflite_path.c_str());
+        }
+        if (m_model == nullptr)
+            return false;
             TFLITE_MINIMAL_CHECK(m_model != nullptr);
             ops::builtin::BuiltinOpResolver resolver;
             InterpreterBuilder builder(*m_model, resolver);
@@ -65,7 +72,10 @@
                 TfLiteXNNPackDelegateOptionsDefault();
             xnnpack_options.num_threads = NUM_INFERENCE_THREADS; // Set number of threads as appropriate for your
                                             // platform and application needs.
-            xnnpack_options.weight_cache_file_path = TfLiteXNNPackDelegateInMemoryFilePath();
+            if (TfLiteXNNPackDelegateCanUseInMemoryWeightCacheProvider()) {
+                xnnpack_options.weight_cache_file_path =
+                    TfLiteXNNPackDelegateInMemoryFilePath();
+            }
             // xnnpack_options.logging_level = TFLITE_XNNPACK_LOGGING_LEVEL_ERROR;
 
             if (m_interpreter->ModifyGraphWithDelegate(
@@ -93,8 +103,28 @@
 
     bool GuitarMidi::ModelInferencer::initialize(const std::string& bundle_path)
     {
+        return start_inferencing(bundle_path, nullptr, 0);
+    }
+
+    bool GuitarMidi::ModelInferencer::initializeFromBuffer(const char* model_data, std::size_t model_size)
+    {
+        if (model_data == nullptr || model_size == 0)
+            return false;
+        return start_inferencing({}, model_data, model_size);
+    }
+
+    bool GuitarMidi::ModelInferencer::start_inferencing(const std::string& bundle_path, const char* model_data, std::size_t model_size)
+    {
+        if (inferencing_thread.joinable()) {
+            stop_thread.store(true, std::memory_order_release);
+            audio_input_buffer.wake_waiters();
+            inferencing_thread.join();
+        }
+
+        stop_thread.store(false, std::memory_order_release);
+        m_initialization_promise = std::promise<bool>{};
         auto init_future = m_initialization_promise.get_future();
-        inferencing_thread = std::thread(&ModelInferencer::inferencing_loop, this,bundle_path);
+        inferencing_thread = std::thread(&ModelInferencer::inferencing_loop, this, bundle_path, model_data, model_size);
         auto status = init_future.get();
         // sleep for a short time to allow the thread to start and initialize the interpreter
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -129,10 +159,8 @@
 
     GuitarMidi::ModelInferencer::~ModelInferencer()
     {
-        {
-
-            stop_thread = true;
-        }
+        stop_thread.store(true, std::memory_order_release);
+        audio_input_buffer.wake_waiters();
         // buffer_cv.notify_all();
         if (inferencing_thread.joinable()) {
             inferencing_thread.join();

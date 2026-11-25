@@ -18,6 +18,8 @@
  * Boston, MA  02110-1301  USA
  */
 #include <thread>
+#include <atomic>
+#include <cstddef>
 #include <future>
 #include <mutex>
 #include <condition_variable>
@@ -49,9 +51,10 @@ namespace GuitarMidi{
         float buffer[NumSlots][Stride];
         atomic<size_t> write_index;
         atomic<size_t> read_index;
+        atomic<uint64_t> m_new_data_promise;
     public:
         /** Creates an empty single-producer, single-consumer ring buffer. */
-        SpscRingBuffer():write_index(0),read_index(0){
+        SpscRingBuffer():write_index(0),read_index(0),m_new_data_promise(0){
            
         }
         /** Adds one fixed-size frame to the ring buffer. */
@@ -60,12 +63,29 @@ namespace GuitarMidi{
             //performant memcpy for fixed size data
             memcpy(buffer[index&(NumSlots-1)],data,Stride*sizeof(float));
             write_index.store((index+1)); // wrap around using bitwise AND, NumSlots must be a power of 2
+            m_new_data_promise.fetch_add(1); // signal that new data is available
+            m_new_data_promise.notify_one(); // notify any waiting threads that new data is available
 
 
     }
         /** Reports whether unread data is available. */
-        bool has_new_data() const{
+        bool has_new_data() {
             return write_index.load()!=read_index.load();
+        }
+
+        void wait_for_new_data(const std::atomic<bool>& stop) {
+            while (!stop.load(std::memory_order_acquire) && !has_new_data()) {
+                auto new_data_count = m_new_data_promise.load(std::memory_order_acquire);
+                if (stop.load(std::memory_order_acquire) || has_new_data()) {
+                    return;
+                }
+                m_new_data_promise.wait(new_data_count, std::memory_order_acquire);
+            }
+        }
+
+        void wake_waiters() {
+            m_new_data_promise.fetch_add(1, std::memory_order_release);
+            m_new_data_promise.notify_all();
         }
         /** Copies the next unread frame into the supplied buffer. */
         void get_latest_data(float* output){
@@ -99,11 +119,12 @@ class ModelInferencer {
         SpscRingBuffer<RING_BUFFER_SIZE, NUM_NOTES*NUM_HARMONICS*BUFFER_SIZE> audio_input_buffer;
         SpscRingBuffer<RING_BUFFER_SIZE, NUM_NOTES> model_output_buffer;
         std::thread inferencing_thread;
-        bool stop_thread;
+        std::atomic<bool> stop_thread{false};
         /** Runs model inference on frames received by the input ring buffer. */
-        void inferencing_loop(const std::string& bundle_path);
+        void inferencing_loop(const std::string& bundle_path, const char* model_data, std::size_t model_size);
 
-        bool initialize_interpreter(const std::string& bundle_path);
+        bool initialize_interpreter(const std::string& bundle_path, const char* model_data, std::size_t model_size);
+        bool start_inferencing(const std::string& bundle_path, const char* model_data, std::size_t model_size);
          std::promise<bool> m_initialization_promise;
         
     public:
@@ -113,6 +134,7 @@ class ModelInferencer {
         ~ModelInferencer();
         /** Loads and initializes the model from the plugin bundle. */
         bool initialize(const std::string& bundle_path);
+        bool initializeFromBuffer(const char* model_data, std::size_t model_size);
         /** Queues audio frames for asynchronous inference. */
         void add_audio_input(const float* input, int num_frames);
         /** Retrieves inferred note activations for a block of frames. */

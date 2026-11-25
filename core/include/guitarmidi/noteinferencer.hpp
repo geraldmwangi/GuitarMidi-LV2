@@ -74,6 +74,7 @@ namespace GuitarMidi{
 
         /** Loads and initializes the neural-network model. */
         bool initialize(const std::string& bundle_path);
+        bool initializeFromBuffer(const char* model_data, std::size_t model_size);
         /** Finalizes model inference and releases inference resources. */
         void finalize();
         /** Returns the MIDI output used for inferred notes. */
@@ -138,7 +139,9 @@ namespace GuitarMidi{
         /** Copies the latest smoothed and momentary confidence and energy values. */
         void getDebugData(float *smoothed_confidences, float *smoothed_energies,
                   float *momentary_confidences, float *momentary_energies,
-                  bool *note_on = nullptr) const;
+                  bool *note_on = nullptr,
+                  float *smoothed_offset_confidences = nullptr,
+                  float *smoothed_offset_energies = nullptr) const;
 
 #ifdef WITH_AUDIO_OUTPUT
         float *audio_output;

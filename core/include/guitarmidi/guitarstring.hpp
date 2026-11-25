@@ -34,7 +34,7 @@ namespace GuitarMidi
         /** Creates the notes represented by the supplied MIDI note frequencies. */
         GuitarString(map<int,int> note_freqs);
         /** Adds this string's note filter representations to the supplied map. */
-        void get_filterrepresentations(map<uint,FilterRepresentation>& filterreps)
+        void get_filterrepresentations(map<unsigned int,FilterRepresentation>& filterreps)
         {
         
             for (auto note : m_notes)

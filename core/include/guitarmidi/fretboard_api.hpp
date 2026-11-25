@@ -17,6 +17,7 @@
  * Boston, MA  02110-1301  USA
  */
 #pragma once
+#include <cstddef>
 
 
 #include <string>
@@ -114,6 +115,7 @@ public:
      *
      */
     virtual bool initialize(const std::string &bundle_path, int samplerate, int buffer_size) = 0;
+    virtual bool initializeFromBuffer(const char*, std::size_t, int, int) { return false; }
 
     /**
      * @brief finalize all filters and release allocated resources
@@ -133,7 +135,9 @@ public:
     /** Copies the latest smoothed and momentary note confidence and energy values. */
     virtual void getNoteDebugData(float *smoothed_confidences, float *smoothed_energies,
                                   float *momentary_confidences, float *momentary_energies,
-                                  bool *note_on = nullptr) const = 0;
+                                  bool *note_on = nullptr,
+                                  float *smoothed_offset_confidences = nullptr,
+                                  float *smoothed_offset_energies = nullptr) const = 0;
 
     /** Copies decimated signed waveform samples for every filter. */
     virtual void getFilterWaveforms(float *waveforms, uint32_t samples_per_filter) const = 0;
