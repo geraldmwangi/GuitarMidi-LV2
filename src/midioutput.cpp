@@ -73,19 +73,20 @@ void MidiOutputLV2::setMidiOutput(LV2_Atom_Sequence *output)
 
 void MidiOutputLV2::initializeSequence()
 {
-    if (m_midioutput)
+    if (m_midioutput && !m_sequenceOpen)
     {
         const uint32_t out_capacity = m_midioutput->atom.size;
         lv2_atom_forge_set_buffer(&m_forge, (uint8_t *)m_midioutput, out_capacity);
         lv2_atom_forge_sequence_head(&m_forge, &m_frame, 0);
-      
+        m_sequenceOpen = true;
     }
 }
 void MidiOutputLV2::finalizeSequence()
 {
-    if (m_midioutput)
+    if (m_midioutput && m_sequenceOpen)
     {
         lv2_atom_forge_pop(&m_forge, &m_frame);
+        m_sequenceOpen = false;
     }
 }
 void MidiOutputLV2::sendMidiMessage(uint8_t midinote[3], int64_t frames)

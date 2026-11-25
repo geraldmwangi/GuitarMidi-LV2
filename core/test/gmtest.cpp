@@ -15,7 +15,8 @@ public:
     void warn(std::string m, va_list a) override { std::printf("[warn] "); std::vprintf(m.c_str(), a); std::printf("\n"); }
 };
 
-LoggerSingleton g_logger{new ConsoleLog};
+// g_logger is defined by the core library (core/src/logging.cpp); attach the
+// console logger in main() instead of defining it here.
 
 class Out : public GuitarMidiOutput {
 public:
@@ -72,6 +73,7 @@ static void usage(const char* prog) {
 }
 
 int main(int argc, char** argv) {
+    g_logger.setLogger(new ConsoleLog);
     const char* bundle = "ext/GuitarMidi-LV2/python/neuralnetmodelling";
     bool matrix = false;
     std::vector<const char*> pos;

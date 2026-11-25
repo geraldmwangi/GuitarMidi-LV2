@@ -23,6 +23,17 @@ message("Tensorflow found at ${TENSORFLOW_SOURCE_DIR}")
 add_subdirectory(core)
 add_subdirectory(src)
 
+option(BUILD_TOOLS "Build offline tools (latency report)" ON)
+if(${BUILD_TOOLS})
+add_subdirectory(tools)
+endif()
+
+option(BUILD_TESTS "Build the unit and pipeline tests" ON)
+if(${BUILD_TESTS})
+enable_testing()
+add_subdirectory(tests)
+endif()
+
 if(${BUILD_UI})
 add_subdirectory(ui)
 endif()

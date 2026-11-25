@@ -55,12 +55,20 @@ private:
     float* m_input_buffer=nullptr;
     int m_resample_buffer_size=0;
     float* m_resampled_buffer=nullptr;
+    /** Samples accumulated towards the next BUFFER_SIZE analysis hop. */
+    int m_hopFill=0;
+    /** Host block size of the current process() call, for event clamping. */
+    int m_blockSize=0;
 
     /** Processes an audio block after sample-rate conversion. */
     void process_resampled(int nsamples,int pos=0);
     /** Processes an audio block at the native sample rate. */
     void process_direct(int nsamples,int pos=0);
     bool initializeFilterbank(int samplerate, int buffer_size);
+    /** Feeds resampled samples to the filter bank in hop-sized chunks.
+     * `hostPos` is the offset of the input chunk in the host block, used by
+     * the filter-output write (audio-output build only). */
+    void consumeResampled(const float* data,int count,int eventPos=0,int hostPos=0);
 
 public:
     /**
@@ -163,9 +171,17 @@ public:
 
     /**
      * @brief finalize all filters and release allocated resources
-     * 
+     *
      */
     virtual void finalize();
+
+    /**
+     * Restarts the inference worker after finalize() (an LV2
+     * deactivate/activate cycle: hosts deactivate and re-activate instances
+     * around buffer-size changes and graph edits). Returns false if the
+     * model could not be reloaded.
+     */
+    virtual bool reactivate();
 
     /**
      * @brief process audio with the filterbank and noteinferencer. The audio is processed in blocks of the size of the host buffer size. 
@@ -175,6 +191,45 @@ public:
      * @param nsamples 
      */
     virtual void process(int nsamples);
+
+    /** Pipeline delay in host frames (analysis window + scheduling bound),
+     * converted from the native analysis rate. */
+    virtual uint32_t getLatencyFrames() const
+    {
+        // The pipeline analyses at the native rate; scale the delay into
+        // host frames so a host at another rate compensates the right
+        // amount (706 frames at 44.1 kHz, 1536 at 96 kHz, for 256-sample
+        // blocks).
+        const uint64_t native = m_noteinferencer.latencyFrames();
+        return static_cast<uint32_t>((native * m_samplerate + NATIVE_SAMPLERATE / 2) /
+                                     NATIVE_SAMPLERATE);
+    }
+
+    /** Pipeline counters and inference timings. */
+    virtual NoteInferenceStats getInferenceStats() const
+    {
+        return m_noteinferencer.getStats();
+    }
+
+    /**
+     * Testing/diagnostics hook: lower bound for one inference invocation in
+     * milliseconds. 0 disables the delay. Used by the pipeline tests to
+     * simulate a machine that cannot keep up with real time.
+     */
+    void setInferenceDelayMs(int delay_ms)
+    {
+        m_noteinferencer.setInferenceDelayMs(delay_ms);
+    }
+
+    /**
+     * Opt-in producer wait when the inference queue is full. 0 keeps the
+     * real-time policy (drop and report); a positive value is for offline
+     * rendering, where waiting keeps every note.
+     */
+    virtual void setBackpressureMs(int milliseconds)
+    {
+        m_noteinferencer.setBackpressureMs(milliseconds);
+    }
 
     /** Copies the latest smoothed and momentary note debug values. */
     virtual void getNoteDebugData(float *smoothed_confidences, float *smoothed_energies,

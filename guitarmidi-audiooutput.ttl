@@ -13,6 +13,7 @@
 @prefix urid:  <http://lv2plug.in/ns/ext/urid#> .
 @prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
 @prefix ui:    <http://lv2plug.in/ns/extensions/ui#> .
+@prefix pp:    <http://lv2plug.in/ns/ext/port-props#> .
 
 # X11 UI for the plugin
 <http://github.com/geraldmwangi/GuitarMidi-LV2#ui>
@@ -158,6 +159,27 @@
         lv2:index 14 ;
         lv2:symbol "debugdata" ;
         lv2:name "Note Debug Data"
+	], [
+		a lv2:OutputPort, lv2:ControlPort ;
+		lv2:index 15 ;
+		lv2:symbol "latency" ;
+		lv2:name "Latency" ;
+		lv2:designation lv2:latency ;
+		lv2:portProperty lv2:integer ;
+		lv2:minimum 0 ;
+		lv2:maximum 65535 ;
+	], [
+		# Set by hosts that render offline (export, freewheeling); see
+		# docs/inference-timing.md. Not a user control.
+		a lv2:InputPort, lv2:ControlPort ;
+		lv2:index 16 ;
+		lv2:symbol "lv2_freewheel" ;
+		lv2:name "Free-wheeling" ;
+		lv2:designation lv2:freeWheeling ;
+		lv2:portProperty lv2:toggled, lv2:connectionOptional, pp:notOnGUI ;
+		lv2:default 0.0 ;
+		lv2:minimum 0.0 ;
+		lv2:maximum 1.0 ;
 	] .
 
 <http://github.com/geraldmwangi/GuitarMidi-LV2#ui>

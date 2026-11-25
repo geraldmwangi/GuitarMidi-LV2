@@ -1,51 +1,111 @@
-    #include <guitarmidi/modelinferencer.hpp>
-    #include <iostream>
-    #include <tensorflow/lite/logger.h>
-    #include <filesystem>
-        // TFlite C++ API reference: https://ai.google.dev/edge/api/tflite/cc?hl=en
-    #define TFLITE_MINIMAL_CHECK(x)                                  \
-        if (!(x))                                                    \
-        {                                                            \
-            fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); \
-            exit(1);                                                 \
-        }
-    void GuitarMidi::ModelInferencer::inferencing_loop(const std::string& bundle_path, const char* model_data, std::size_t model_size)
+#include <guitarmidi/modelinferencer.hpp>
+#include <algorithm>
+#include <chrono>
+#include <cstring>
+#include <filesystem>
+#include <iostream>
+#include <tensorflow/lite/logger.h>
+
+// TFlite C++ API reference: https://ai.google.dev/edge/api/tflite/cc?hl=en
+
+namespace GuitarMidi
+{
+    namespace
     {
-        if (!initialize_interpreter(bundle_path, model_data, model_size)) {
-            //lv2_log_error(&g_logger, "Failed to initialize interpreter.\n");
-            g_logger.error("Failed to initialize interpreter.\n");
-            m_initialization_promise.set_value(false);
-            return;
+        constexpr std::size_t kInputFloats = NUM_NOTES * NUM_HARMONICS * BUFFER_SIZE;
+    }
+
+    void ModelInferencer::inferencing_loop(bool load, std::string bundle_path, const char *model_data, std::size_t model_size)
+    {
+        if (load)
+        {
+            if (!initialize_interpreter(bundle_path, model_data, model_size))
+            {
+                g_logger.error("Failed to initialize interpreter.\n");
+                m_initialization_promise.set_value(false);
+                return;
+            }
+            m_initialization_promise.set_value(true);
         }
-        m_initialization_promise.set_value(true);
-        while (!stop_thread) {
-            // std::unique_lock<std::mutex> lock(buffer_mutex);
-            // buffer_cv.wait(lock, [this] { return stop_thread || audio_input_buffer.has_new_data(); });
-            if (stop_thread) break;
 
+        // The queue pops straight into the interpreter's input tensor: one
+        // copy per frame on this side. The tensor address is stable once the
+        // tensors are allocated.
+        float *const input = m_interpreter->typed_input_tensor<float>(0);
+        float output_frame[NUM_NOTES * 2];
 
-        audio_input_buffer.wait_for_new_data(stop_thread);
-        if (stop_thread) break;
-        if (audio_input_buffer.has_new_data() && m_interpreter) {
-                float* input_buffer=m_interpreter->typed_input_tensor<float>(0);
-                audio_input_buffer.get_latest_data(input_buffer); // Assuming 1 frame of input
-                TFLITE_MINIMAL_CHECK(m_interpreter->Invoke() == kTfLiteOk);
+        uint32_t seen = m_wake.load(std::memory_order_acquire);
+        while (!m_stop.load(std::memory_order_acquire))
+        {
+            uint64_t stamp = 0;
+            if (!m_input_queue.pop(input, stamp))
+            {
+                // Sleep until the audio thread queues a frame. `seen` is read
+                // after the failed pop, so a frame queued in between changes
+                // the counter and the wait returns immediately.
+                m_wake.wait(seen, std::memory_order_acquire);
+                seen = m_wake.load(std::memory_order_acquire);
+                continue;
+            }
 
-                TfLiteTensor *output = m_interpreter->output_tensor(0);
-                float* output_data=m_interpreter->typed_output_tensor<float>(0);
-                // print the output dims
-                TfLiteIntArray* output_dims = output->dims;
+            // Carry the per-note energies of the same analysis window with
+            // the probabilities: the consumer's thresholds must not mix a
+            // result with the energies of a later frame (the skew would
+            // vary with the host block size). Computed before Invoke() so
+            // nothing depends on the interpreter leaving its input intact.
+            for (int i = 0; i < NUM_NOTES; ++i)
+            {
+                const float *row = input + i * NUM_HARMONICS * BUFFER_SIZE;
+                float energy = 0.0f;
+                for (int w = 0; w < BUFFER_SIZE; ++w)
+                    energy += row[w];
+                output_frame[NUM_NOTES + i] = energy;
+            }
 
-                    // Add the model output to the model output ring buffer
-                    model_output_buffer.add_data(output_data); // Assuming 1 frame of output
-                }
+            const int artificial_delay = m_inference_delay_ms.load(std::memory_order_relaxed);
+            const auto begin = std::chrono::steady_clock::now();
+            const TfLiteStatus status = m_interpreter->Invoke();
+            const auto end = std::chrono::steady_clock::now();
+            if (status != kTfLiteOk)
+            {
+                // Skip the result: the consumer sees a hole in the stamps.
+                // Log the first failure only; this repeats once per hop.
+                if (m_invoke_failures.fetch_add(1, std::memory_order_relaxed) == 0)
+                    g_logger.error("Model inference failed; results are being skipped\n");
+                continue;
+            }
+            const uint64_t elapsed_us =
+                static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count());
 
+            m_infer_us_sum.fetch_add(elapsed_us, std::memory_order_relaxed);
+            m_infer_count.fetch_add(1, std::memory_order_relaxed);
+            uint64_t previous_max = m_infer_us_max.load(std::memory_order_relaxed);
+            while (elapsed_us > previous_max &&
+                   !m_infer_us_max.compare_exchange_weak(previous_max, elapsed_us,
+                                                         std::memory_order_relaxed))
+            {
+            }
 
+            if (artificial_delay > 0)
+                std::this_thread::sleep_for(std::chrono::milliseconds(artificial_delay));
+
+            std::memcpy(output_frame, m_interpreter->typed_output_tensor<float>(0),
+                        sizeof(float) * NUM_NOTES);
+            // A full output queue refuses the frame rather than overwriting an
+            // older result; NoteInferencer sees the resulting stamp hole.
+            if (!m_output_queue.push(output_frame, stamp))
+                m_output_queue.countDrop();
         }
     }
 
-    bool GuitarMidi::ModelInferencer::initialize_interpreter(const std::string &bundle_path, const char* model_data, std::size_t model_size)
+    bool ModelInferencer::initialize_interpreter(const std::string &bundle_path, const char *model_data, std::size_t model_size)
     {
+        // Release in dependency order before replacing the model: the old
+        // interpreter must not outlive the model or delegate it refers to.
+        m_interpreter.reset();
+        m_delegate.reset();
+        m_model.reset();
+
         if (model_data != nullptr && model_size > 0)
         {
             g_logger.info("Loading model from embedded BinaryData\n");
@@ -53,133 +113,217 @@
         }
         else
         {
-            std::string tflite_path = bundle_path + "/guitarmidi.tflite";
+            const std::string tflite_path = bundle_path + "/guitarmidi.tflite";
             g_logger.info("Loading model from: %s\n", tflite_path.c_str());
-            if (!std::filesystem::exists(tflite_path)) {
+            if (!std::filesystem::exists(tflite_path))
+            {
                 g_logger.error("Model file not found: %s\n", tflite_path.c_str());
                 return false;
             }
             m_model = FlatBufferModel::BuildFromFile(tflite_path.c_str());
         }
         if (m_model == nullptr)
+        {
+            g_logger.error("Failed to load the model\n");
             return false;
-            TFLITE_MINIMAL_CHECK(m_model != nullptr);
-            ops::builtin::BuiltinOpResolver resolver;
-            InterpreterBuilder builder(*m_model, resolver);
+        }
 
-            builder(&m_interpreter);
-            TfLiteXNNPackDelegateOptions xnnpack_options =
-                TfLiteXNNPackDelegateOptionsDefault();
-            xnnpack_options.num_threads = NUM_INFERENCE_THREADS; // Set number of threads as appropriate for your
-                                            // platform and application needs.
-            if (TfLiteXNNPackDelegateCanUseInMemoryWeightCacheProvider()) {
-                xnnpack_options.weight_cache_file_path =
-                    TfLiteXNNPackDelegateInMemoryFilePath();
-            }
-            // xnnpack_options.logging_level = TFLITE_XNNPACK_LOGGING_LEVEL_ERROR;
+        ops::builtin::BuiltinOpResolver resolver;
+        InterpreterBuilder builder(*m_model, resolver);
+        if (builder(&m_interpreter) != kTfLiteOk || m_interpreter == nullptr)
+        {
+            g_logger.error("Failed to build the interpreter\n");
+            m_interpreter.reset();
+            return false;
+        }
 
-            if (m_interpreter->ModifyGraphWithDelegate(
-                    TfLiteXNNPackDelegateCreate(&xnnpack_options)) != kTfLiteOk)
-            {
-                // Handle error, but usually optional
-                //lv2_log_error(&g_logger, "Failed to apply XNNPack delegate\n"); 
-                g_logger.error( "Failed to apply XNNPack delegate\n");
-                return false;
-            }
-            // Allocate tensor buffers.
-            TFLITE_MINIMAL_CHECK(m_interpreter->AllocateTensors() == kTfLiteOk);
-            printf("=== Pre-invoke Interpreter State ===\n");
-            // tflite::PrintInterpreterState(m_interpreter.get());
-            tflite::LoggerOptions::SetMinimumLogSeverity(tflite::TFLITE_LOG_ERROR);
-            //lv2_log_note(&g_logger, "Model loaded and interpreter initialized successfully.\n");
-            g_logger.info("Model loaded and interpreter initialized successfully.\n");
-            //log the ring buffer and inference thread info
-            //lv2_log_note(&g_logger, "Inference thread count: %d\n", NUM_INFERENCE_THREADS);
-            g_logger.info("Inference thread count: %d\n", NUM_INFERENCE_THREADS);
-            // lv2_log_note(&g_logger, "Ring buffer size: %d frames\n", RING_BUFFER_SIZE);
-            g_logger.info("Ring buffer size: %d frames\n", RING_BUFFER_SIZE);
-            return true;
+        TfLiteXNNPackDelegateOptions xnnpack_options =
+            TfLiteXNNPackDelegateOptionsDefault();
+        xnnpack_options.num_threads = NUM_INFERENCE_THREADS;
+        // The in-memory weight cache provider only exists in newer TensorFlow
+        // Lite builds; keep the default weight cache where it is missing.
+        if (TfLiteXNNPackDelegateCanUseInMemoryWeightCacheProvider())
+        {
+            xnnpack_options.weight_cache_file_path = TfLiteXNNPackDelegateInMemoryFilePath();
+        }
+
+        // The interpreter does not take ownership of the delegate; keep it
+        // here so it (and its thread pool) is released with the interpreter.
+        m_delegate.reset(TfLiteXNNPackDelegateCreate(&xnnpack_options));
+        if (!m_delegate || m_interpreter->ModifyGraphWithDelegate(m_delegate.get()) != kTfLiteOk)
+        {
+            g_logger.error("Failed to apply XNNPack delegate\n");
+            m_interpreter.reset();
+            m_delegate.reset();
+            return false;
+        }
+        if (m_interpreter->AllocateTensors() != kTfLiteOk)
+        {
+            g_logger.error("Failed to allocate the model tensors\n");
+            m_interpreter.reset();
+            m_delegate.reset();
+            return false;
+        }
+
+        // The worker copies fixed-size frames in and out of the tensors; a
+        // model with other shapes would be read or written out of bounds.
+        const TfLiteTensor *in = m_interpreter->input_tensor(0);
+        const TfLiteTensor *out = m_interpreter->output_tensor(0);
+        if (in == nullptr || out == nullptr || in->type != kTfLiteFloat32 ||
+            out->type != kTfLiteFloat32 || in->bytes != kInputFloats * sizeof(float) ||
+            out->bytes < NUM_NOTES * sizeof(float))
+        {
+            g_logger.error("The model's input/output tensors do not match the plugin\n");
+            m_interpreter.reset();
+            m_delegate.reset();
+            return false;
+        }
+
+        tflite::LoggerOptions::SetMinimumLogSeverity(tflite::TFLITE_LOG_ERROR);
+        g_logger.info("Model loaded and interpreter initialized successfully.\n");
+        g_logger.info("Inference thread count: %d\n", NUM_INFERENCE_THREADS);
+        g_logger.info("Input queue: %zu frames\n", m_input_queue.capacity());
+        return true;
     }
 
-    bool GuitarMidi::ModelInferencer::initialize(const std::string& bundle_path)
+    bool ModelInferencer::initialize(const std::string &bundle_path)
     {
         return start_inferencing(bundle_path, nullptr, 0);
     }
 
-    bool GuitarMidi::ModelInferencer::initializeFromBuffer(const char* model_data, std::size_t model_size)
+    bool ModelInferencer::initializeFromBuffer(const char *model_data, std::size_t model_size)
     {
         if (model_data == nullptr || model_size == 0)
             return false;
-        return start_inferencing({}, model_data, model_size);
+        return start_inferencing(std::string(), model_data, model_size);
     }
 
-    bool GuitarMidi::ModelInferencer::start_inferencing(const std::string& bundle_path, const char* model_data, std::size_t model_size)
+    bool ModelInferencer::start_inferencing(const std::string &bundle_path, const char *model_data, std::size_t model_size)
     {
-        if (inferencing_thread.joinable()) {
-            stop_thread.store(true, std::memory_order_release);
-            audio_input_buffer.wake_waiters();
-            inferencing_thread.join();
-        }
+        stop_worker();
 
-        stop_thread.store(false, std::memory_order_release);
+        // stop_worker() set the stop flag for the previous worker; the new
+        // thread must start with it cleared or it exits immediately.
+        m_stop.store(false, std::memory_order_release);
         m_initialization_promise = std::promise<bool>{};
         auto init_future = m_initialization_promise.get_future();
-        inferencing_thread = std::thread(&ModelInferencer::inferencing_loop, this, bundle_path, model_data, model_size);
-        auto status = init_future.get();
-        // sleep for a short time to allow the thread to start and initialize the interpreter
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-        //check if the interpreter was initialized successfully
-        if (!status) {
-            //lv2_log_error(&g_logger, "Failed to initialize interpreter in inferencing thread.\n");
+        m_inferencing_thread = std::thread(&ModelInferencer::inferencing_loop, this, true,
+                                           bundle_path, model_data, model_size);
+        if (!init_future.get())
+        {
+            // The thread has returned; join it so a later start is clean.
+            m_inferencing_thread.join();
             g_logger.error("Failed to initialize interpreter in inferencing thread.\n");
             return false;
         }
-        else {
-            //lv2_log_note(&g_logger, "Interpreter initialized successfully in inferencing thread.\n");
-            g_logger.info("Interpreter initialized successfully in inferencing thread.\n");
-        }
-
-        
+        m_running.store(true, std::memory_order_release);
         return true;
     }
 
-    GuitarMidi::ModelInferencer::ModelInferencer()
+    bool ModelInferencer::restart()
     {
-
-        stop_thread = false;
-        m_interpreter=nullptr;
-        
-        //log the size of the ring buffers
-        //lv2_log_note(&g_logger, "Audio input ring buffer size: %d frames\n", RING_BUFFER_SIZE);
-        g_logger.info("Audio input ring buffer size: %d frames\n", RING_BUFFER_SIZE);
-        // lv2_log_note(&g_logger, "Model output ring buffer size: %d frames\n", RING_BUFFER_SIZE);
-        g_logger.info("Model output ring buffer size: %d frames\n", RING_BUFFER_SIZE);
+        if (m_inferencing_thread.joinable())
+            return true;
+        if (!m_interpreter)
+            return false;
+        m_input_queue.reset();
+        m_output_queue.reset();
+        m_stop.store(false, std::memory_order_release);
+        m_inferencing_thread = std::thread(&ModelInferencer::inferencing_loop, this, false,
+                                           std::string(), nullptr, std::size_t{0});
+        m_running.store(true, std::memory_order_release);
+        return true;
     }
 
-    GuitarMidi::ModelInferencer::~ModelInferencer()
+    void ModelInferencer::stop_worker()
     {
-        stop_thread.store(true, std::memory_order_release);
-        audio_input_buffer.wake_waiters();
-        // buffer_cv.notify_all();
-        if (inferencing_thread.joinable()) {
-            inferencing_thread.join();
-        }
+        m_running.store(false, std::memory_order_release);
+        if (!m_inferencing_thread.joinable())
+            return;
+        m_stop.store(true, std::memory_order_release);
+        m_wake.fetch_add(1, std::memory_order_release);
+        m_wake.notify_one();
+        m_inferencing_thread.join();
+        m_input_queue.reset();
+        m_output_queue.reset();
     }
 
-    void GuitarMidi::ModelInferencer::add_audio_input(const float *input, int num_frames)
+    void ModelInferencer::finalize()
     {
-
-        audio_input_buffer.add_data(input);
-
+        stop_worker();
     }
 
-    bool GuitarMidi::ModelInferencer::get_model_output(float *output, int num_frames)
+    void ModelInferencer::setQueueCapacity(std::size_t frames)
     {
+        // Only legal while stopped: resize() reallocates the slots.
+        if (m_inferencing_thread.joinable())
+            return;
+        m_input_queue.resize(std::max<std::size_t>(frames, 1));
+        // The consumer drains results at process() boundaries, so the output
+        // queue must absorb a whole block's worth; output slots are small.
+        m_output_queue.resize(std::max<std::size_t>(frames, 1) * 2);
+    }
 
-        if (model_output_buffer.has_new_data()) {
-            model_output_buffer.get_latest_data(output);
+    ModelInferencer::ModelInferencer()
+    {
+    }
+
+    ModelInferencer::~ModelInferencer()
+    {
+        stop_worker();
+    }
+
+    bool ModelInferencer::add_audio_input(const float *input, uint64_t stamp)
+    {
+        if (m_input_queue.push(input, stamp))
+        {
+            m_wake.fetch_add(1, std::memory_order_release);
+            m_wake.notify_one();
             return true;
         }
+
+        // Opt-in backpressure (offline rendering): wait for room instead of
+        // dropping, because the host is not holding a real-time deadline.
+        // Never wait for a worker that is not running: nothing would drain
+        // the queue and every hop would burn the whole budget.
+        const int budget_ms = m_backpressure_ms.load(std::memory_order_relaxed);
+        if (budget_ms > 0 && running())
+        {
+            const auto deadline = std::chrono::steady_clock::now() +
+                                  std::chrono::milliseconds(budget_ms);
+            while (std::chrono::steady_clock::now() < deadline)
+            {
+                std::this_thread::yield();
+                if (m_input_queue.push(input, stamp))
+                {
+                    m_wake.fetch_add(1, std::memory_order_release);
+                    m_wake.notify_one();
+                    return true;
+                }
+            }
+        }
+        // Retries are not frames lost; only the final refusal is.
+        m_input_queue.countDrop();
         return false;
     }
+
+    bool ModelInferencer::get_model_output(float *output, uint64_t &stamp)
+    {
+        return m_output_queue.pop(output, stamp);
+    }
+
+    double ModelInferencer::meanInferenceMs() const
+    {
+        const uint64_t count = m_infer_count.load(std::memory_order_relaxed);
+        if (count == 0)
+            return 0.0;
+        return static_cast<double>(m_infer_us_sum.load(std::memory_order_relaxed)) /
+               static_cast<double>(count) / 1000.0;
+    }
+
+    double ModelInferencer::maxInferenceMs() const
+    {
+        return static_cast<double>(m_infer_us_max.load(std::memory_order_relaxed)) / 1000.0;
+    }
+
+} // namespace GuitarMidi

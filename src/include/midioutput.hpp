@@ -45,6 +45,12 @@ namespace GuitarMidi {
         LV2_Atom_Forge_Frame m_frame;
         LV2_URID m_midiEvent;
         LV2_Atom_Sequence *m_midioutput;
+        /* Whether initializeSequence() pushed a frame that finalizeSequence()
+         * has not popped yet. The forge stack must stay balanced: run() closes
+         * its own sequence in postprocess(), so the extra finalizeSequence()
+         * from NoteInferencer::finalize() (LV2 deactivate) must not pop an
+         * empty stack. */
+        bool m_sequenceOpen = false;
       
 
         bool forge_midimessage(

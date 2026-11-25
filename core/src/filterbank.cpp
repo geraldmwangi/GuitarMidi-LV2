@@ -131,20 +131,52 @@ void FilterBank::reset()
     std::memset(m_s2, 0, sizeof(m_s2));
     std::memset(m_filterwaveformbuffer.audio_buffer_2D, 0,
                 NUM_FILTERS * WAVEFORM_SAMPLES * sizeof(float));
+    std::memset(m_framebuffer.audio_buffer_2D, 0,
+                NUM_FILTERS * BUFFER_SIZE * sizeof(float));
+    m_current_buffer_offset = 0;
     m_waveform_sample_phase = 0;
     m_waveform_capture_column = 0;
 }
 
-void FilterBank::process(int nsamples,int pos)
+void FilterBank::captureFrame()
+{
+    // m_current_buffer_offset is the next write position, so it is also the
+    // oldest sample of the rolling buffer. Copy the two segments in time order
+    // so callers always see a linear window, whatever the host block size was.
+    const int offset = m_current_buffer_offset % BUFFER_SIZE;
+    for (int f = 0; f < NUM_FILTERS; ++f)
+    {
+        const float *src = m_filterbankbuffer.audio_buffer_2D + f * BUFFER_SIZE;
+        float *dst = m_framebuffer.audio_buffer_2D + f * BUFFER_SIZE;
+        const int first = BUFFER_SIZE - offset;
+        std::memcpy(dst, src + offset, first * sizeof(float));
+        if (offset > 0)
+            std::memcpy(dst + first, src, offset * sizeof(float));
+    }
+}
+
+void FilterBank::process(int nsamples,int pos,int output_pos)
 {
     if (m_current_buffer_offset + nsamples > m_filterbankbuffer.window_size)
         m_current_buffer_offset = 0;
     if (nsamples > m_filterbankbuffer.window_size)
         nsamples = m_filterbankbuffer.window_size;
 
+    // Host-block index of this chunk in the filter output buffer. Only the
+    // audio-output build reads it; the resampled path passes a different
+    // value than the input offset.
+    const int out_pos = output_pos >= 0 ? output_pos : pos;
+    (void)out_pos;
+
     float gain = powf(10.0f, *m_gain_db * 0.05f);
     for (int n = 0; n < nsamples; ++n)
-    { 
+    {
+#ifdef WITH_AUDIO_OUTPUT
+        // Never write past the host block: a misbehaving host or a resampled
+        // chunk that maps past the block end must not corrupt memory.
+        float *const filter_out =
+            out_pos + n < m_hostbuffer_size ? m_filter_output_buffer + out_pos + n : nullptr;
+#endif
         m_waveform_sample_phase += WAVEFORM_SAMPLES;
         int waveform_capture_column = -1;
         if (m_waveform_sample_phase >= WAVEFORM_CAPTURE_INTERVAL)
@@ -195,7 +227,8 @@ void FilterBank::process(int nsamples,int pos)
             {
                 if (currentnote == selectednote && currentharmonic == selectedharmonic)
                 {
-                    m_filter_output_buffer[n] =  x;//y1;
+                    if (filter_out)
+                        *filter_out =  x;//y1;
                 }
             }
             else
@@ -204,11 +237,13 @@ void FilterBank::process(int nsamples,int pos)
                 {
                     if (currentharmonic == 0)
                     {
-                        m_filter_output_buffer[n] = y1;
+                        if (filter_out)
+                            *filter_out = y1;
                     }
                     else
                     {
-                        m_filter_output_buffer[n] += y1;
+                        if (filter_out)
+                            *filter_out += y1;
                     }
                 }
             }

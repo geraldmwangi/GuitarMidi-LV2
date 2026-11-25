@@ -42,6 +42,11 @@ namespace GuitarMidi{
            
             AudioBuffer2D m_filterbankbuffer; //number of filters x buffersize
             AudioBuffer2D m_filterwaveformbuffer;
+            // Contiguous copy of the rolling filter output, oldest sample first.
+            // The model must never be handed a wrapped buffer: for host block
+            // sizes that do not divide BUFFER_SIZE the raw buffer is rotated,
+            // which puts a discontinuity in the middle of the analysis window.
+            AudioBuffer2D m_framebuffer;
             //filter coefficients for the filters in the filter bank for direct form II implementation
             // Per filter, per section: biquad coefficients (a0 normalized to 1)
             float m_b0[NUM_FILTERS][NUM_SECTIONS];
@@ -77,6 +82,9 @@ namespace GuitarMidi{
                 m_filterwaveformbuffer.num_filters = NUM_FILTERS;
                 m_filterwaveformbuffer.window_size = WAVEFORM_SAMPLES;
                 m_filterwaveformbuffer.audio_buffer_2D = new float[NUM_FILTERS * m_filterwaveformbuffer.window_size];
+                m_framebuffer.num_filters = NUM_FILTERS;
+                m_framebuffer.window_size = BUFFER_SIZE;
+                m_framebuffer.audio_buffer_2D = new float[NUM_FILTERS * m_framebuffer.window_size]();
                 m_current_buffer_offset = 0;
             };
             /** Releases the filter-bank output buffer. */
@@ -84,6 +92,7 @@ namespace GuitarMidi{
                 // Free the 2D audio buffer
                 delete[] m_filterbankbuffer.audio_buffer_2D;
                 delete[] m_filterwaveformbuffer.audio_buffer_2D;
+                delete[] m_framebuffer.audio_buffer_2D;
             };
 
             /** Configures filter coefficients for the requested fretboard representation. */
@@ -102,12 +111,45 @@ namespace GuitarMidi{
                 
             }
 
-            /** Processes a block of audio through all filters. */
-            void process(int nsamples,int pos=0);
+            /**
+             * Processes a block of audio through all filters. `pos` is the
+             * offset of the chunk in the input buffer; `output_pos`
+             * (audio-output build only) is its offset in the host block,
+             * which differs from `pos` on the resampled path — -1 uses
+             * `pos`. The filter-output write is clamped to the host block
+             * size announced at setup.
+             */
+            void process(int nsamples,int pos=0,int output_pos=-1);
 
             /** Returns the filter-bank output buffer. */
             AudioBuffer2D get_buffer() const{
                 return m_filterbankbuffer;
+            }
+
+            /**
+             * Copies the most recent BUFFER_SIZE output samples of every
+             * filter into a contiguous, oldest-first frame.
+             */
+            void captureFrame();
+
+            /**
+             * Returns the most recent BUFFER_SIZE output samples of every
+             * filter as a contiguous, oldest-first frame. When the rolling
+             * buffer is aligned (the caller feeds hop-aligned chunks, which
+             * FretBoard always does) that is the buffer itself and nothing is
+             * copied; otherwise captureFrame() linearises it first.
+             */
+            const float *analysisFrame()
+            {
+                if (m_current_buffer_offset % BUFFER_SIZE == 0)
+                    return m_filterbankbuffer.audio_buffer_2D;
+                captureFrame();
+                return m_framebuffer.audio_buffer_2D;
+            }
+
+            /** Returns the contiguous frame filled by captureFrame(). */
+            AudioBuffer2D get_frame_buffer() const{
+                return m_framebuffer;
             }
 
             /** Returns the signed filter responses used for waveform visualization. */
