@@ -124,6 +124,15 @@ public:
     virtual void finalize() = 0;
 
     /**
+     * @brief restart the inference worker after finalize()
+     *
+     * LV2 hosts deactivate and re-activate instances around buffer-size
+     * changes and graph edits; finalize() stops the worker, so activate
+     * must bring it back. Returns false if the model could not be reloaded.
+     */
+    virtual bool reactivate() = 0;
+
+    /**
      * @brief process audio with the filterbank and noteinferencer. The audio is processed in blocks of the size of the host buffer size.
      * If the samplerate of the host is different from the native samplerate of the plugin, the audio is resampled before being processed by the filterbank and noteinferencer.
      * The output of the noteinferencer is sent to the midi output buffer as MIDI messages.
@@ -131,6 +140,19 @@ public:
      * @param nsamples
      */
     virtual void process(int nsamples) = 0;
+
+    /** Constant pipeline delay in frames, for the host's latency compensation. */
+    virtual uint32_t getLatencyFrames() const = 0;
+
+    /** Pipeline counters and inference timings. */
+    virtual GuitarMidi::NoteInferenceStats getInferenceStats() const = 0;
+
+    /**
+     * Opt-in producer wait when the inference queue is full, in milliseconds.
+     * 0 is the real-time policy (drop the frame and report the gap); a
+     * positive value is for offline rendering, where waiting keeps every note.
+     */
+    virtual void setBackpressureMs(int milliseconds) = 0;
 
     /** Copies the latest smoothed and momentary note confidence and energy values. */
     virtual void getNoteDebugData(float *smoothed_confidences, float *smoothed_energies,

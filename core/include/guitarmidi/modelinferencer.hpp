@@ -17,127 +17,171 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
-#include <thread>
 #include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <future>
-#include <mutex>
-#include <condition_variable>
+#include <memory>
+#include <string>
+#include <thread>
 #include <guitarmidi/common.hpp>
+#include <guitarmidi/ringbuffer.hpp>
 #include <tensorflow/lite/version.h>
 #include "tensorflow/core/public/release_version.h"
 #include "tensorflow/core/public/version.h"
-#include "tensorflow/lite/version.h"
-#include "tensorflow/lite/core/interpreter_builder.h"
-#include "tensorflow/lite/interpreter.h"
-#include "tensorflow/lite/kernels/register.h"
-#include "tensorflow/lite/model_builder.h"
-#include "tensorflow/lite/optional_debug_tools.h"
-#include "tensorflow/lite/delegates/xnnpack/xnnpack_delegate.h"
-using namespace std;
+#include <tensorflow/lite/core/interpreter_builder.h>
+#include <tensorflow/lite/interpreter.h>
+#include <tensorflow/lite/kernels/register.h>
+#include <tensorflow/lite/model_builder.h>
+#include <tensorflow/lite/optional_debug_tools.h>
+#include <tensorflow/lite/delegates/xnnpack/xnnpack_delegate.h>
+
 using namespace tflite;
-//#define RING_BUFFER_SIZE 8 // Number of frames to store in the ring buffer
+
 /*
-    * ModelInferencer class for handling model inference tasks. This class contains two ringbuffers for storing the last N frames of the audio input and model output.
-        The audio input ringbuffer is used to store the last N frames of the audio input, which are then fed into the model for inference.
-         The model output ringbuffer is used to store the last N frames of the model output, which are then used to in noteinferencer.cpp to trigger MIDI messages based on the confidence of the detected notes.
-         The inferencing is performed in a separate thread to avoid blocking the audio processing thread, and the results are communicated back to the main thread using the output ringbuffer.
+ * ModelInferencer runs the neural net on its own thread so the audio thread
+ * only pays for the filter bank.
+ *
+ * The two threads communicate through two bounded, stamped queues: the audio
+ * thread queues a completed analysis frame (148 x BUFFER_SIZE rectified filter
+ * envelopes) with the index of the hop it came from, and the worker returns a
+ * 37-note probability vector with that same index. Stamps are what let
+ * NoteInferencer schedule results deterministically and notice a hole in the
+ * stream; an un-stamped queue can only guess, which is what made note timing
+ * drift under load.
+ *
+ * The worker sleeps on an atomic wait until a frame is queued. The previous
+ * implementation spun on a flag, which burned a core and starved the audio
+ * thread whenever inference became expensive.
  */
+namespace GuitarMidi
+{
+class ModelInferencer
+{
+private:
+    using InputQueue = SpscRingBuffer<NUM_NOTES * NUM_HARMONICS * BUFFER_SIZE>;
+    /* Each output slot carries the note probabilities followed by the
+     * per-note energies of the same analysis window, so the thresholds
+     * always see a coherent frame. */
+    using OutputQueue = SpscRingBuffer<NUM_NOTES * 2>;
+    using DelegatePtr = std::unique_ptr<TfLiteDelegate, void (*)(TfLiteDelegate *)>;
 
-namespace GuitarMidi{
-    //spsc ring buffer for audio input and model output with atomic read and write indices for thread safety
-    template<size_t NumSlots,size_t Stride>
-    class SpscRingBuffer{
-        float buffer[NumSlots][Stride];
-        atomic<size_t> write_index;
-        atomic<size_t> read_index;
-        atomic<uint64_t> m_new_data_promise;
-    public:
-        /** Creates an empty single-producer, single-consumer ring buffer. */
-        SpscRingBuffer():write_index(0),read_index(0),m_new_data_promise(0){
-           
-        }
-        /** Adds one fixed-size frame to the ring buffer. */
-        void add_data(const float* data){
-            size_t index=write_index.load();
-            //performant memcpy for fixed size data
-            memcpy(buffer[index&(NumSlots-1)],data,Stride*sizeof(float));
-            write_index.store((index+1)); // wrap around using bitwise AND, NumSlots must be a power of 2
-            m_new_data_promise.fetch_add(1); // signal that new data is available
-            m_new_data_promise.notify_one(); // notify any waiting threads that new data is available
+    /* Declaration order is destruction order in reverse: the interpreter
+     * must go before the delegate it was modified with, and both before the
+     * model they were built from. */
+    std::unique_ptr<FlatBufferModel> m_model;
+    DelegatePtr m_delegate{nullptr, TfLiteXNNPackDelegateDelete};
+    std::unique_ptr<Interpreter> m_interpreter;
+    InputQueue m_input_queue{RING_BUFFER_SIZE};
+    OutputQueue m_output_queue{RING_BUFFER_SIZE * 2};
 
+    std::thread m_inferencing_thread;
+    std::atomic<bool> m_stop{false};
+    std::atomic<bool> m_running{false};
+    std::atomic<uint32_t> m_wake{0};
+    std::promise<bool> m_initialization_promise;
 
+    std::atomic<uint64_t> m_infer_us_sum{0};
+    std::atomic<uint64_t> m_infer_us_max{0};
+    std::atomic<uint64_t> m_infer_count{0};
+    std::atomic<uint64_t> m_invoke_failures{0};
+    std::atomic<int> m_inference_delay_ms{0};
+    std::atomic<int> m_backpressure_ms{0};
+
+    /**
+     * Runs model inference on frames received from the audio thread. With
+     * `load` set it first builds the interpreter and reports the outcome
+     * through m_initialization_promise; a restart reuses the interpreter.
+     */
+    void inferencing_loop(bool load, std::string bundle_path, const char *model_data, std::size_t model_size);
+    /**
+     * Loads the model and allocates the interpreter. A non-null `model_data`
+     * takes precedence over the model file in the bundle. Never terminates
+     * the process: every failure is logged and reported as false.
+     */
+    bool initialize_interpreter(const std::string &bundle_path, const char *model_data, std::size_t model_size);
+    /** Starts the worker thread and waits for the interpreter to be ready. */
+    bool start_inferencing(const std::string &bundle_path, const char *model_data, std::size_t model_size);
+    /** Joins the worker thread; the interpreter stays loaded. */
+    void stop_worker();
+
+public:
+    /** Creates the model inferencer. */
+    ModelInferencer();
+    /** Stops inference and releases model resources. */
+    ~ModelInferencer();
+
+    /** Loads the model from the plugin bundle and starts the worker. */
+    bool initialize(const std::string &bundle_path);
+    /** Loads the model from an embedded in-memory buffer and starts the worker. */
+    bool initializeFromBuffer(const char *model_data, std::size_t model_size);
+    /**
+     * Stops the worker thread (LV2 deactivate). The interpreter, its
+     * delegate and the model stay loaded so restart() is cheap; they are
+     * released by the destructor.
+     */
+    void finalize();
+    /**
+     * Restarts the worker after finalize() with the interpreter that is
+     * already loaded: no model reload, no new XNNPack thread pool. Returns
+     * false if no interpreter was ever loaded; a no-op while running.
+     */
+    bool restart();
+    /** True while the worker thread is consuming frames. */
+    bool running() const { return m_running.load(std::memory_order_acquire); }
+
+    /**
+     * Sizes both queues for `frames` analysis frames in flight. One
+     * process() call queues a whole host block of hops back to back, so the
+     * input queue must hold at least that many plus the worker's slack, or
+     * frames are refused even when inference keeps up. Allocates: only call
+     * while the worker is stopped (before initialize()).
+     */
+    void setQueueCapacity(std::size_t frames);
+
+    /**
+     * Queue one analysis frame. `stamp` identifies the hop it belongs to.
+     * Returns false if the queue was full; the result is never overwritten.
+     */
+    bool add_audio_input(const float *input, uint64_t stamp);
+    /**
+     * Pop the next result. Returns false when none is ready; on success
+     * `stamp` is set to the hop the result was computed from.
+     */
+    bool get_model_output(float *output, uint64_t &stamp);
+
+    uint64_t inputDropped() const { return m_input_queue.dropped(); }
+    uint64_t invokeFailures() const { return m_invoke_failures.load(std::memory_order_relaxed); }
+    uint64_t outputDropped() const { return m_output_queue.dropped(); }
+
+    /** Mean/max wall time of one interpreter invocation, in milliseconds. */
+    double meanInferenceMs() const;
+    double maxInferenceMs() const;
+
+    /**
+     * Testing/diagnostics hook: make each inference take at least this long,
+     * so the bounded-queue and staleness behaviour can be exercised without a
+     * slow machine. 0 disables the delay.
+     */
+    void setInferenceDelayMs(int delay_ms)
+    {
+        m_inference_delay_ms.store(delay_ms, std::memory_order_relaxed);
     }
-        /** Reports whether unread data is available. */
-        bool has_new_data() {
-            return write_index.load()!=read_index.load();
-        }
 
-        void wait_for_new_data(const std::atomic<bool>& stop) {
-            while (!stop.load(std::memory_order_acquire) && !has_new_data()) {
-                auto new_data_count = m_new_data_promise.load(std::memory_order_acquire);
-                if (stop.load(std::memory_order_acquire) || has_new_data()) {
-                    return;
-                }
-                m_new_data_promise.wait(new_data_count, std::memory_order_acquire);
-            }
-        }
-
-        void wake_waiters() {
-            m_new_data_promise.fetch_add(1, std::memory_order_release);
-            m_new_data_promise.notify_all();
-        }
-        /** Copies the next unread frame into the supplied buffer. */
-        void get_latest_data(float* output){
-            size_t index=read_index.load();
-            memcpy(output,buffer[index&(NumSlots-1)],Stride*sizeof(float));
-            read_index.store((index+1)); // wrap around using bitwise AND, NumSlots must be a power of 2
-        }
-        /** Returns the next unread frame, or nullptr when none is available. */
-        float* get_latest_data(){
-            if(!has_new_data()){
-                return nullptr;
-            }
-            size_t index=read_index.load();
-            read_index.store((index+1));
-            return buffer[index&(NumSlots-1)];
-        }
-    };
-
-
-
-/*
-    * ModelInferencer class for handling model inference tasks. This class contains two ringbuffers for storing the last N frames of the audio input and model output.
-        The audio input ringbuffer is used to store the last N frames of the audio input, which are then fed into the model for inference.
-         The model output ringbuffer is used to store the last N frames of the model output, which are then used to in noteinferencer.cpp to trigger MIDI messages based on the confidence of the detected notes.
-         The inferencing is performed in a separate thread to avoid blocking the audio processing thread, and the results are communicated back to the main thread using the output ringbuffer.
-*/
-class ModelInferencer {
-    private:
-        unique_ptr<FlatBufferModel> m_model;
-        unique_ptr<Interpreter> m_interpreter;
-        SpscRingBuffer<RING_BUFFER_SIZE, NUM_NOTES*NUM_HARMONICS*BUFFER_SIZE> audio_input_buffer;
-        SpscRingBuffer<RING_BUFFER_SIZE, NUM_NOTES> model_output_buffer;
-        std::thread inferencing_thread;
-        std::atomic<bool> stop_thread{false};
-        /** Runs model inference on frames received by the input ring buffer. */
-        void inferencing_loop(const std::string& bundle_path, const char* model_data, std::size_t model_size);
-
-        bool initialize_interpreter(const std::string& bundle_path, const char* model_data, std::size_t model_size);
-        bool start_inferencing(const std::string& bundle_path, const char* model_data, std::size_t model_size);
-         std::promise<bool> m_initialization_promise;
-        
-    public:
-        /** Creates the model inferencer. */
-        ModelInferencer();
-        /** Stops inference and releases model resources. */
-        ~ModelInferencer();
-        /** Loads and initializes the model from the plugin bundle. */
-        bool initialize(const std::string& bundle_path);
-        bool initializeFromBuffer(const char* model_data, std::size_t model_size);
-        /** Queues audio frames for asynchronous inference. */
-        void add_audio_input(const float* input, int num_frames);
-        /** Retrieves inferred note activations for a block of frames. */
-        bool get_model_output(float* output, int num_frames);
+    /**
+     * How long the producer may wait for room when the queue is full.
+     *
+     * 0 (default) is the real-time policy: refuse the frame, keep the audio
+     * thread's deadline, let the consumer report the gap.
+     *
+     * A non-zero value trades the deadline for completeness, which is what an
+     * offline render wants: the host is not on a clock, so waiting for
+     * inference keeps every note instead of dropping the ones that arrive
+     * while the model is busy.
+     */
+    void setBackpressureMs(int milliseconds)
+    {
+        m_backpressure_ms.store(milliseconds, std::memory_order_relaxed);
+    }
 };
 } // namespace GuitarMidi

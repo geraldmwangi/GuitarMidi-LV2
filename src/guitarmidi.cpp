@@ -36,7 +36,6 @@
 #include <lv2logger.hpp>
 
 
-LoggerSingleton g_logger;
 typedef enum
 {
 	FRETBOARD_INPUT = 0,
@@ -57,16 +56,28 @@ typedef enum
 
 #ifdef WITH_AUDIO_OUTPUT
 static constexpr uint32_t DEBUG_DATA_PORT = 14;
+static constexpr uint32_t LATENCY_PORT = 15;
+static constexpr uint32_t FREEWHEEL_PORT = 16;
 #else
 static constexpr uint32_t DEBUG_DATA_PORT = 10;
+static constexpr uint32_t LATENCY_PORT = 11;
+static constexpr uint32_t FREEWHEEL_PORT = 12;
 #endif
 static constexpr uint32_t FILTER_WAVEFORM_SAMPLES = 64;
+
+/* Deadline of the producer waits while the host is free-wheeling (offline
+ * render). A healthy pipeline needs a few ms per hop; this only bounds
+ * pathological cases so a render can finish instead of hanging. */
+static constexpr int FREEWHEEL_BACKPRESSURE_MS = 200;
 
 struct GuitarMidiPlugin
 {
 	FretBoardAPI *fretboard;
 	LV2_Atom_Sequence *debug_output = nullptr;
 	LV2_Atom_Forge debug_forge;
+	float *latency_output = nullptr;
+	float *freewheel_input = nullptr;
+	bool freewheel_active = false;
 	float debug_tick = 0.0f;
 	uint64_t debug_samples_since_update = 0;
 	uint64_t debug_update_interval_samples = 2400;
@@ -133,7 +144,7 @@ instantiate(const LV2_Descriptor *descriptor,
 	// get the sample rate and buffer size from the host options
 	if (options)
 	{
-		for (int o = 0; o < options[o].key; o++)
+		for (int o = 0; options[o].key; o++)
 		{
 			if (options[o].key == urids.samplerate)
 			{
@@ -177,6 +188,17 @@ connect_port(LV2_Handle instance,
 	if (port == DEBUG_DATA_PORT)
 	{
 		plugin->debug_output = (LV2_Atom_Sequence *)data;
+		return;
+	}
+	if (port == LATENCY_PORT)
+	{
+		plugin->latency_output = (float *)data;
+		return;
+	}
+	if (port == FREEWHEEL_PORT)
+	{
+		// connectionOptional: the host may leave this at NULL.
+		plugin->freewheel_input = (float *)data;
 		return;
 	}
 
@@ -245,7 +267,12 @@ activate(LV2_Handle instance)
 {
 	// lv2_log_note(&g_logger, "Activating GuitarMidi-LV2 Plugin\n");
 	g_logger.info( "Activating GuitarMidi-LV2 Plugin\n");
-	// FretBoardAPI *notecl = (FretBoardAPI *)instance;
+	GuitarMidiPlugin *plugin = (GuitarMidiPlugin *)instance;
+	// deactivate() stopped the inference worker; hosts deactivate and
+	// re-activate around buffer-size changes and graph edits and expect a
+	// working plugin afterwards.
+	if (!plugin->fretboard->reactivate())
+		g_logger.error("Failed to restart the inference worker on activation\n");
 }
 
 static void
@@ -256,6 +283,20 @@ run(LV2_Handle instance, uint32_t n_samples)
 	timespec start = timer_start();
 #endif
 	GuitarMidiPlugin *plugin = (GuitarMidiPlugin *)instance;
+	if (plugin->latency_output)
+		*plugin->latency_output = (float)plugin->fretboard->getLatencyFrames();
+	// lv2:freeWheeling: hosts set this while rendering offline (export,
+	// freewheeling). Switch the pipeline from the real-time drop policy to
+	// the bounded hand-off so the render keeps every note at real-time
+	// timing, and back when the host returns to real time.
+	const bool freewheeling = plugin->freewheel_input != nullptr &&
+	                          *plugin->freewheel_input >= 0.5f;
+	if (freewheeling != plugin->freewheel_active)
+	{
+		plugin->freewheel_active = freewheeling;
+		plugin->fretboard->setBackpressureMs(
+			freewheeling ? FREEWHEEL_BACKPRESSURE_MS : 0);
+	}
 	plugin->fretboard->process(n_samples);
 	if (plugin->debug_output)
 	{

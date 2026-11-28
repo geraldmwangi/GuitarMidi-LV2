@@ -62,6 +62,21 @@ The plugin exposes several LV2 control ports to tune detection behavior. The val
 
 These controls let you balance sensitivity and stability for your guitar signal and playing style.
 
+The plugin also exposes an output control port **Latency** (`lv2:latency`): the
+pipeline's detection-delay bound in frames, scaled to the host sample rate and
+block size, so the host can compensate for it. No note-on is ever emitted
+later than this bound.
+See [docs/inference-timing.md](docs/inference-timing.md) for how results are
+scheduled and what the number includes.
+
+For offline rendering there is an input control port **Free-wheeling**
+(`lv2_freewheel`, designation `lv2:freeWheeling`), set by hosts while they
+process faster than real time (export, freewheeling; Ardour and mod-host do
+this). While it is set the pipeline switches to a bounded hand-off with the
+inference worker so the render keeps every note with real-time timing; hosts
+that do not use it are unaffected (the port is optional and defaults to
+real-time behaviour).
+
 # Model description (written with AI)
 The neural network model in this project is designed to analyze guitar audio and predict which notes are being played, converting the sound into MIDI data for music production. Here's a simple explanation for non-experts:
 
@@ -90,6 +105,14 @@ The process is like breaking down the guitar sound into manageable pieces and th
 6. **Output**: The model combines the per-string predictions into a final output of 37 possible notes (covering the guitar's range from low E to high E). It uses a special "sparse guitar output" layer that maps string/fret combinations to MIDI notes, ensuring only valid guitar notes are predicted. The output is probabilities (0-1) for each note, using multiple softmax activations for multi-label detection (multiple notes can be active at once).
 ## Latency Measurements
 The plugin has a build option WITH_AUDIO_OUTPUT which you can activate to output short blips on the onsets. My measurements show a latency of 4ms for the high open e (330Hz) and 16ms for the low E (82Hz). The higher the note, the lower the latency.
+
+That figure is the detector's onset response. The end-to-end delay from the
+audio to the emitted note also contains the analysis hop, the scheduling delay
+and the confidence smoothing, and the plugin reports the deterministic part on
+its **Latency** output port. `tools/latency_report` measures the whole chain
+offline; [docs/inference-timing.md](docs/inference-timing.md) has the method and
+the numbers, including a before/after comparison of the old and the current
+worker-thread hand-off.
 
 ## Key Technical Details 
 - **Architecture**: Convolutional Neural Network (CNN) with transformer elements, specialized for guitar.
@@ -146,6 +169,18 @@ cmake --install .
 The core ships a headless test harness that drives the processing pipeline (filterbank + model inference) over many samplerate/blocksize combinations, without a plugin host. Build it with `-DGUITARMIDI_BUILD_TEST_HARNESS=ON` and see [core/test/README.md](core/test/README.md) for usage.
 
 Point your lv2 host to ~/.lv2 (Ardour and Carla will autmatically search in this directory on debian based systems)
+
+## Tests and measurements
+`BUILD_TESTS` (default on) builds the unit and pipeline tests and registers them with CTest; `BUILD_TOOLS` (default on) builds the offline measurement tool. Both need the model in `python/neuralnetmodelling/`.
+
+```bash
+ctest --test-dir build --output-on-failure
+
+# Per-note latency/jitter of the detection pipeline:
+./build/tools/latency_report --model python/neuralnetmodelling --block 300 --realtime 1 --notes 8
+```
+
+See [docs/inference-timing.md](docs/inference-timing.md) for what each test covers and the before/after numbers.
 
 # Acknowledgments
 I'd like to thank the team at https://synthtab.dev/ for the great dataset they put out.
